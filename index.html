@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#191E1B">
+<title>O Sindicato dos Dados — UC6 Criar e Manter Banco de Dados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;600;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+/* ---------- capa ---------- */
+.capa-grade{display:grid;grid-template-columns:1.35fr .65fr;gap:40px;align-items:start;margin-top:34px}
+.carimbo{animation:bater .5s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes bater{from{transform:rotate(-6deg) scale(2.4);opacity:0}to{transform:rotate(-6deg) scale(1);opacity:.86}}
+
+/* ---------- painel de hoje ---------- */
+.hoje{
+  border:2px solid var(--tinta);background:var(--papel);
+  box-shadow:7px 7px 0 var(--tinta);
+  padding:22px 24px 24px
+}
+.hoje-rotulo{background:var(--tinta);color:var(--papel);display:inline-block;padding:4px 12px;font-size:13px;margin-bottom:14px}
+.hoje h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:29px;line-height:1.04}
+.hoje-linha{display:flex;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--borda);font-size:16.5px}
+.hoje-linha dt{min-width:76px;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:13px;font-weight:600;color:var(--tinta-fraca);padding-top:3px}
+.hoje-linha dd{flex:1}
+
+/* ---------- seções ---------- */
+.secao{padding:60px 0;border-top:2px solid var(--tinta)}
+.secao-cab{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
+.secao-num{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--carimbo);font-weight:700}
+.secao h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:clamp(30px,5.5vw,46px);line-height:1}
+.secao-sub{max-width:60ch;margin-bottom:30px;font-size:18px;color:var(--tinta-fraca)}
+
+/* ---------- atos ---------- */
+.ato{border-bottom:1px solid var(--borda)}
+.ato-btn{
+  width:100%;background:none;border:none;cursor:pointer;text-align:left;
+  display:grid;grid-template-columns:58px 1fr auto;gap:18px;align-items:center;
+  padding:19px 4px;color:inherit;font-family:inherit
+}
+.ato-btn:hover{background:var(--papel-barra)}
+.ato-btn:focus-visible{outline:2px solid var(--carimbo);outline-offset:-2px}
+.ato-num{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:34px;color:var(--carimbo);line-height:1}
+.ato-tit{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:21px;line-height:1.1}
+.ato-dias{font-size:13px;color:var(--tinta-fraca);letter-spacing:.08em;font-family:'JetBrains Mono',monospace}
+.ato-sinal{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--carimbo)}
+.ato-corpo{display:none;padding:4px 4px 30px 76px}
+.ato.aberto .ato-corpo{display:block}
+.ato-corpo h4{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:13px;color:var(--tinta-fraca);margin:20px 0 7px;font-weight:600}
+.ato-corpo ul{margin-left:19px}
+.ato-corpo li{margin-bottom:5px}
+.entrega{border-left:3px solid var(--carimbo);padding:9px 0 9px 14px;margin-top:18px;font-style:italic}
+
+/* ---------- livro-caixa ---------- */
+.filtros{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px}
+.filtro{
+  font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:13px;font-weight:600;
+  padding:7px 14px;border:1.5px solid var(--tinta);background:none;cursor:pointer;color:var(--tinta)
+}
+.filtro[aria-pressed="true"]{background:var(--tinta);color:var(--papel)}
+.filtro:focus-visible{outline:2px solid var(--carimbo);outline-offset:2px}
+
+.livro{border:2px solid var(--tinta);background:var(--papel)}
+.livro-cab,.livro-lin{display:grid;grid-template-columns:52px 1fr 128px 92px;gap:14px;padding:9px 16px;align-items:baseline}
+.livro-cab{background:var(--tinta);color:var(--papel);font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.11em;font-size:12.5px;font-weight:600;position:sticky;top:44px;z-index:10}
+.livro-lin{border-top:1px solid var(--papel-linha);cursor:pointer;width:100%;text-align:left;background:none;font-family:inherit;color:inherit;font-size:17.5px}
+.livro-lin:nth-of-type(even){background:var(--papel-barra)}
+.livro-lin:hover{background:#D2DCC6}
+.livro-lin:focus-visible{outline:2px solid var(--carimbo);outline-offset:-2px}
+.lin-dia{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--carimbo);font-weight:700}
+.lin-op b{display:block;font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:19px;text-transform:uppercase;letter-spacing:.02em}
+.lin-det{display:none;font-size:16px;color:var(--tinta-fraca);margin-top:6px;padding-right:10px}
+.livro-lin.aberto .lin-det{display:block}
+.lin-ind{font-family:'JetBrains Mono',monospace;font-size:13px}
+.lin-ato{font-family:'Saira Condensed',sans-serif;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-fraca)}
+
+/* ---------- arsenal ---------- */
+.grade2{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+.cheat{border:2px solid var(--tinta);padding:18px 20px 20px}
+.cheat h3{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;font-size:20px;margin-bottom:4px;font-weight:800}
+.cheat p{font-size:15.5px;color:var(--tinta-fraca);margin-bottom:12px}
+.cheat code{
+  display:block;font-family:'JetBrains Mono',monospace;font-size:14px;
+  background:var(--tinta);color:#CFE0C4;padding:9px 11px;margin-bottom:6px;
+  white-space:pre-wrap;word-break:break-word;line-height:1.5
+}
+.links{list-style:none}
+.links li{border-bottom:1px solid var(--borda)}
+.links a{display:block;padding:13px 0;text-decoration:none;color:var(--tinta)}
+.links a:hover strong,.links a:focus-visible strong{color:var(--carimbo);text-decoration:underline}
+.links strong{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;font-size:18px;letter-spacing:.03em;font-weight:600}
+.links span{display:block;font-size:15.5px;color:var(--tinta-fraca)}
+
+/* ---------- chamada do caderno ---------- */
+.caderno-chamada{
+  display:block;position:relative;margin-top:34px;padding:20px 60px 22px 22px;
+  border:2px solid var(--tinta);box-shadow:7px 7px 0 var(--tinta);
+  text-decoration:none;color:var(--tinta);background:var(--papel)
+}
+.caderno-chamada:hover,.caderno-chamada:focus-visible{background:var(--papel-barra);outline:none}
+.caderno-chamada .rot{font-size:12.5px;color:var(--carimbo)}
+.caderno-chamada b{display:block;font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:31px;line-height:1;margin:4px 0 7px}
+.cc-txt{display:block;max-width:62ch;font-size:16.5px;color:var(--tinta-fraca)}
+.cc-seta{position:absolute;right:22px;top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:26px;color:var(--carimbo)}
+.caderno-chamada:hover .cc-seta{right:16px}
+
+/* ---------- placar ---------- */
+.celulas{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:16px}
+.celula{border:2px solid var(--tinta);padding:15px 17px;position:relative}
+.celula-xp{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:31px;color:var(--latao);line-height:1}
+.celula h3{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;font-size:20px;font-weight:800;margin:5px 0 2px}
+.celula p{font-size:15px;color:var(--tinta-fraca)}
+.patente{display:inline-block;margin-top:9px;border:1.5px solid var(--latao);color:var(--latao);font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:600;padding:3px 9px}
+
+/* ---------- ficha ---------- */
+.ind{display:grid;grid-template-columns:34px 1fr;gap:16px;padding:15px 0;border-bottom:1px solid var(--borda);align-items:start}
+.ind-n{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:25px;color:var(--carimbo);line-height:1}
+.ind b{display:block;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;font-size:18px;letter-spacing:.02em;font-weight:600;margin-bottom:3px}
+.ind span{font-size:16px;color:var(--tinta-fraca)}
+.mencao{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px}
+.mencao div{border:1.5px solid var(--tinta);padding:9px 14px;font-size:15px}
+.mencao b{font-family:'JetBrains Mono',monospace;color:var(--carimbo)}
+
+/* ---------- quadro de filiados ---------- */
+.quadro{display:grid;grid-template-columns:repeat(auto-fill,minmax(254px,1fr));gap:16px}
+.fich{border:2px solid var(--tinta);background:var(--papel);padding:15px 17px;position:relative;overflow:hidden}
+.fich::after{
+  content:"Filiado";position:absolute;right:-20px;top:13px;
+  font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;
+  font-size:12px;letter-spacing:.2em;color:var(--carimbo);border:2px solid var(--carimbo);
+  padding:2px 26px;transform:rotate(14deg);opacity:.32;pointer-events:none
+}
+.fich-topo{display:flex;align-items:center;gap:13px}
+.fich-topo>div{padding-right:46px;min-width:0}
+.fich-sem{width:60px;height:60px;flex:none;border:2px solid var(--borda);background:var(--papel-barra);display:flex;align-items:center;justify-content:center;font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:23px;letter-spacing:.02em;color:var(--tinta-fraca)}
+.fich.chefia{border-color:var(--latao);box-shadow:inset 0 0 0 1px var(--latao)}
+.fich.chefia::after{content:"Chefia";color:var(--latao);border-color:var(--latao);opacity:.4}
+.fich img{width:60px;height:60px;flex:none;object-fit:cover;border:2px solid var(--tinta);background:var(--papel-barra);filter:grayscale(1) contrast(1.05)}
+.fich:hover img{filter:none}
+.fich-mat{display:block;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--carimbo)}
+.fich h3{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:20px;line-height:1.08;margin-top:3px}
+.fich-baixo{margin-top:13px;padding-top:10px;border-top:1px solid var(--borda);display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.fich-baixo a{font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--tinta);text-decoration:none;border-bottom:1px solid var(--borda)}
+.fich-baixo a:hover,.fich-baixo a:focus-visible{color:var(--carimbo);border-bottom-color:var(--carimbo)}
+.fich-cel{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.11em;font-size:12px;font-weight:600;color:var(--tinta-fraca)}
+.fich.vaga{border-style:dashed;border-color:var(--borda);display:flex;flex-direction:column;justify-content:center}
+.fich.vaga::after{display:none}
+.fich.vaga b{display:block;font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:19px;margin-bottom:5px}
+.fich.vaga span{font-size:15px;color:var(--tinta-fraca)}
+.filiar{border:2px solid var(--tinta);box-shadow:7px 7px 0 var(--tinta);background:var(--papel);padding:20px 22px 22px;margin-top:30px}
+.filiar h3{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:24px;margin-bottom:4px}
+.filiar ol{margin:12px 0 0 22px;max-width:70ch}
+.filiar li{margin-bottom:7px}
+.filiar pre{font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.55;background:var(--tinta);color:#CFE0C4;padding:13px 15px;margin:14px 0;white-space:pre-wrap;max-width:58ch;border-left:4px solid var(--carimbo)}
+
+@media(max-width:860px){
+  .secao{padding:40px 0}
+  .secao-sub{margin-bottom:22px;font-size:17px}
+  .capa-grade,.grade2{grid-template-columns:1fr;gap:26px}
+  .carimbo{justify-self:start}
+  .hoje{padding:18px 17px 20px;box-shadow:5px 5px 0 var(--tinta)}
+  .hoje h2{font-size:25px}
+  .hoje-linha{flex-direction:column;gap:2px}
+  .hoje-linha dt{padding-top:0}
+
+  .livro-cab{display:none}
+  .livro-lin{grid-template-columns:42px 1fr;gap:4px 12px;padding:14px 13px}
+  .lin-ind,.lin-ato{grid-column:2;font-size:11.5px}
+  .lin-op b{font-size:17.5px}
+
+  .ato-btn{grid-template-columns:38px 1fr auto;gap:13px;padding:16px 2px}
+  .ato-num{font-size:26px}
+  .ato-tit{font-size:19px}
+  .ato-corpo{padding:2px 2px 24px 0}
+
+  .cheat code{font-size:13px}
+  .caderno-chamada{padding:17px 46px 18px 17px;box-shadow:5px 5px 0 var(--tinta)}
+  .caderno-chamada b{font-size:26px}
+  .celulas{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .quadro{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+  .filiar{padding:18px 16px 20px;box-shadow:5px 5px 0 var(--tinta)}
+  .mencao div{font-size:14px;padding:8px 11px}
+}
+@media(max-width:420px){
+  .celulas{grid-template-columns:1fr 1fr}
+  .quadro{grid-template-columns:1fr}
+  .filtros{gap:6px}
+  .filtro{flex:1;min-width:calc(33.33% - 4px)}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav" data-pagina="index.html"></nav>
+
+
+<header class="capa env" id="hoje">
+  <div class="classif rot">
+    <span>Dossiê A-279 · Uso interno</span>
+    <span id="cabDia">Operação 01 de 27</span>
+    <span>108 horas · 15h–19h</span>
+  </div>
+
+  <h1 class="titulo">O Sindicato<br>dos <em>Dados</em></h1>
+  <p class="subtitulo">Ninguém nesta cidade guarda informação melhor que a gente. Você entrou como novato. Em 27 operações, ou sai daqui sabendo projetar, construir e defender um banco de dados — ou não sai.</p>
+
+  <div class="capa-grade">
+    <section class="hoje" aria-labelledby="tHoje">
+      <span class="hoje-rotulo rot">Operação de hoje</span>
+      <h2 id="tHoje">—</h2>
+      <dl>
+        <div class="hoje-linha"><dt>Objetivo</dt><dd id="hjObj">—</dd></div>
+        <div class="hoje-linha"><dt>Em sala</dt><dd id="hjSala">—</dd></div>
+        <div class="hoje-linha"><dt>Entrega</dt><dd id="hjEnt">—</dd></div>
+      </dl>
+    </section>
+    <div class="carimbo"><b>Confidencial</b><span>Célula ES · Senac</span></div>
+  </div>
+</header>
+
+<section class="secao env" id="atos">
+  <div class="secao-cab"><span class="secao-num">I</span><h2>Os seis atos</h2></div>
+  <p class="secao-sub">O caminho do novato até chefe de família. Toque em um ato para abrir o conteúdo.</p>
+  <div id="listaAtos"></div>
+</section>
+
+<section class="secao env" id="livro">
+  <div class="secao-cab"><span class="secao-num">II</span><h2>O livro-caixa</h2></div>
+  <p class="secao-sub">As 27 operações, uma por dia. Cada linha registra o que foi feito e qual indicador da competência ela marca. Toque numa linha para ver o detalhe.</p>
+  <div class="filtros" id="filtros"></div>
+  <div class="livro">
+    <div class="livro-cab"><span>Dia</span><span>Operação</span><span>Ato</span><span>Indicador</span></div>
+    <div id="linhas"></div>
+  </div>
+</section>
+
+<section class="secao env" id="arsenal">
+  <div class="secao-cab"><span class="secao-num">III</span><h2>Arsenal</h2></div>
+  <p class="secao-sub">Comandos de bolso e os campos de treino externos.</p>
+  <div class="grade2">
+    <div id="cheats"></div>
+    <div>
+      <h3 class="rot" style="font-size:14px;color:var(--tinta-fraca);margin-bottom:6px">Campos de treino</h3>
+      <ul class="links" id="links"></ul>
+    </div>
+  </div>
+
+  <a class="caderno-chamada" href="caderno.html">
+    <span class="rot">Material completo</span>
+    <b>O Caderno</b>
+    <span class="cc-txt">Todo o conteúdo da unidade em oito partes: banco de dados, SQL, CRUD, LGPD, glossário e gabarito lacrado. Consulta liberada durante as operações.</span>
+    <span class="cc-seta" aria-hidden="true">→</span>
+  </a>
+</section>
+
+<section class="secao env" id="placar">
+  <div class="secao-cab"><span class="secao-num">IV</span><h2>Placar das células</h2></div>
+  <p class="secao-sub">XP acumulado por equipe. Atualizado no debriefing, todo dia às 18h30.</p>
+  <div class="celulas" id="celulas"></div>
+</section>
+
+<section class="secao env" id="filiados">
+  <div class="secao-cab"><span class="secao-num">V</span><h2>Quadro de filiados</h2></div>
+  <p class="secao-sub">Quem assinou o contrato do Sindicato. A ficha entra sozinha aqui assim que voc&ecirc; se filia &mdash; e o quadro sai do banco de dados, n&atilde;o do c&oacute;digo desta p&aacute;gina.</p>
+  <div class="quadro" id="quadro" aria-live="polite"></div>
+
+  <div class="filiar" id="filiar">
+    <h3>Como colocar a sua ficha</h3>
+    <ol>
+      <li>Clique em <b>Filiar-se</b> aqui embaixo.</li>
+      <li>Escolha e-mail e senha &mdash; ou entre com a sua conta do <b>GitHub</b>, que j&aacute; traz a foto pronta.</li>
+      <li>Digite o <b>c&oacute;digo da turma</b>, aquele que eu ditei em sala. Sem ele a ficha n&atilde;o é carimbada.</li>
+      <li>Pronto: sua ficha aparece neste quadro e a porta da <b>sala dos fundos</b> abre.</li>
+    </ol>
+    <p class="fraco" style="font-size:16px;margin-top:14px">A foto vem do seu perfil do GitHub quando voc&ecirc; informa o usu&aacute;rio; sem isso o quadro usa suas iniciais. Nada de enviar foto.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+      <a class="btn" href="entrar.html">Filiar-se</a>
+      <a class="btn vazado" href="forum.html">Ver a sala dos fundos</a>
+    </div>
+  </div>
+</section>
+
+<section class="secao env" id="ficha">
+  <div class="secao-cab"><span class="secao-num">VI</span><h2>Ficha do agente</h2></div>
+  <p class="secao-sub">Você não é avaliado por prova. É avaliado por estes quatro indicadores, e cada operação do livro-caixa marca um deles.</p>
+  <div id="indicadores"></div>
+  <div class="mencao">
+    <div><b>A</b> — Atendido</div>
+    <div><b>PA</b> — Parcialmente atendido, cabe missão de recuperação</div>
+    <div><b>NA</b> — Não atendido</div>
+    <div><b>D</b> — Competência desenvolvida ao fim da UC</div>
+  </div>
+  <p style="margin-top:22px;font-size:16px" class="fraco">Frequência mínima de 75%. Todos os quatro indicadores precisam chegar a <span class="mono">A</span> até a última operação.</p>
+</section>
+
+<footer class="rodape env">
+  <p class="rot" style="font-size:13px">UC6 · Criar e Manter Banco de Dados · Técnico em Desenvolvimento de Sistemas</p>
+</footer>
+
+<script>
+/* ==========================================================================
+   DADOS — É SÓ AQUI QUE VOCÊ EDITA.
+   Troque textos, adicione operações, mude o XP das células. O site se remonta
+   sozinho. Depois é só dar commit no GitHub.
+   ========================================================================== */
+const DADOS = {
+
+  /* Qual operação é a de hoje. Mude este número todo dia. */
+  diaAtual: 1,
+
+  /* Quadro de filiados de reserva. O quadro de verdade vem do banco de dados,
+     preenchido sozinho quando o aluno se cadastra em entrar.html. Esta lista só
+     aparece enquanto o Supabase não estiver configurado — ou se ele cair. */
+  alunos: [
+    {nome:"Laranja",              github:"octocat",      celula:"Docente"},
+    {nome:"Maria Fernanda Alves", github:"torvalds",     celula:"Alfa"},
+    {nome:"João Pedro Ramos",     github:"gaearon",      celula:"Bravo"},
+    {nome:"Beatriz Nogueira",     github:"sindresorhus", celula:"Charlie"}
+  ],
+
+  atos: [
+    { num:"I", nome:"A escolha do cofre", dias:"Dias 1–5",
+      objetivo:"Entender o que é um banco de dados, distinguir os sete tipos e escolher um SGBD com argumento.",
+      conteudos:["O que é banco de dados: tabelas, registros, atributos","Boas práticas de nomenclatura: minúsculas, snake_case, prefixos","Bancos relacionais e não relacionais (NoSQL)","Hierárquico, em rede, orientado a objetos, em memória, distribuído","ACID e consistência eventual","SGBD: funções, concorrência, backup, indexação"],
+      atividades:["Banco de dados humano — a turma vira a tabela e você executa SELECT em voz alta","Speed dating de SGBD — cada célula defende um sistema diante de um cliente-cenário"],
+      entrega:"Relatório de inteligência: resenha crítica recomendando um tipo de banco e um SGBD para a startup do estudo de caso." },
+
+    { num:"II", nome:"A planta do prédio", dias:"Dias 6–11",
+      objetivo:"Modelar um banco antes de escrever uma linha de código.",
+      conteudos:["Entidades, atributos e relacionamentos (MER)","Cardinalidade 1:1, 1:N, N:M","Diagrama de Entidade-Relacionamento (DER) e seus símbolos","Chave primária e chave estrangeira","Integridade referencial","Normalização: 1FN, 2FN, 3FN"],
+      atividades:["Post-it storming — amarelo é entidade, rosa é atributo, verde é relacionamento","Barbante e cadeiras — cardinalidade fica óbvia quando um aluno segura três barbantes","A tabela imunda — recortar uma planilha horrível e remontar normalizada"],
+      entrega:"DER completo de um sistema real, feito no brModelo ou dbdiagram.io e commitado no repositório da célula." },
+
+    { num:"III", nome:"As chaves", dias:"Dias 12–19",
+      objetivo:"Escrever SQL com fluência nas cinco categorias da linguagem.",
+      conteudos:["DDL: CREATE, ALTER, DROP e tipos de dados","Restrições: NOT NULL, UNIQUE, CHECK, DEFAULT","Índices: primário, único, não único","DML: INSERT, UPDATE, DELETE","DQL: SELECT, WHERE, ORDER BY, DISTINCT, GROUP BY, funções de agregação","JOIN entre tabelas","TCL: transações, COMMIT, ROLLBACK","DCL: usuários, GRANT, REVOKE"],
+      atividades:["Deck de cartas SQL — montar a query mais elegante em cinco minutos","Caça ao bug — script quebrado no GitHub, quem abre a Issue certa primeiro leva XP","Boss: SQL Murder Mystery, resolvido só com SELECT e JOIN"],
+      entrega:"Banco da célula criado, populado e consultado. Script versionado com histórico de commits legível." },
+
+    { num:"IV", nome:"A operação", dias:"Dias 20–22",
+      objetivo:"Ligar o banco à aplicação e fazer o CRUD rodar de verdade.",
+      conteudos:["Conexão da aplicação com o SGBD","Create, Read, Update e Delete a partir do código","Tratamento de erro na operação com o banco","Manutenção e edição de banco em produção"],
+      atividades:["A ponte — primeira conexão da aplicação orientada a objetos com a tabela","Auditoria cruzada — a célula A revisa o banco da célula B por Pull Request, com checklist"],
+      entrega:"Aplicação executando as quatro operações do CRUD sobre o banco da célula." },
+
+    { num:"V", nome:"A batida", dias:"Dias 23–25",
+      objetivo:"Defender o banco juridicamente e sobreviver a uma migração.",
+      conteudos:["LGPD: dado pessoal, dado sensível, titular, tratamento","Princípios legais e direitos do titular","Controlador, operador e o encarregado (DPO)","ANPD: fiscalização e penalidades","Transferência internacional de dados","Conversão de banco: análise, mapeamento, extração, transformação, carga, validação, otimização","Desafios da migração e ferramentas"],
+      atividades:["Tribunal da LGPD — empresa contra ANPD, com júri, citando artigo e princípio","Mudança de cofre — migrar um CSV bagunçado para o banco modelado, e validar"],
+      entrega:"Parecer de conformidade do banco da célula e log da migração executada." },
+
+    { num:"VI", nome:"A última entrega", dias:"Dias 26–27",
+      objetivo:"Apresentar o banco pronto, documentado e defensável.",
+      conteudos:["Documentação técnica no README","Apresentação do produto","Articulação com o Projeto Integrador"],
+      atividades:["Montagem final e revisão da documentação","Apresentação para a turma, com arguição"],
+      entrega:"Banco de dados funcional, aplicação conectada, documentação no GitHub e defesa oral de dez minutos." }
+  ],
+
+  /* ind: quais indicadores da competência a operação marca */
+  operacoes: [
+    {d:1,ato:"I",t:"O recrutamento",ind:"—",det:"Contrato do Sindicato, formação das células, codinomes, tour pelo site e pelo GitHub. Primeira query rodando no DB Fiddle ainda hoje, sem instalar nada."},
+    {d:2,ato:"I",t:"O que a gente guarda",ind:"2",det:"O que é banco de dados. Tabelas, registros e atributos. Nomenclatura: minúsculas, snake_case, nome descritivo, prefixos. Atividade do banco de dados humano."},
+    {d:3,ato:"I",t:"Sete cofres",ind:"2",det:"Relacional, NoSQL, hierárquico, em rede, orientado a objetos, em memória e distribuído. ACID contra consistência eventual. Speed dating de SGBD."},
+    {d:4,ato:"I",t:"O porteiro",ind:"3",det:"O que faz um SGBD: armazenamento, transações, concorrência, segurança, backup, indexação. Instalação do SGBD escolhido e primeiro acesso."},
+    {d:5,ato:"I",t:"Relatório de inteligência",ind:"2 · 3",det:"Situações de aprendizagem 2.7 e 2.8 do caderno. Resenha crítica escolhendo tipo de banco e SGBD para dois cenários, com justificativa de negócio."},
+    {d:6,ato:"II",t:"Entidades e atributos",ind:"4",det:"MER: o que vira entidade, o que vira atributo. Post-it storming sobre um negócio real da cidade."},
+    {d:7,ato:"II",t:"Quem se liga a quem",ind:"4",det:"Relacionamentos e cardinalidade 1:1, 1:N e N:M. Atividade do barbante e das cadeiras."},
+    {d:8,ato:"II",t:"A planta no papel",ind:"4",det:"DER e seus símbolos. Modelagem no brModelo ou dbdiagram.io, que já gera o SQL a partir do desenho."},
+    {d:9,ato:"II",t:"A tabela imunda",ind:"4",det:"Normalização até a 3FN. Recortar uma planilha caótica em cartolina e remontar em tabelas limpas."},
+    {d:10,ato:"II",t:"As chaves da casa",ind:"4",det:"Chave primária, chave estrangeira e integridade referencial. Por que um pedido órfão quebra o sistema."},
+    {d:11,ato:"II",t:"Boss: a planta do zero",ind:"4",det:"Cada célula recebe um briefing lacrado e tem o dia para entregar o DER completo, normalizado e defendido diante da turma."},
+    {d:12,ato:"III",t:"Abrindo o cofre — DDL",ind:"4",det:"CREATE DATABASE, CREATE TABLE, tipos de dados INTEGER, VARCHAR, DATE, DECIMAL. Traduzir o DER do Ato II em código."},
+    {d:13,ato:"III",t:"Regras da casa",ind:"4",det:"ALTER e DROP. Restrições NOT NULL, UNIQUE, CHECK, DEFAULT, AUTO_INCREMENT. Índices e por que a consulta fica rápida."},
+    {d:14,ato:"III",t:"Movimentando — DML",ind:"1",det:"INSERT, UPDATE e DELETE. O perigo do DELETE sem WHERE, demonstrado ao vivo."},
+    {d:15,ato:"III",t:"Perguntando — DQL",ind:"1",det:"SELECT, WHERE, operadores lógicos, LIKE, BETWEEN, IN. Deck de cartas SQL em duplas."},
+    {d:16,ato:"III",t:"Organizando a resposta",ind:"1",det:"ORDER BY, LIMIT, DISTINCT, COUNT, SUM, AVG, MAX, MIN e GROUP BY com HAVING."},
+    {d:17,ato:"III",t:"Costurando tabelas — JOIN",ind:"1",det:"INNER JOIN e LEFT JOIN. Consultar duas e três tabelas de uma vez. O dia mais difícil do ato."},
+    {d:18,ato:"III",t:"Cofre e cadeado — TCL e DCL",ind:"1",det:"START TRANSACTION, COMMIT, ROLLBACK. CREATE USER, GRANT e REVOKE. Quem pode ver o quê dentro do Sindicato."},
+    {d:19,ato:"III",t:"Boss: caso de assassinato",ind:"1",det:"SQL Murder Mystery cronometrado, em célula. Só se resolve com SELECT, WHERE e JOIN. Quem entrega o culpado com a query correta leva a patente."},
+    {d:20,ato:"IV",t:"A ponte",ind:"1",det:"Conectar a aplicação orientada a objetos ao SGBD: driver, string de conexão, primeiro SELECT vindo do código."},
+    {d:21,ato:"IV",t:"CRUD completo",ind:"1",det:"Create, Read, Update e Delete funcionando pela interface da aplicação, com tratamento de erro."},
+    {d:22,ato:"IV",t:"Auditoria cruzada",ind:"1",det:"Cada célula revisa o banco de outra por Pull Request, seguindo checklist de nomenclatura, chaves, normalização e restrições."},
+    {d:23,ato:"V",t:"A lei chega",ind:"1",det:"LGPD: dado pessoal e sensível, titular, tratamento, princípios legais, direitos do titular, controlador, operador, DPO, ANPD e penalidades."},
+    {d:24,ato:"V",t:"Tribunal",ind:"1",det:"Júri simulado sobre um vazamento, com as situações 5.9 e 5.10 do caderno como base da acusação e da defesa."},
+    {d:25,ato:"V",t:"Mudança de cofre",ind:"1 · 4",det:"Conversão de banco: análise, mapeamento, extração, transformação, carga, validação e otimização. Migrar um arquivo sujo para o banco da célula."},
+    {d:26,ato:"VI",t:"Fechando o dossiê",ind:"1 · 4",det:"Montagem final, README documentando o modelo, script de criação versionado, últimos ajustes de desempenho."},
+    {d:27,ato:"VI",t:"A última entrega",ind:"1 · 2 · 3 · 4",det:"Apresentação do banco com a aplicação rodando ao vivo. Dez minutos por célula, mais arguição da turma e da docente."}
+  ],
+
+  cheats: [
+    {t:"DDL — definir",p:"Cria e altera a estrutura.",c:["CREATE DATABASE sindicato;","CREATE TABLE clientes (\n  id_cliente INT AUTO_INCREMENT PRIMARY KEY,\n  nome_completo VARCHAR(255) NOT NULL,\n  email VARCHAR(255) UNIQUE NOT NULL\n);","ALTER TABLE clientes ADD telefone VARCHAR(15);","DROP TABLE clientes;"]},
+    {t:"DML — movimentar",p:"Mexe nos dados, não na estrutura.",c:["INSERT INTO clientes (nome_completo, email)\nVALUES ('Ana Souza', 'ana@email.com');","UPDATE clientes SET telefone = '(27) 99999-1234'\nWHERE id_cliente = 1;","DELETE FROM clientes WHERE id_cliente = 1;"]},
+    {t:"DQL — perguntar",p:"O comando que você mais vai usar na vida.",c:["SELECT * FROM clientes;","SELECT nome_completo, email FROM clientes\nWHERE status_cliente = 'ativo'\nORDER BY nome_completo;","SELECT c.nome_completo, p.valor_total\nFROM clientes c\nJOIN pedidos p ON c.id_cliente = p.id_cliente;","SELECT status_cliente, COUNT(*) AS total\nFROM clientes GROUP BY status_cliente;"]},
+    {t:"TCL e DCL — controlar",p:"Transação e permissão.",c:["START TRANSACTION;\nUPDATE clientes SET status_cliente = 'inativo'\nWHERE id_cliente = 1;\nCOMMIT;","ROLLBACK;","GRANT SELECT ON sindicato.clientes\nTO 'consulta'@'localhost';","REVOKE SELECT ON sindicato.clientes\nFROM 'consulta'@'localhost';"]}
+  ],
+
+  links: [
+    {t:"SQL Murder Mystery",u:"https://mystery.knightlab.com/",d:"Resolver um assassinato escrevendo consultas. Roda no navegador, sem cadastro. É o Boss do Ato III."},
+    {t:"SQL Island",u:"https://sql-island.informatik.uni-kl.de/",d:"RPG em que você sobrevive numa ilha escrevendo SQL. Ótimo primeiro contato."},
+    {t:"DB Fiddle",u:"https://www.db-fiddle.com/",d:"Escreva e execute SQL sem instalar nada. Use na primeira semana."},
+    {t:"dbdiagram.io",u:"https://dbdiagram.io/",d:"Desenhe o modelo e ele gera o SQL de criação das tabelas."},
+    {t:"SQLBolt",u:"https://sqlbolt.com/",d:"Exercícios curtos e progressivos, com correção imediata."},
+    {t:"Lei nº 13.709 — LGPD",u:"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm",d:"O texto da lei. Fonte oficial para o Tribunal do Ato V."}
+  ],
+
+  celulas: [
+    {nome:"Célula Alfa",membros:"—",xp:0,patente:"Novato"},
+    {nome:"Célula Bravo",membros:"—",xp:0,patente:"Novato"},
+    {nome:"Célula Charlie",membros:"—",xp:0,patente:"Novato"},
+    {nome:"Célula Delta",membros:"—",xp:0,patente:"Novato"}
+  ],
+
+  indicadores: [
+    {t:"Edita e mantém",d:"Executa atividade de edição e manutenção de banco de dados conforme demandas."},
+    {t:"Diferencia tipos",d:"Diferencia tipos de banco de dados conforme demanda e aplicabilidade."},
+    {t:"Define o SGBD",d:"Define o Sistema Gerenciador de Banco de Dados de acordo com a aplicação."},
+    {t:"Cria o banco",d:"Cria banco de dados conforme requisitos da aplicação."}
+  ]
+};
+
+/* ==========================================================================
+   MONTAGEM — daqui para baixo não precisa mexer.
+   ========================================================================== */
+window.DADOS = DADOS;                 /* assets/quadro.js lê a lista de reserva daqui */
+const $ = s => document.querySelector(s);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* painel de hoje */
+(function(){
+  const op = DADOS.operacoes.find(o => o.d === DADOS.diaAtual) || DADOS.operacoes[0];
+  const ato = DADOS.atos.find(a => a.num === op.ato);
+  $('#cabDia').textContent = 'Operação ' + String(op.d).padStart(2,'0') + ' de ' + DADOS.operacoes.length;
+  $('#tHoje').textContent = op.t;
+  $('#hjObj').textContent = ato ? ato.objetivo : '—';
+  $('#hjSala').textContent = op.det;
+  $('#hjEnt').textContent = ato ? ato.entrega : '—';
+})();
+
+/* atos */
+$('#listaAtos').innerHTML = DADOS.atos.map((a,i) => `
+  <div class="ato" id="ato${i}">
+    <button class="ato-btn" aria-expanded="false" aria-controls="corpo${i}" data-ato="${i}">
+      <span class="ato-num">${esc(a.num)}</span>
+      <span><span class="ato-tit">${esc(a.nome)}</span><br><span class="ato-dias">${esc(a.dias)}</span></span>
+      <span class="ato-sinal" aria-hidden="true">+</span>
+    </button>
+    <div class="ato-corpo" id="corpo${i}">
+      <p>${esc(a.objetivo)}</p>
+      <h4>Conteúdos</h4><ul>${a.conteudos.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>
+      <h4>Em sala</h4><ul>${a.atividades.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>
+      <p class="entrega">Entrega do ato: ${esc(a.entrega)}</p>
+    </div>
+  </div>`).join('');
+
+document.querySelectorAll('.ato-btn').forEach(b => b.addEventListener('click', () => {
+  const box = b.closest('.ato');
+  const on = box.classList.toggle('aberto');
+  b.setAttribute('aria-expanded', on);
+  b.querySelector('.ato-sinal').textContent = on ? '−' : '+';
+}));
+
+/* livro-caixa */
+let filtroAtivo = 'todos';
+function pintarLinhas(){
+  const lista = filtroAtivo === 'todos' ? DADOS.operacoes : DADOS.operacoes.filter(o => o.ato === filtroAtivo);
+  $('#linhas').innerHTML = lista.map(o => `
+    <button class="livro-lin" data-dia="${o.d}">
+      <span class="lin-dia">${String(o.d).padStart(2,'0')}</span>
+      <span class="lin-op"><b>${esc(o.t)}</b><span class="lin-det">${esc(o.det)}</span></span>
+      <span class="lin-ato">Ato ${esc(o.ato)}</span>
+      <span class="lin-ind">Ind. ${esc(o.ind)}</span>
+    </button>`).join('');
+  document.querySelectorAll('.livro-lin').forEach(l =>
+    l.addEventListener('click', () => l.classList.toggle('aberto')));
+}
+const atosUnicos = ['todos', ...DADOS.atos.map(a => a.num)];
+$('#filtros').innerHTML = atosUnicos.map(a =>
+  `<button class="filtro" data-f="${a}" aria-pressed="${a==='todos'}">${a==='todos'?'Tudo':'Ato '+a}</button>`).join('');
+document.querySelectorAll('.filtro').forEach(f => f.addEventListener('click', () => {
+  filtroAtivo = f.dataset.f;
+  document.querySelectorAll('.filtro').forEach(x => x.setAttribute('aria-pressed', x === f));
+  pintarLinhas();
+}));
+pintarLinhas();
+
+/* arsenal */
+$('#cheats').innerHTML = DADOS.cheats.map(c => `
+  <div class="cheat" style="margin-bottom:18px">
+    <h3>${esc(c.t)}</h3><p>${esc(c.p)}</p>
+    ${c.c.map(x=>`<code>${esc(x)}</code>`).join('')}
+  </div>`).join('');
+
+$('#links').innerHTML = DADOS.links.map(l => `
+  <li><a href="${esc(l.u)}" target="_blank" rel="noopener">
+    <strong>${esc(l.t)}</strong><span>${esc(l.d)}</span>
+  </a></li>`).join('');
+
+/* placar */
+$('#celulas').innerHTML = DADOS.celulas
+  .slice().sort((a,b) => b.xp - a.xp)
+  .map(c => `<div class="celula">
+    <div class="celula-xp">${c.xp} XP</div>
+    <h3>${esc(c.nome)}</h3><p>${esc(c.membros)}</p>
+    <span class="patente">${esc(c.patente)}</span>
+  </div>`).join('');
+
+/* nav: marca a seção que está na tela.
+   Espera o DOM ficar pronto porque quem desenha a barra é assets/nav.js. */
+document.addEventListener('DOMContentLoaded', function(){
+  const links = [...document.querySelectorAll('.nav a[href^="#"]')];
+  const alvos = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  if(!alvos.length || !('IntersectionObserver' in window)) return;
+  const visiveis = new Set();
+  const obs = new IntersectionObserver(es => {
+    es.forEach(e => e.isIntersecting ? visiveis.add(e.target.id) : visiveis.delete(e.target.id));
+    const atual = alvos.map(s => s.id).find(id => visiveis.has(id));
+    links.forEach(a => a.classList.toggle('aqui', a.getAttribute('href') === '#' + atual));
+  }, {rootMargin:'-45% 0px -50% 0px'});
+  alvos.forEach(s => obs.observe(s));
+});
+
+/* O quadro de filiados agora vem do banco: quem monta é assets/quadro.js. */
+
+/* ficha */
+$('#indicadores').innerHTML = DADOS.indicadores.map((i,n) => `
+  <div class="ind"><span class="ind-n">${n+1}</span>
+  <span><b>${esc(i.t)}</b><span>${esc(i.d)}</span></span></div>`).join('');
+</script>
+
+<script src="assets/config.js"></script>
+<script type="module" src="assets/nav.js"></script>
+<script type="module" src="assets/quadro.js"></script>
+</body>
+</html>

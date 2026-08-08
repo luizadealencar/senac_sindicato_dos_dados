@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#191E1B">
+<title>Filiação — O Sindicato dos Dados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;600;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+.palco{padding:34px 0 60px}
+.palco-grade{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:start;margin-top:30px}
+
+.balcao{border:2px solid var(--tinta);background:var(--papel);box-shadow:8px 8px 0 var(--tinta);padding:24px 26px 28px}
+.balcao h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:27px;line-height:1.05;margin-bottom:4px}
+.balcao>p.abre{color:var(--tinta-fraca);font-size:16.5px;margin-bottom:20px;max-width:52ch}
+
+/* abas entrar / filiar */
+.abas{display:flex;border:2px solid var(--tinta);margin-bottom:22px}
+.aba{
+  flex:1;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;
+  font-size:13.5px;font-weight:600;padding:12px 8px;min-height:46px;
+  background:none;border:none;border-right:2px solid var(--tinta);cursor:pointer;color:var(--tinta-fraca)
+}
+.aba:last-child{border-right:none}
+.aba[aria-selected="true"]{background:var(--tinta);color:var(--papel)}
+.aba:focus-visible{outline:2px solid var(--carimbo);outline-offset:-4px}
+
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+form[hidden],section[hidden],div[hidden]{display:none}
+
+.ou{display:flex;align-items:center;gap:12px;margin:22px 0 18px;color:var(--tinta-fraca)}
+.ou::before,.ou::after{content:'';flex:1;height:1px;background:var(--borda)}
+.ou span{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:12px}
+
+.btn-github{
+  width:100%;background:var(--tinta);border-color:var(--tinta);color:var(--papel);
+  font-size:14px;min-height:50px
+}
+.btn-github:hover{background:var(--papel);color:var(--tinta)}
+.btn-github svg{width:19px;height:19px;fill:currentColor;flex:none}
+
+.rodape-form{margin-top:18px;font-size:15.5px;color:var(--tinta-fraca)}
+.rodape-form button{background:none;border:none;padding:0;font:inherit;color:var(--carimbo);cursor:pointer;text-decoration:underline}
+
+/* contrato ao lado */
+.contrato{border:2px solid var(--tinta);padding:20px 22px 24px;background:var(--papel-barra)}
+.contrato .rot{font-size:12px;color:var(--carimbo);display:block;margin-bottom:8px}
+.contrato h3{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:22px;margin-bottom:10px;line-height:1.05}
+.contrato ol{margin-left:19px;font-size:16.5px}
+.contrato li{margin-bottom:9px}
+.contrato .selo{display:flex;justify-content:flex-end;margin-top:18px}
+.contrato .carimbo{--x:1;transform:rotate(-7deg);padding:11px 14px}
+.contrato .carimbo b{font-size:19px}
+
+/* tela de código da turma */
+.senha-turma{max-width:520px}
+.senha-turma .campo input{font-size:22px;letter-spacing:.28em;text-align:center;padding:14px 12px;min-height:58px}
+
+.dentro{text-align:center;padding:8px 0 4px}
+.dentro .ini,.dentro .av{--retrato:76px;width:76px;height:76px;margin:0 auto 14px;display:flex}
+.dentro h2{margin-bottom:6px}
+.dentro .acoes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+
+.carregando{display:flex;align-items:center;gap:12px;color:var(--tinta-fraca);font-size:16.5px;padding:8px 0}
+.carregando::before{
+  content:'';width:16px;height:16px;flex:none;
+  border:2px solid var(--borda);border-top-color:var(--carimbo);border-radius:50%;
+  animation:girar .7s linear infinite
+}
+@keyframes girar{to{transform:rotate(360deg)}}
+
+@media(max-width:860px){
+  .palco{padding:22px 0 44px}
+  .palco-grade{grid-template-columns:1fr;gap:26px;margin-top:22px}
+  .balcao{padding:20px 18px 24px;box-shadow:5px 5px 0 var(--tinta)}
+  .dupla{grid-template-columns:1fr}
+  .contrato{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav" data-pagina="entrar.html"></nav>
+
+<main class="palco env">
+
+  <div class="classif rot">
+    <span>Dossiê A-279 · Setor de filiação</span>
+    <span>Guichê único</span>
+    <span>Atendimento contínuo</span>
+  </div>
+
+  <h1 class="titulo">A <em>Filiação</em></h1>
+  <p class="subtitulo">Sem ficha assinada ninguém entra na sala dos fundos. Leva dois minutos e você não precisa de conta em lugar nenhum — a não ser que queira entrar pelo GitHub.</p>
+
+  <div id="avisoConfig" hidden class="aviso-config">
+    <b>O cadastro ainda não foi ligado</b>
+    <p>Quem cuida do site precisa preencher as chaves do Supabase em <span class="mono">assets/config.js</span>. As instruções estão no arquivo <span class="mono">LEIA-ME.md</span> do repositório.</p>
+  </div>
+
+  <div class="palco-grade" id="palco" hidden>
+
+    <div class="balcao">
+      <div id="carregando" class="carregando">Conferindo se você já tem ficha…</div>
+
+      <!-- ---------- ENTRAR / CADASTRAR ---------- -->
+      <div id="areaPorta" hidden>
+        <div class="abas" role="tablist">
+          <button class="aba" role="tab" id="abaEntrar"  aria-selected="true"  aria-controls="formEntrar">Já sou filiado</button>
+          <button class="aba" role="tab" id="abaFiliar"  aria-selected="false" aria-controls="formCadastro">Quero me filiar</button>
+        </div>
+
+        <p class="recado" id="recadoPorta" hidden></p>
+
+        <form id="formEntrar" role="tabpanel" aria-labelledby="abaEntrar" novalidate>
+          <h2>Entrar</h2>
+          <p class="abre">Mesmo e-mail e senha que você usou ao se filiar.</p>
+
+          <label class="campo"><span>E-mail</span>
+            <input type="email" name="email" autocomplete="email" required placeholder="voce@exemplo.com">
+          </label>
+          <label class="campo"><span>Senha</span>
+            <input type="password" name="senha" autocomplete="current-password" required minlength="6">
+          </label>
+
+          <button class="btn" type="submit">Entrar</button>
+
+          <p class="rodape-form">Não tem ficha ainda?
+            <button type="button" data-vai="filiar">Filie-se aqui</button>
+          </p>
+        </form>
+
+        <form id="formCadastro" role="tabpanel" aria-labelledby="abaFiliar" novalidate hidden>
+          <h2>Assinar o contrato</h2>
+          <p class="abre">O código da turma é ditado em sala. Sem ele a ficha fica em branco.</p>
+
+          <label class="campo"><span>Nome completo</span>
+            <input type="text" name="nome" autocomplete="name" required minlength="2" maxlength="80" placeholder="Como aparece na chamada">
+          </label>
+
+          <div class="dupla">
+            <label class="campo"><span>E-mail</span>
+              <input type="email" name="email" autocomplete="email" required placeholder="voce@exemplo.com">
+            </label>
+            <label class="campo"><span>Senha</span>
+              <input type="password" name="senha" autocomplete="new-password" required minlength="6">
+              <span class="dica">Mínimo de 6 caracteres.</span>
+            </label>
+          </div>
+
+          <div class="dupla">
+            <label class="campo"><span>Célula</span>
+              <select name="celula" id="selCelula" required></select>
+            </label>
+            <label class="campo"><span>GitHub <span style="text-transform:none;letter-spacing:0">(opcional)</span></span>
+              <input type="text" name="github" autocomplete="off" maxlength="39" placeholder="seu-usuario" pattern="[A-Za-z0-9\-]{1,39}">
+              <span class="dica">Só o usuário. Vira sua foto no quadro.</span>
+            </label>
+          </div>
+
+          <label class="campo mono"><span>Código da turma</span>
+            <input type="text" name="codigo" autocomplete="off" required maxlength="40" placeholder="XXXXXXXX">
+          </label>
+
+          <button class="btn" type="submit">Assinar e entrar</button>
+
+          <p class="rodape-form">Já assinou antes?
+            <button type="button" data-vai="entrar">Entre por aqui</button>
+          </p>
+        </form>
+
+        <div class="ou"><span>ou</span></div>
+
+        <button class="btn btn-github" type="button" id="btnGithub">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          Entrar com o GitHub
+        </button>
+      </div>
+
+      <!-- ---------- CÓDIGO DA TURMA (já entrou, falta filiar) ---------- -->
+      <div id="areaCodigo" class="senha-turma" hidden>
+        <h2>Falta o código</h2>
+        <p class="abre">Sua conta está criada, mas a ficha ainda não foi carimbada. Digite o código que a docente passou em sala.</p>
+
+        <p class="recado" id="recadoCodigo" hidden></p>
+
+        <form id="formCodigo" novalidate>
+          <label class="campo mono"><span>Código da turma</span>
+            <input type="text" name="codigo" autocomplete="off" required maxlength="40" placeholder="XXXXXXXX">
+          </label>
+          <label class="campo"><span>Célula</span>
+            <select name="celula" id="selCelula2" required></select>
+          </label>
+          <button class="btn" type="submit">Carimbar a ficha</button>
+        </form>
+
+        <p class="rodape-form">Não é você? <button type="button" id="btnSair2">Sair desta conta</button></p>
+      </div>
+
+      <!-- ---------- JÁ ESTÁ DENTRO ---------- -->
+      <div id="areaDentro" class="dentro" hidden></div>
+    </div>
+
+    <aside class="contrato">
+      <span class="rot">Cláusulas</span>
+      <h3>O que você assina</h3>
+      <ol>
+        <li>Pergunta idiota não existe. Pergunta guardada, sim — e essa custa nota.</li>
+        <li>Print de erro vale mais que descrição de erro. Cole a imagem.</li>
+        <li>Quem responde o colega aprende duas vezes. É assim que o XP da célula sobe.</li>
+        <li>O que se combina na sala dos fundos fica na sala dos fundos.</li>
+      </ol>
+      <div class="selo">
+        <div class="carimbo"><b>Confidencial</b><span>Célula ES · Senac</span></div>
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+<footer class="rodape env">
+  <p class="rot" style="font-size:13px">UC6 · Criar e Manter Banco de Dados · Técnico em Desenvolvimento de Sistemas</p>
+</footer>
+
+<script src="assets/config.js"></script>
+<script type="module" src="assets/nav.js"></script>
+<script type="module" src="assets/entrar.js"></script>
+</body>
+</html>

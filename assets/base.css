@@ -1,0 +1,256 @@
+/* ==========================================================================
+   O SINDICATO DOS DADOS — folha de estilo comum a todas as páginas.
+   Tokens, tipografia, navegação, formulários e rodapé.
+   Cada página traz só o que é dela num <style> próprio.
+   ========================================================================== */
+
+:root{
+  --papel:#E9EDE3;
+  --papel-barra:#DDE4D5;
+  --papel-linha:#C3CDB8;
+  --tinta:#191E1B;
+  --tinta-fraca:#3F4A3D;
+  --carimbo:#8E2323;
+  --latao:#9A7226;
+  --borda:#B4BFA9;
+  --alt-nav:52px;
+  --folga:24px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{
+  scroll-behavior:smooth;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+body{
+  background:var(--papel);
+  color:var(--tinta);
+  font-family:'Spectral',Georgia,serif;
+  font-size:18.5px;
+  line-height:1.7;
+  background-image:repeating-linear-gradient(180deg,transparent 0,transparent 31px,rgba(140,160,130,.18) 31px,rgba(140,160,130,.18) 32px);
+  overflow-wrap:break-word;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+img{max-width:100%;height:auto}
+
+.env{
+  max-width:1060px;margin:0 auto;
+  padding-left:max(var(--folga),env(safe-area-inset-left));
+  padding-right:max(var(--folga),env(safe-area-inset-right));
+}
+
+/* ---------- utilitários de texto ---------- */
+.rot{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-weight:600}
+.mono{font-family:'JetBrains Mono',monospace}
+.fraco{color:var(--tinta-fraca)}
+.so-leitor{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ==========================================================================
+   NAVEGAÇÃO — montada por assets/nav.js em todas as páginas
+   ========================================================================== */
+.nav{
+  position:sticky;top:0;z-index:60;
+  background:var(--tinta);color:var(--papel);
+  border-bottom:3px solid var(--carimbo);
+  padding-top:env(safe-area-inset-top);
+}
+.nav-in{
+  max-width:1060px;margin:0 auto;
+  padding:9px max(var(--folga),env(safe-area-inset-right)) 9px max(var(--folga),env(safe-area-inset-left));
+  display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center;
+  min-height:var(--alt-nav)
+}
+.nav-marca{
+  font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;
+  letter-spacing:.08em;font-size:16px;margin-right:auto;color:var(--papel);
+  text-decoration:none;line-height:1.1
+}
+.nav-marca:hover,.nav-marca:focus-visible{color:var(--papel);outline:none}
+.nav-menu{display:flex;flex-wrap:wrap;gap:6px 17px;align-items:center}
+.nav a:not(.nav-marca):not(.nav-sessao-btn){
+  color:var(--papel);text-decoration:none;
+  font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;
+  font-size:13.5px;font-weight:600;padding:4px 0;border-bottom:2px solid transparent;
+  white-space:nowrap
+}
+.nav a:not(.nav-marca):hover,.nav a:not(.nav-marca):focus-visible{border-bottom-color:var(--carimbo);outline:none}
+.nav a.aqui{border-bottom-color:var(--carimbo)}
+
+/* bloco de sessão (avatar, nome, entrar/sair) */
+.nav-sessao{display:flex;align-items:center;gap:9px;padding-left:4px}
+.nav-sessao img{width:26px;height:26px;border:1px solid var(--borda);object-fit:cover;flex:none}
+.nav-sessao-nome{
+  font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;
+  font-size:13px;font-weight:600;max-width:15ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+.nav-sessao-aviso{
+  font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;
+  font-size:12px;font-weight:600;color:#93A48B;
+  border:1px dashed #4A554A;padding:4px 9px;white-space:nowrap
+}
+.nav-sessao-btn{
+  font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;
+  font-size:12.5px;font-weight:600;padding:5px 11px;cursor:pointer;
+  border:1.5px solid var(--papel);background:none;color:var(--papel);text-decoration:none;
+  display:inline-block;line-height:1.4
+}
+.nav-sessao-btn:hover,.nav-sessao-btn:focus-visible{background:var(--carimbo);border-color:var(--carimbo);color:var(--papel);outline:none}
+
+/* botão do menu — só aparece no celular */
+.nav-abrir{
+  display:none;align-items:center;gap:8px;
+  background:none;border:1.5px solid var(--papel);color:var(--papel);cursor:pointer;
+  font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
+  font-size:13px;font-weight:600;padding:8px 12px;min-height:40px
+}
+.nav-abrir:focus-visible{outline:2px solid var(--carimbo);outline-offset:2px}
+.nav-abrir .barras{display:inline-flex;flex-direction:column;gap:3px;width:15px}
+.nav-abrir .barras i{display:block;height:2px;background:var(--papel);transition:transform .18s,opacity .18s}
+.nav.aberto .nav-abrir .barras i:nth-child(1){transform:translateY(5px) rotate(45deg)}
+.nav.aberto .nav-abrir .barras i:nth-child(2){opacity:0}
+.nav.aberto .nav-abrir .barras i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+
+/* a barra tem itens demais para caber deitada: vira menu de gaveta cedo */
+@media(max-width:980px){
+  .nav-in{gap:0;flex-wrap:nowrap}
+  .nav-abrir{display:inline-flex}
+  .nav-menu{
+    display:none;position:absolute;left:0;right:0;top:100%;
+    flex-direction:column;align-items:stretch;gap:0;
+    background:var(--tinta);border-bottom:3px solid var(--carimbo);
+    padding:4px max(var(--folga),env(safe-area-inset-left)) 14px;
+    max-height:calc(100dvh - var(--alt-nav) - 20px);overflow-y:auto
+  }
+  .nav.aberto .nav-menu{display:flex}
+  .nav-menu a:not(.nav-sessao-btn){
+    padding:13px 0;border-bottom:1px solid rgba(233,237,227,.16);font-size:16px;letter-spacing:.12em
+  }
+  .nav-menu a.aqui{border-bottom-color:var(--carimbo);color:#E7B9B9}
+  .nav-sessao{
+    padding:14px 0 4px;margin-top:6px;border-top:2px solid var(--carimbo);
+    flex-wrap:wrap;gap:10px
+  }
+  .nav-sessao-nome{max-width:none;font-size:15px}
+  .nav-sessao-btn{padding:9px 14px;font-size:13.5px;margin-left:auto}
+}
+
+/* ==========================================================================
+   CAPA — comum ao index e ao caderno
+   ========================================================================== */
+.capa{padding:52px 0 38px;position:relative;overflow:hidden}
+.classif{
+  display:flex;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;
+  border-top:2px solid var(--tinta);border-bottom:2px solid var(--tinta);
+  padding:8px 0;font-size:13.5px
+}
+.titulo{
+  font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;
+  font-size:clamp(44px,11vw,110px);line-height:.88;letter-spacing:-.01em;margin:24px 0 13px
+}
+.titulo em{font-style:normal;color:var(--carimbo)}
+.subtitulo{max-width:52ch;font-size:clamp(17px,4.4vw,20px)}
+
+/* ==========================================================================
+   FORMULÁRIOS E BOTÕES
+   ========================================================================== */
+.btn{
+  font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
+  font-size:14px;font-weight:600;padding:11px 19px;min-height:44px;
+  border:2px solid var(--carimbo);background:var(--carimbo);color:var(--papel);
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  text-decoration:none;line-height:1.2
+}
+.btn:hover{background:var(--papel);color:var(--carimbo)}
+.btn:focus-visible{outline:2px solid var(--tinta);outline-offset:3px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn[disabled]:hover{background:var(--carimbo);color:var(--papel)}
+.btn.vazado{background:none;color:var(--tinta);border-color:var(--tinta)}
+.btn.vazado:hover{background:var(--tinta);color:var(--papel)}
+.btn.miudo{font-size:12.5px;padding:7px 13px;min-height:36px;letter-spacing:.1em;border-width:1.5px}
+
+.campo{display:block;margin-bottom:16px}
+.campo>span{
+  display:block;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;
+  letter-spacing:.12em;font-size:12.5px;font-weight:600;color:var(--tinta-fraca);margin-bottom:5px
+}
+.campo input,.campo select,.campo textarea{
+  width:100%;font-family:'Spectral',Georgia,serif;
+  font-size:16.5px;                    /* 16px+ evita o zoom automático do iPhone */
+  padding:11px 13px;min-height:46px;
+  border:2px solid var(--tinta);background:var(--papel);color:var(--tinta);
+  border-radius:0;-webkit-appearance:none;appearance:none
+}
+.campo textarea{min-height:120px;line-height:1.55;resize:vertical}
+.campo select{
+  background-image:linear-gradient(45deg,transparent 50%,var(--tinta) 50%),linear-gradient(135deg,var(--tinta) 50%,transparent 50%);
+  background-position:calc(100% - 18px) calc(50% + 2px),calc(100% - 12px) calc(50% + 2px);
+  background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:38px
+}
+.campo input:focus-visible,.campo select:focus-visible,.campo textarea:focus-visible{
+  outline:2px solid var(--carimbo);outline-offset:2px
+}
+.campo input::placeholder,.campo textarea::placeholder{color:#8C9A85}
+.campo .dica{display:block;font-size:14px;color:var(--tinta-fraca);margin-top:5px;letter-spacing:0;text-transform:none;font-family:'Spectral',Georgia,serif}
+.campo.mono input{font-family:'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase}
+
+/* recado de erro / sucesso */
+.recado{border:2px solid var(--tinta);padding:12px 15px;margin-bottom:18px;font-size:16.5px}
+.recado.ruim{border-color:var(--carimbo);color:var(--carimbo)}
+.recado.bom{border-color:var(--latao);color:var(--latao)}
+.recado[hidden]{display:none}
+
+/* carimbo de página */
+.carimbo{
+  border:4px double var(--carimbo);color:var(--carimbo);
+  padding:14px 16px;transform:rotate(-6deg);text-align:center;
+  font-family:'Saira Condensed',sans-serif;text-transform:uppercase;font-weight:800;
+  letter-spacing:.12em;line-height:1.15;opacity:.86
+}
+.carimbo b{display:block;font-size:24px}
+.carimbo span{display:block;font-size:11px;letter-spacing:.2em;margin-top:5px;font-weight:600}
+
+/* ---------- retrato do agente ---------- */
+.ini{
+  display:inline-flex;align-items:center;justify-content:center;flex:none;
+  width:var(--retrato,44px);height:var(--retrato,44px);
+  border:2px solid var(--borda);background:var(--papel-barra);color:var(--tinta-fraca);
+  font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:calc(var(--retrato,44px) * .38);
+  letter-spacing:.02em;line-height:1
+}
+.av{object-fit:cover;flex:none;border:2px solid var(--tinta);background:var(--papel-barra);filter:grayscale(1) contrast(1.05)}
+.nav-sessao .ini{--retrato:26px;border-width:1px;background:#2A322B;color:var(--papel);border-color:#4A554A}
+.nav-sessao .av{border-width:1px}
+
+/* ---------- rodapé ---------- */
+.rodape{border-top:2px solid var(--tinta);padding:26px 0 46px;font-size:14.5px;color:var(--tinta-fraca)}
+
+/* ---------- avisos de configuração pendente ---------- */
+.aviso-config{
+  border:2px dashed var(--carimbo);padding:16px 18px;margin:22px 0;background:var(--papel-barra)
+}
+.aviso-config b{
+  display:block;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;
+  font-size:18px;color:var(--carimbo);margin-bottom:5px;font-weight:800
+}
+.aviso-config p{font-size:16px;color:var(--tinta-fraca);max-width:70ch}
+
+/* ---------- ajustes gerais de celular ---------- */
+@media(max-width:860px){
+  :root{--folga:18px}
+  body{font-size:17.5px}
+  .capa{padding:34px 0 26px}
+  .titulo{margin:18px 0 11px}
+  .classif{font-size:12.5px;justify-content:flex-start;gap:4px 14px}
+}
+@media(max-width:420px){
+  :root{--folga:15px}
+  .btn{width:100%}
+  .btn.miudo,.btn.encolhe{width:auto}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}

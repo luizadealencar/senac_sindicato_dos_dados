@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#191E1B">
+<title>O Caderno — UC6 Criar e Manter Banco de Dados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;600;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+.subtitulo{max-width:56ch}
+
+/* ---------- layout de leitura ---------- */
+.layout{display:grid;grid-template-columns:238px 1fr;gap:48px;align-items:start;padding-bottom:20px}
+/* sem isto a coluna de texto se recusa a encolher e o caderno vaza para fora
+   da tela do celular: item de grid nasce com min-width:auto */
+.layout>*{min-width:0}
+
+.indice{position:sticky;top:70px;border:2px solid var(--tinta);background:var(--papel);padding:16px 16px 18px;max-height:calc(100vh - 96px);overflow:auto}
+.indice>summary{display:none}   /* no computador o índice fica sempre aberto */
+.indice h2{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:13px;color:var(--tinta-fraca);margin-bottom:10px;font-weight:600}
+.indice ol{list-style:none}
+.indice li{border-top:1px solid var(--papel-linha)}
+.indice li:first-child{border-top:none}
+.indice a{display:grid;grid-template-columns:24px 1fr;gap:8px;padding:8px 0;text-decoration:none;color:var(--tinta);font-family:'Saira Condensed',sans-serif;text-transform:uppercase;font-size:15.5px;letter-spacing:.03em;line-height:1.25;font-weight:600}
+.indice a span{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--carimbo);font-weight:700;padding-top:2px}
+.indice a:hover,.indice a:focus-visible{color:var(--carimbo);outline:none}
+.indice a.ativo{color:var(--carimbo)}
+.indice a.ativo::after{content:'◂';margin-left:4px}
+
+/* ---------- texto ---------- */
+.parte{border-top:2px solid var(--tinta);padding:46px 0 6px;scroll-margin-top:60px}
+.parte:first-child{border-top:none;padding-top:6px}
+.parte-cab{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.parte-num{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--carimbo);font-weight:700}
+.parte h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:clamp(28px,5vw,42px);line-height:1}
+.parte>p.abre{max-width:62ch;color:var(--tinta-fraca);margin-bottom:26px}
+h3{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:23px;line-height:1.1;margin:34px 0 10px;scroll-margin-top:60px}
+h4{font-family:'Saira Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:14px;color:var(--tinta-fraca);margin:24px 0 8px}
+p{margin-bottom:14px;max-width:70ch}
+.parte ul,.parte ol.lista{margin:0 0 16px 20px;max-width:70ch}
+.parte li{margin-bottom:6px}
+b,strong{font-weight:600}
+a.ext{color:var(--carimbo)}
+
+/* ---------- código ---------- */
+pre{
+  font-family:'JetBrains Mono',monospace;font-size:14.5px;line-height:1.6;
+  background:var(--tinta);color:#CFE0C4;padding:14px 16px;margin:0 0 16px;
+  overflow-x:auto;border-left:4px solid var(--carimbo)
+}
+pre .cm{color:#8FA487}
+code.inl{font-family:'JetBrains Mono',monospace;font-size:.88em;background:var(--papel-barra);padding:1px 5px;border:1px solid var(--papel-linha)}
+
+/* ---------- tabelas ---------- */
+.tab-rolo{overflow-x:auto;margin-bottom:18px}
+table{border-collapse:collapse;width:100%;min-width:480px;background:var(--papel);border:2px solid var(--tinta);font-size:16.5px}
+caption{caption-side:bottom;text-align:left;font-size:13.5px;color:var(--tinta-fraca);padding-top:6px}
+th{background:var(--tinta);color:var(--papel);font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:12.5px;font-weight:600;text-align:left;padding:9px 12px}
+td{padding:8px 12px;border-top:1px solid var(--papel-linha);vertical-align:top}
+tbody tr:nth-child(even){background:var(--papel-barra)}
+td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
+
+/* ---------- caixas ---------- */
+.caixa{border:2px solid var(--tinta);background:var(--papel);padding:16px 18px;margin:20px 0}
+.caixa-rot{display:inline-block;background:var(--tinta);color:var(--papel);font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:600;padding:4px 11px;margin-bottom:10px}
+.caixa p:last-child{margin-bottom:0}
+.caixa.alerta{border-color:var(--carimbo)}
+.caixa.alerta .caixa-rot{background:var(--carimbo)}
+.caixa.missao{box-shadow:6px 6px 0 var(--tinta)}
+.caixa.missao .caixa-rot{background:var(--latao)}
+
+/* ---------- gabarito lacrado ---------- */
+.lacre{border:2px dashed var(--carimbo);padding:18px;text-align:center;margin-bottom:24px}
+.lacre p{max-width:none;color:var(--tinta-fraca);font-size:16.5px;margin-bottom:12px}
+#respostas[hidden]{display:none}
+
+/* ---------- glossário ---------- */
+.busca{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.busca input{
+  font-family:'Spectral',Georgia,serif;font-size:17.5px;padding:10px 13px;
+  border:2px solid var(--tinta);background:var(--papel);color:var(--tinta);flex:1;min-width:220px
+}
+.busca input:focus-visible{outline:2px solid var(--carimbo);outline-offset:2px}
+.busca span{font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--tinta-fraca)}
+.glos{border-top:1px solid var(--borda)}
+.glos div{border-bottom:1px solid var(--borda);padding:11px 0;display:grid;grid-template-columns:230px 1fr;gap:18px}
+.glos dt{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;font-size:17.5px;letter-spacing:.02em;font-weight:600}
+.glos dd{font-size:17px;color:var(--tinta-fraca)}
+.glos div[hidden]{display:none}
+
+/* ---------- rodapé ---------- */
+.rodape{margin-top:40px}
+.topo{
+  position:fixed;z-index:40;
+  right:max(16px,env(safe-area-inset-right));
+  bottom:max(16px,env(safe-area-inset-bottom));
+  background:var(--tinta);color:var(--papel);border:none;
+  font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.08em;
+  padding:12px 15px;min-height:44px;cursor:pointer;text-decoration:none;
+  display:inline-flex;align-items:center
+}
+.topo:hover{background:var(--carimbo)}
+
+@media(max-width:880px){
+  .layout{grid-template-columns:1fr;gap:0}
+  .glos div{grid-template-columns:1fr;gap:2px}
+  .parte{padding:32px 0 6px;scroll-margin-top:56px}
+  h3{font-size:21px;margin:26px 0 9px;scroll-margin-top:56px}
+  pre{font-size:13.5px;padding:12px 13px}
+  table{font-size:15.5px;min-width:420px}
+  th,td{padding:7px 10px}
+  .caixa{padding:14px 15px;margin:18px 0}
+  .caixa.missao{box-shadow:4px 4px 0 var(--tinta)}
+  .busca input{font-size:16.5px;min-height:46px}
+
+  /* o índice vira gaveta, para não empurrar o conteúdo lá para baixo */
+  .indice{position:static;max-height:none;margin-bottom:28px;padding:0;overflow:visible}
+  .indice>summary{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:14px 16px;min-height:52px;cursor:pointer;list-style:none;
+    background:var(--tinta);color:var(--papel);
+    font-family:'Saira Condensed',sans-serif;text-transform:uppercase;
+    letter-spacing:.12em;font-size:14px;font-weight:600
+  }
+  .indice>summary::-webkit-details-marker{display:none}
+  .indice>summary::after{content:'+';font-family:'JetBrains Mono',monospace;font-size:20px;line-height:1}
+  .indice[open]>summary::after{content:'−'}
+  .indice>h2{display:none}
+  .indice>ol{padding:4px 16px 12px}
+  .indice a{padding:12px 0;font-size:16.5px}
+}
+@media print{
+  .nav,.indice,.topo,.lacre{display:none}
+  body{background:#fff;font-size:11pt}
+  .layout{grid-template-columns:1fr}
+  #respostas[hidden]{display:block!important}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav" data-pagina="caderno.html"></nav>
+
+
+<header class="capa env">
+  <div class="classif rot">
+    <span>Dossiê A-279 · Material de estudo</span>
+    <span>7 partes</span>
+    <span>Consulta liberada durante as operações</span>
+  </div>
+  <h1 class="titulo">O <em>Caderno</em></h1>
+  <p class="subtitulo">Todo o conteúdo da unidade curricular em um lugar só. Sem PDF, sem impressão, sem desculpa. Use o índice ao lado, ou dê <span class="mono">Ctrl+F</span> e procure pelo que precisa.</p>
+</header>
+
+<div class="env layout">
+
+<details class="indice" id="indice" open>
+  <summary>Índice do caderno</summary>
+  <h2>Índice</h2>
+  <ol>
+    <li><a href="#p1"><span>01</span>Antes de começar</a></li>
+    <li><a href="#p2"><span>02</span>Banco de dados</a></li>
+    <li><a href="#p3"><span>03</span>SQL</a></li>
+    <li><a href="#p4"><span>04</span>CRUD</a></li>
+    <li><a href="#p5"><span>05</span>LGPD</a></li>
+    <li><a href="#p6"><span>06</span>Glossário</a></li>
+    <li><a href="#p7"><span>07</span>Gabarito</a></li>
+  </ol>
+</details>
+
+<main>
+
+<!-- ==================== PARTE 1 ==================== -->
+<section class="parte" id="p1">
+  <div class="parte-cab"><span class="parte-num">01</span><h2>Antes de começar</h2></div>
+  <p class="abre">O que esta unidade curricular cobra de você, em que ordem, e como usar este caderno sem se perder.</p>
+
+  <p>São 108 horas para sair daqui capaz de projetar, criar, alimentar e defender um banco de dados. A teoria aparece sempre colada a um problema: você aprende a modelar porque precisa entregar um modelo, aprende SQL porque precisa consultar um banco que você mesmo construiu, e aprende LGPD porque alguém vai perguntar o que você guarda e por quê.</p>
+
+  <p>Ao final, espera-se que você consiga:</p>
+  <ul>
+    <li>editar e manter bancos de dados conforme a demanda que chegar;</li>
+    <li>diferenciar os tipos de banco e dizer onde cada um se aplica;</li>
+    <li>escolher e configurar um SGBD adequado ao cenário;</li>
+    <li>projetar e implementar um banco alinhado aos requisitos de uma aplicação real.</li>
+  </ul>
+
+  <p>A avaliação não é prova. São os quatro indicadores acima, marcados operação a operação, e a entrega final: uma aplicação que integra tabelas, manipula dados e demonstra domínio das ferramentas estudadas.</p>
+
+  <div class="caixa">
+    <span class="caixa-rot">Como usar</span>
+    <p>Cada parte deste caderno corresponde a um trecho do percurso. As <strong>missões</strong> (caixas com sombra) são as situações de aprendizagem — elas valem indicador. O gabarito existe, está na Parte 07, e vem lacrado de propósito: tente antes de abrir.</p>
+  </div>
+</section>
+
+<!-- ==================== PARTE 2 ==================== -->
+<section class="parte" id="p2">
+  <div class="parte-cab"><span class="parte-num">02</span><h2>Banco de dados</h2></div>
+  <p class="abre">O que é, quais tipos existem, quem gerencia e como se desenha um antes de escrever qualquer código.</p>
+
+  <h3 id="p2-1">2.1 O que é um banco de dados</h3>
+  <p>Um banco de dados é uma coleção estruturada de informações, organizada de forma sistemática para que armazenar, recuperar e manipular dados seja rápido e confiável. Ele sustenta desde um sistema acadêmico até a operação de uma empresa inteira.</p>
+  <p>Num banco relacional, os dados ficam em <strong>tabelas</strong>, formadas por <strong>linhas</strong> (os registros) e <strong>colunas</strong> (os atributos). Cada tabela guarda informação de um tipo de entidade: clientes, produtos, transações. Essa estrutura lógica é o que garante consistência e integridade.</p>
+
+  <div class="tab-rolo">
+  <table>
+    <caption>Tabela 1 — cadastro simples de clientes, com dados fictícios.</caption>
+    <thead><tr><th class="mono">id_cliente</th><th class="mono">nome_completo</th><th class="mono">email</th><th class="mono">telefone</th><th class="mono">data_cadastro</th><th class="mono">status_cliente</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Ana Souza</td><td>ana.souza@email.com</td><td>(27) 99999-1234</td><td>2025-01-10</td><td>ativo</td></tr>
+      <tr><td>2</td><td>Carlos Oliveira</td><td>carlos.oliveira@email.com</td><td>(27) 98888-5678</td><td>2025-01-11</td><td>inativo</td></tr>
+      <tr><td>3</td><td>Beatriz Almeida</td><td>beatriz.almeida@email.com</td><td>(27) 97777-9012</td><td>2025-01-12</td><td>ativo</td></tr>
+      <tr><td>4</td><td>Daniel Pereira</td><td>daniel.pereira@email.com</td><td>(27) 96666-3456</td><td>2025-01-13</td><td>ativo</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Coluna por coluna</h4>
+  <ul>
+    <li><code class="inl">id_cliente</code> — identificador único de cada cliente e chave primária da tabela. É ele que impede duplicidade e permite localizar um registro sem ambiguidade.</li>
+    <li><code class="inl">nome_completo</code> — identifica a pessoa e personaliza a comunicação.</li>
+    <li><code class="inl">email</code> — principal canal com o cliente e, em muitos sistemas, também serve de login e de caminho para recuperação de senha.</li>
+    <li><code class="inl">telefone</code> — contato direto, para quando a resposta precisa ser imediata.</li>
+    <li><code class="inl">data_cadastro</code> — marca quando a relação começou. Serve para histórico, segmentação e análise de crescimento.</li>
+    <li><code class="inl">status_cliente</code> — diz se o cliente está ativo ou inativo. É o que permite, por exemplo, disparar campanha só para quem ainda compra.</li>
+  </ul>
+
+  <div class="caixa alerta">
+    <span class="caixa-rot">Pegadinha</span>
+    <p>A apostila impressa diz, num descuido de revisão, que a chave primária “permite duplicações”. É o contrário: ela <strong>impede</strong>. Se aparecer numa prova, a resposta certa é sempre unicidade e proibição de nulo.</p>
+  </div>
+
+  <h3 id="p2-2">2.2 Nomenclatura: como batizar tabelas e colunas</h3>
+  <p>Padrão de nome não é frescura. É o que faz outra pessoa abrir seu banco daqui a seis meses e entender tudo em cinco minutos.</p>
+  <ul>
+    <li><strong>Minúsculas sempre.</strong> Evita erro em sistemas que diferenciam maiúsculas de minúsculas.</li>
+    <li><strong>snake_case.</strong> Underscore separando palavras: <code class="inl">id_cliente</code>, não <code class="inl">idCliente</code>.</li>
+    <li><strong>Nome descritivo.</strong> <code class="inl">email</code> e <code class="inl">telefone</code> dizem o que guardam. <code class="inl">campo3</code> não diz nada.</li>
+    <li><strong>Consistência.</strong> Escolha um padrão e mantenha. Misturar <code class="inl">Nome</code>, <code class="inl">nomeUsuario</code> e <code class="inl">EmailID</code> na mesma base é dívida técnica no primeiro dia.</li>
+    <li><strong>Prefixos com significado.</strong> <code class="inl">id_</code> para identificadores, <code class="inl">status_</code> para estados. Dá contexto imediato.</li>
+  </ul>
+
+  <h3 id="p2-3">2.3 Os sete tipos de banco de dados</h3>
+  <p>A classificação depende da estrutura, do modelo de dados e do uso. Não existe modelo ideal para tudo: existe o modelo adequado ao seu problema.</p>
+
+  <h4>1 · Relacional</h4>
+  <p>Dados em tabelas ligadas por chaves primárias e estrangeiras, consultados em SQL. Garante <strong>ACID</strong> — atomicidade (a transação acontece inteira ou não acontece), consistência (o banco termina em estado válido), isolamento (transações não interferem entre si) e durabilidade (o efeito sobrevive a uma queda). Escala verticalmente, ou seja, ganhando mais memória e processador na mesma máquina. Brilha em consultas complexas com JOIN, agrupamento e subconsulta.<br><span class="fraco">Onde usar: sistemas financeiros, ERP, qualquer coisa que não pode perder um centavo. Exemplos: MySQL, PostgreSQL, Oracle Database, SQL Server.</span></p>
+
+  <h4>2 · Não relacional (NoSQL)</h4>
+  <p>Sem esquema rígido. Armazena dado estruturado, semiestruturado ou nenhum dos dois: documentos, pares chave-valor, grafos, colunas. Escala horizontalmente — em vez de uma máquina maior, mais máquinas. Leitura e escrita muito rápidas. O preço é a <strong>consistência eventual</strong>: os nós se sincronizam depois, não na hora.<br><span class="fraco">Onde usar: big data, aplicativos móveis, redes sociais, alta disponibilidade. Exemplos: MongoDB, Cassandra, Redis, Neo4j.</span></p>
+
+  <h4>3 · Hierárquico</h4>
+  <p>Árvore: uma raiz, e cada registro tem um único “pai” e vários “filhos”. Relacionamentos de padrão fixo, pouca flexibilidade, mas leitura muito rápida quando a consulta segue a hierarquia.<br><span class="fraco">Onde usar: sistemas de arquivos, catálogos, organogramas. Exemplo: IBM Information Management System (IMS).</span></p>
+
+  <h4>4 · Em rede</h4>
+  <p>Parecido com o hierárquico, porém um registro pode ter <strong>vários pais</strong>. As ligações são feitas por ponteiros, e não por campo em comum. Representa muitos-para-muitos com naturalidade e navega bem por conexões, mas fica difícil de manter quando o número de relações cresce.<br><span class="fraco">Onde usar: redes de transporte, sistemas de recomendação. Exemplos: Integrated Data Store (IDS), TurboIMAGE.</span></p>
+
+  <h4>5 · Orientado a objetos</h4>
+  <p>Os dados são objetos, com atributos e métodos, iguais aos da programação orientada a objetos. Elimina a tradução entre o formato do banco e o objeto da aplicação, o que reduz código e aumenta produtividade. Lida bem com estruturas aninhadas e modelos complexos.<br><span class="fraco">Onde usar: CAD, simulações, modelagem tridimensional. Exemplos: db4o, ObjectDB.</span></p>
+
+  <h4>6 · Em memória</h4>
+  <p>Guarda os dados direto na RAM. Acesso quase instantâneo, porque não passa por disco. A contrapartida é a volatilidade: desligou, perdeu — a menos que haja estratégia de persistência ou backup. O tamanho também esbarra na memória disponível.<br><span class="fraco">Onde usar: cache, trading, jogos online, recomendação em tempo real. Exemplos: Redis, Memcached.</span></p>
+
+  <h4>7 · Distribuído</h4>
+  <p>Armazenamento e processamento divididos entre vários locais físicos, funcionando como um sistema só. Dá escalabilidade global e alta disponibilidade: se um nó cai, outro assume. Também esbarra na consistência eventual, derivada do <strong>Teorema CAP</strong> — prioriza disponibilidade e tolerância a partição em vez de consistência imediata.<br><span class="fraco">Onde usar: grandes plataformas online, big data, operação em vários países. Exemplos: Google Spanner, Apache Cassandra.</span></p>
+
+  <div class="tab-rolo">
+  <table>
+    <caption>Resumo de bolso para a hora de escolher.</caption>
+    <thead><tr><th>Tipo</th><th>Força</th><th>Fraqueza</th><th>Exemplo</th></tr></thead>
+    <tbody>
+      <tr><td>Relacional</td><td>Integridade e ACID</td><td>Escala vertical, esquema rígido</td><td>PostgreSQL</td></tr>
+      <tr><td>NoSQL</td><td>Flexibilidade e escala horizontal</td><td>Consistência eventual</td><td>MongoDB</td></tr>
+      <tr><td>Hierárquico</td><td>Leitura rápida na árvore</td><td>Relações fixas</td><td>IMS</td></tr>
+      <tr><td>Em rede</td><td>Muitos-para-muitos nativo</td><td>Complexidade de manutenção</td><td>IDS</td></tr>
+      <tr><td>Orientado a objetos</td><td>Casa com a linguagem</td><td>Ecossistema pequeno</td><td>ObjectDB</td></tr>
+      <tr><td>Em memória</td><td>Velocidade extrema</td><td>Volátil e limitado pela RAM</td><td>Redis</td></tr>
+      <tr><td>Distribuído</td><td>Disponibilidade global</td><td>Consistência eventual</td><td>Cassandra</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 id="p2-4">2.4 SGBD — Sistema Gerenciador de Banco de Dados</h3>
+  <p>O SGBD é o software que fica entre você e os dados. Ele cria, manipula, administra e controla o banco, garantindo integridade, segurança e desempenho.</p>
+  <h4>As sete funções que ele exerce</h4>
+  <ul>
+    <li><strong>Armazenamento e recuperação:</strong> organiza os dados e devolve o que foi pedido.</li>
+    <li><strong>Gerenciamento de transações:</strong> faz valer o ACID.</li>
+    <li><strong>Controle de concorrência:</strong> muita gente mexendo ao mesmo tempo sem corromper nada.</li>
+    <li><strong>Segurança e controle de acesso:</strong> autenticação e permissões.</li>
+    <li><strong>Backup e recuperação:</strong> cópia periódica e volta ao ar depois de falha.</li>
+    <li><strong>Gerenciamento de consultas:</strong> traduz seu SQL em plano de execução eficiente.</li>
+    <li><strong>Indexação:</strong> acelera a busca.</li>
+  </ul>
+  <p class="fraco">Os mais usados no mercado: Oracle, MySQL, SQL Server, PostgreSQL, MongoDB e MariaDB.</p>
+
+  <h3 id="p2-5">2.5 Modelagem: o desenho antes do código</h3>
+  <p>Modelar é criar a representação estrutural do banco: o que será guardado, como as informações se relacionam e como serão acessadas. A primeira fase é a <strong>modelagem conceitual</strong>, feita com o Modelo Entidade-Relacionamento (MER), proposto por Peter Chen em 1976. Ele descreve a estrutura de forma abstrata, sem se preocupar ainda com a implementação física.</p>
+
+  <h4>Componentes do MER</h4>
+  <ul>
+    <li><strong>Entidade</strong> — objeto ou conceito do mundo real com significado para o banco. Pode ser concreta (Cliente, Produto, Funcionário) ou abstrata (Pedido, Curso).</li>
+    <li><strong>Atributo</strong> — propriedade de uma entidade. O Cliente tem Nome, E-mail, Endereço.</li>
+    <li><strong>Relacionamento</strong> — associação entre entidades. “Um Cliente realiza Pedidos” é um relacionamento entre Cliente e Pedido.</li>
+    <li><strong>Cardinalidade</strong> — quantas instâncias de uma entidade se ligam a quantas da outra.</li>
+  </ul>
+
+  <h4>As três cardinalidades</h4>
+  <ul>
+    <li><strong>1:1</strong> — cada instância de A se liga a no máximo uma de B, e vice-versa. Cada pessoa tem um RG, e cada RG pertence a uma pessoa.</li>
+    <li><strong>1:N</strong> — uma instância de A se liga a várias de B, mas cada B pertence a um único A. Um cliente faz vários pedidos; cada pedido é de um cliente só.</li>
+    <li><strong>N:M</strong> — várias de A para várias de B. Um aluno se matricula em vários cursos, e um curso tem vários alunos.</li>
+  </ul>
+
+  <h4>DER e seus símbolos</h4>
+  <p>O Diagrama de Entidade-Relacionamento é a representação gráfica do MER.</p>
+  <div class="tab-rolo">
+  <table>
+    <thead><tr><th>Elemento</th><th>Símbolo</th></tr></thead>
+    <tbody>
+      <tr><td>Entidade</td><td>Retângulo</td></tr>
+      <tr><td>Atributo</td><td>Elipse (ou círculo)</td></tr>
+      <tr><td>Relacionamento</td><td>Losango</td></tr>
+      <tr><td>Cardinalidade</td><td>Números junto aos conectores: 1, N, M</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Exemplo completo: sistema de vendas</h4>
+  <p>Três entidades. <strong>Cliente</strong> (Nome, Email, Endereço), <strong>Pedido</strong> (Data, Valor Total) e <strong>Produto</strong> (Nome, Preço). Dois relacionamentos:</p>
+  <ul>
+    <li><strong>Cliente realiza Pedido (1:N)</strong> — um cliente faz muitos pedidos, cada pedido é de um cliente.</li>
+    <li><strong>Pedido contém Produto (N:M)</strong> — um pedido tem vários produtos, e um produto aparece em vários pedidos. Na hora de implementar, esse N:M vira uma tabela intermediária, algo como <code class="inl">itens_pedido</code>.</li>
+  </ul>
+
+  <h3 id="p2-6">2.6 Conversão de banco de dados</h3>
+  <p>Converter é migrar dados de um sistema ou formato para outro: trocar de tecnologia, integrar bases, sair de relacional para NoSQL ou o caminho inverso. Feito no improviso, destrói informação. Feito em etapas, não.</p>
+
+  <h4>As sete etapas</h4>
+  <ol class="lista">
+    <li><strong>Análise inicial</strong> — identificar origem e destino, entender a estrutura e os relacionamentos da origem, levantar as limitações e especificidades do destino.</li>
+    <li><strong>Mapeamento de dados</strong> — estabelecer as correspondências entre os esquemas, adaptar tipos de dados e planejar como chaves primárias e estrangeiras serão traduzidas.</li>
+    <li><strong>Extração</strong> — tirar os dados da origem com ferramenta ou script, já no formato que o destino aceita.</li>
+    <li><strong>Transformação</strong> — ajustar os dados extraídos, normalizando ou desnormalizando conforme a necessidade do novo sistema.</li>
+    <li><strong>Carga</strong> — inserir no destino e validar a consistência do que chegou.</li>
+    <li><strong>Validação e testes</strong> — comparar origem e destino registro a registro e testar integridade de chaves e relacionamentos.</li>
+    <li><strong>Otimização</strong> — ajustar índices, revisar tabelas, configurar permissões e acessos.</li>
+  </ol>
+
+  <h4>Três tipos de conversão</h4>
+  <ul>
+    <li><strong>Estrutural</strong> — muda o esquema para caber no novo formato.</li>
+    <li><strong>Semântica</strong> — transforma os dados para atender às novas regras de negócio.</li>
+    <li><strong>Tecnológica</strong> — troca o sistema em si, por exemplo de SQL para NoSQL.</li>
+  </ul>
+
+  <h4>O que costuma dar errado</h4>
+  <ul>
+    <li><strong>Incompatibilidade de formatos</strong> entre os tipos de dados da origem e do destino.</li>
+    <li><strong>Perda de integridade</strong> nas relações e chaves durante o transporte.</li>
+    <li><strong>Volume de dados</strong>, que torna tudo mais lento e multiplica a chance de erro.</li>
+    <li><strong>Downtime</strong>, quando a conversão exige o sistema fora do ar.</li>
+  </ul>
+  <p class="fraco">Ferramentas conhecidas: SQL Server Integration Services (SSIS), Oracle Data Integrator (ODI), pgLoader e MongoDB Atlas Data Lake.</p>
+
+  <div class="caixa missao">
+    <span class="caixa-rot">Missão 2.7 · Qual cofre</span>
+    <p>Você é consultor de TI contratado por uma startup. Ela quer uma aplicação para gerenciar vendas, acompanhar pedidos e analisar dados de clientes — e, no futuro, prever demanda com machine learning.</p>
+    <p><strong>Pesquise</strong> os principais tipos de banco (relacional, não relacional, em memória, distribuído) e levante características, vantagens, desvantagens e exemplos de uso. <strong>Entregue</strong> uma resenha crítica indicando qual tipo atende melhor a startup, com justificativa de negócio, cenários de uso e as limitações da sua escolha.</p>
+  </div>
+
+  <div class="caixa missao">
+    <span class="caixa-rot">Missão 2.8 · Qual porteiro</span>
+    <p>Uma organização educacional quer trocar de SGBD para melhorar segurança, desempenho em consultas e gerenciamento de transações, e pediu um relatório.</p>
+    <p><strong>Pesquise</strong> MySQL, PostgreSQL, SQL Server e MongoDB, comparando segurança, controle de concorrência, suporte a transações e indexação. <strong>Entregue</strong> uma resenha crítica com pontos fortes e fracos de cada um no contexto dessa instituição, terminando com uma recomendação fundamentada no perfil dela.</p>
+  </div>
+</section>
+
+<!-- ==================== PARTE 3 ==================== -->
+<section class="parte" id="p3">
+  <div class="parte-cab"><span class="parte-num">03</span><h2>SQL</h2></div>
+  <p class="abre">A língua franca dos bancos relacionais. Cinco categorias de comando, e você usa todas antes do fim da unidade.</p>
+
+  <p>SQL, de <em>Structured Query Language</em>, é uma linguagem padronizada para gerenciar e manipular dados em bancos relacionais. Ela é <strong>declarativa</strong>: você descreve <em>o que</em> quer, e o SGBD decide <em>como</em> buscar. Por ser padrão, os mesmos conceitos servem em MySQL, PostgreSQL, Oracle ou SQL Server — muda pouca coisa de dialeto.</p>
+
+  <div class="tab-rolo">
+  <table>
+    <caption>As cinco categorias da linguagem.</caption>
+    <thead><tr><th>Sigla</th><th>Serve para</th><th class="mono">Comandos</th></tr></thead>
+    <tbody>
+      <tr><td><strong>DDL</strong><br><span class="fraco">Data Definition Language</span></td><td>Definir a estrutura: tabelas, esquemas, índices</td><td class="mono">CREATE, ALTER, DROP</td></tr>
+      <tr><td><strong>DML</strong><br><span class="fraco">Data Manipulation Language</span></td><td>Mexer nos registros</td><td class="mono">INSERT, UPDATE, DELETE</td></tr>
+      <tr><td><strong>DQL</strong><br><span class="fraco">Data Query Language</span></td><td>Consultar, filtrar, ordenar, agregar</td><td class="mono">SELECT</td></tr>
+      <tr><td><strong>TCL</strong><br><span class="fraco">Transaction Control Language</span></td><td>Confirmar ou desfazer um conjunto de operações</td><td class="mono">COMMIT, ROLLBACK</td></tr>
+      <tr><td><strong>DCL</strong><br><span class="fraco">Data Control Language</span></td><td>Permissões e restrições de acesso</td><td class="mono">GRANT, REVOKE</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>SQL também é peça de segurança e conformidade: controle de acesso, auditoria e proteção contra vazamento passam por ela — o que a coloca no centro de qualquer conversa sobre LGPD, assunto da Parte 05.</p>
+
+  <h3 id="p3-1">3.1 DDL — criando o banco e a tabela</h3>
+  <p>Vamos construir de verdade a tabela <code class="inl">clientes</code> mostrada na Parte 02. O SGBD e a ferramenta de administração ficam a critério da turma.</p>
+
+<pre><span class="cm">-- Criar o banco de dados</span>
+CREATE DATABASE sistema_clientes;
+
+<span class="cm">-- Passar a usá-lo</span>
+USE sistema_clientes;</pre>
+
+<pre><span class="cm">-- Criar a tabela 'clientes'</span>
+CREATE TABLE clientes (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nome_completo VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    telefone VARCHAR(15),
+    data_cadastro DATE DEFAULT CURRENT_DATE,
+    status_cliente ENUM('ativo', 'inativo') DEFAULT 'ativo'
+);</pre>
+
+  <h4>Descrição dos campos</h4>
+  <div class="tab-rolo">
+  <table>
+    <thead><tr><th class="mono">Campo</th><th>Tipo</th><th>O que guarda e por quê</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">id_cliente</td><td>INTEGER</td><td>Identificador único e sequencial. Chave primária: nenhum cliente pode repetir ID.</td></tr>
+      <tr><td class="mono">nome_completo</td><td>VARCHAR</td><td>Nome do cliente, para identificação e comunicação personalizada.</td></tr>
+      <tr><td class="mono">email</td><td>VARCHAR</td><td>Único por cliente. Serve de contato e de credencial de autenticação.</td></tr>
+      <tr><td class="mono">telefone</td><td>VARCHAR</td><td>Número com código de área. É texto porque pode ter parênteses e hífen.</td></tr>
+      <tr><td class="mono">data_cadastro</td><td>DATE</td><td>Quando o cliente entrou. Base de histórico e de relatório por período.</td></tr>
+      <tr><td class="mono">status_cliente</td><td>VARCHAR</td><td>Situação atual: ativo ou inativo.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Validações que o próprio banco garante</h4>
+  <ul>
+    <li><code class="inl">id_cliente</code> é auto-incrementado — ninguém digita ID na mão.</li>
+    <li><code class="inl">email</code> é <code class="inl">UNIQUE NOT NULL</code>, o que bloqueia cadastro duplicado.</li>
+    <li><code class="inl">data_cadastro</code> recebe a data atual por padrão, no momento do registro.</li>
+    <li><code class="inl">status_cliente</code> só aceita <code class="inl">'ativo'</code> ou <code class="inl">'inativo'</code>.</li>
+  </ul>
+
+  <div class="caixa">
+    <span class="caixa-rot">Nota de campo</span>
+    <p>Descrever cada campo antes de criar a tabela parece burocracia até a primeira vez que você precisa alterar um banco em produção. Documentar tipo, função e validação é o que impede o improviso na hora ruim.</p>
+  </div>
+
+  <h3 id="p3-2">3.2 DML — inserindo dados</h3>
+<pre><span class="cm">-- Inserir registros na tabela</span>
+INSERT INTO clientes (nome_completo, email, telefone, status_cliente)
+VALUES
+('Ana Souza', 'ana.souza@email.com', '(27) 99999-1234', 'ativo'),
+('Carlos Oliveira', 'carlos.oliveira@email.com', '(27) 98888-5678', 'inativo'),
+('Beatriz Almeida', 'beatriz.almeida@email.com', '(27) 97777-9012', 'ativo'),
+('Daniel Pereira', 'daniel.pereira@email.com', '(27) 96666-3456', 'ativo');</pre>
+  <p>Repare que <code class="inl">id_cliente</code> e <code class="inl">data_cadastro</code> não aparecem: o banco preenche os dois sozinho.</p>
+
+  <h3 id="p3-3">3.3 DQL — consultando</h3>
+<pre><span class="cm">-- Todos os clientes, todos os campos</span>
+SELECT * FROM clientes;
+
+<span class="cm">-- Só os ativos, só nome e email</span>
+SELECT nome_completo, email FROM clientes WHERE status_cliente = 'ativo';
+
+<span class="cm">-- Cadastrados depois de uma data</span>
+SELECT * FROM clientes WHERE data_cadastro &gt; '2025-01-10';</pre>
+
+  <h3 id="p3-4">3.4 TCL — transações</h3>
+  <p>Transação é um pacote: ou tudo acontece, ou nada acontece. <code class="inl">COMMIT</code> confirma; <code class="inl">ROLLBACK</code> desfaz o que ainda não foi confirmado.</p>
+<pre><span class="cm">-- Abrir a transação</span>
+START TRANSACTION;
+
+<span class="cm">-- Alterar o status de um cliente</span>
+UPDATE clientes SET status_cliente = 'inativo' WHERE id_cliente = 1;
+
+<span class="cm">-- Confirmar</span>
+COMMIT;</pre>
+<pre><span class="cm">-- Ou voltar atrás antes de confirmar</span>
+UPDATE clientes SET status_cliente = 'ativo' WHERE id_cliente = 1;
+ROLLBACK;</pre>
+
+  <h3 id="p3-5">3.5 DCL — permissões</h3>
+<pre><span class="cm">-- Criar um usuário</span>
+CREATE USER 'usuario_consulta'@'localhost' IDENTIFIED BY 'senha123';
+
+<span class="cm">-- Conceder permissão de leitura</span>
+GRANT SELECT ON sistema_clientes.clientes TO 'usuario_consulta'@'localhost';
+
+<span class="cm">-- Revogar essa permissão</span>
+REVOKE SELECT ON sistema_clientes.clientes FROM 'usuario_consulta'@'localhost';</pre>
+
+  <h3 id="p3-6">3.6 Chave primária</h3>
+  <p>Um ou mais campos que identificam de forma única cada registro. Cada tabela tem <strong>uma só</strong>.</p>
+  <ul><li>Valores únicos.</li><li>Não aceita nulo.</li></ul>
+<pre>CREATE TABLE clientes (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nome_completo VARCHAR(255),
+    email VARCHAR(255)
+);</pre>
+
+  <h3 id="p3-7">3.7 Chave estrangeira</h3>
+  <p>Coluna que aponta para a chave primária de outra tabela. É ela que sustenta a <strong>integridade referencial</strong> — sem ela, você acaba com pedido de cliente que não existe.</p>
+  <ul><li>Mantém a relação entre tabelas.</li><li>Aceita nulo, a menos que você declare <code class="inl">NOT NULL</code>.</li></ul>
+<pre>CREATE TABLE pedidos (
+    id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT,
+    valor_total DECIMAL(10, 2),
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+);</pre>
+
+  <h3 id="p3-8">3.8 Índices</h3>
+  <p>Estrutura auxiliar que acelera a busca, principalmente em tabela grande. Custa espaço e deixa a escrita um pouco mais lenta — por isso índice se cria com critério, não em toda coluna.</p>
+  <ul>
+    <li><strong>Primário</strong> — criado automaticamente para a chave primária.</li>
+    <li><strong>Único</strong> — garante que os valores da coluna não se repitam.</li>
+    <li><strong>Não único</strong> — só melhora desempenho, sem impor unicidade.</li>
+  </ul>
+<pre>CREATE INDEX idx_email ON clientes(email);</pre>
+
+  <h3 id="p3-9">3.9 Relacionamentos na prática</h3>
+  <ul>
+    <li><strong>1:1</strong> — um registro corresponde a exatamente um registro de outra tabela.</li>
+    <li><strong>1:N</strong> — um registro se liga a vários de outra tabela.</li>
+    <li><strong>N:N</strong> — exige tabela intermediária para funcionar.</li>
+  </ul>
+  <p>Exemplo de um para muitos: cada departamento pode ter vários funcionários.</p>
+<pre>CREATE TABLE departamentos (
+    id_departamento INT PRIMARY KEY,
+    nome_departamento VARCHAR(255)
+);
+
+CREATE TABLE funcionarios (
+    id_funcionario INT PRIMARY KEY,
+    id_departamento INT,
+    nome_funcionario VARCHAR(255),
+    FOREIGN KEY (id_departamento) REFERENCES departamentos(id_departamento)
+);</pre>
+
+  <h3 id="p3-10">3.10 Normalização</h3>
+  <p>Organizar os dados para eliminar redundância e dependência indevida. Cada etapa se chama forma normal.</p>
+  <ul>
+    <li><strong>1FN</strong> — acabar com grupos repetidos: cada célula guarda um único valor.</li>
+    <li><strong>2FN</strong> — remover dependências parciais: toda coluna depende da chave primária inteira.</li>
+    <li><strong>3FN</strong> — remover dependências transitivas: coluna não pode depender de outra coluna que não seja a chave.</li>
+  </ul>
+  <p><strong>Sem normalizar</strong> — o nome e o endereço do cliente se repetem em toda venda:</p>
+<pre>CREATE TABLE vendas (
+    id_venda INT,
+    cliente_nome VARCHAR(255),
+    cliente_endereco VARCHAR(255)
+);</pre>
+  <p><strong>Depois de normalizar</strong> — o cliente vive numa tabela só, e a venda aponta para ele:</p>
+<pre>CREATE TABLE clientes (
+    id_cliente INT PRIMARY KEY,
+    nome VARCHAR(255),
+    endereco VARCHAR(255)
+);
+
+CREATE TABLE vendas (
+    id_venda INT PRIMARY KEY,
+    id_cliente INT,
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+);</pre>
+
+  <h3 id="p3-11">3.11 Restrições</h3>
+  <p>Regras que o banco aplica sozinho, sem depender da aplicação lembrar delas.</p>
+  <ul>
+    <li><code class="inl">PRIMARY KEY</code> — identifica unicamente o registro.</li>
+    <li><code class="inl">FOREIGN KEY</code> — mantém a integridade referencial.</li>
+    <li><code class="inl">NOT NULL</code> — o campo não pode ficar vazio.</li>
+    <li><code class="inl">UNIQUE</code> — os valores da coluna não se repetem.</li>
+    <li><code class="inl">CHECK</code> — impõe uma condição ao valor.</li>
+  </ul>
+<pre>CREATE TABLE produtos (
+    id_produto INT PRIMARY KEY,
+    nome_produto VARCHAR(255) NOT NULL,
+    preco DECIMAL(10, 2) CHECK (preco &gt; 0)
+);</pre>
+  <p>Aqui, preço zero ou negativo é rejeitado pelo banco, não pelo formulário.</p>
+
+  <div class="caixa missao">
+    <span class="caixa-rot">Missão 3.9 · Reservas de hotel</span>
+    <p>Um hotel gerencia as reservas dos quartos com duas tabelas.</p>
+    <div class="tab-rolo">
+    <table>
+      <caption>Tabela: quartos</caption>
+      <thead><tr><th class="mono">id_quarto</th><th class="mono">tipo_quarto</th><th class="mono">preco_diaria</th><th class="mono">status_quarto</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Single</td><td>150.00</td><td>Disponível</td></tr>
+        <tr><td>2</td><td>Double</td><td>200.00</td><td>Ocupado</td></tr>
+        <tr><td>3</td><td>Suíte</td><td>350.00</td><td>Disponível</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="tab-rolo">
+    <table>
+      <caption>Tabela: reservas</caption>
+      <thead><tr><th class="mono">id_reserva</th><th class="mono">id_quarto</th><th class="mono">nome_cliente</th><th class="mono">data_checkin</th><th class="mono">data_checkout</th><th class="mono">status_reserva</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>2</td><td>João Santos</td><td>2025-01-10</td><td>2025-01-12</td><td>Confirmada</td></tr>
+        <tr><td>2</td><td>3</td><td>Maria Oliveira</td><td>2025-01-14</td><td>2025-01-16</td><td>Pendente</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><strong>Tarefa.</strong> Insira uma reserva para Ana Souza no quarto Single (<code class="inl">id_quarto = 1</code>), check-in em 2025-01-20, check-out em 2025-01-22, status Confirmada. Atualize o status do quarto para Ocupado. Depois, liste todas as reservas confirmadas mostrando o tipo do quarto, o nome do cliente e as duas datas.</p>
+  </div>
+
+  <div class="caixa missao">
+    <span class="caixa-rot">Missão 3.10 · Inventário de armazém</span>
+    <p>Uma empresa de logística controla o estoque com duas tabelas.</p>
+    <div class="tab-rolo">
+    <table>
+      <caption>Tabela: produtos</caption>
+      <thead><tr><th class="mono">id_produto</th><th class="mono">nome_produto</th><th class="mono">quantidade_estoque</th><th class="mono">preco_unitario</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Televisores</td><td>50</td><td>1200.00</td></tr>
+        <tr><td>2</td><td>Geladeiras</td><td>30</td><td>2500.00</td></tr>
+        <tr><td>3</td><td>Máquinas de Lavar</td><td>20</td><td>1800.00</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="tab-rolo">
+    <table>
+      <caption>Tabela: movimentacoes</caption>
+      <thead><tr><th class="mono">id_movimentacao</th><th class="mono">id_produto</th><th class="mono">tipo_movimentacao</th><th class="mono">quantidade</th><th class="mono">data_movimentacao</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>1</td><td>Entrada</td><td>10</td><td>2025-01-10</td></tr>
+        <tr><td>2</td><td>2</td><td>Saída</td><td>5</td><td>2025-01-11</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><strong>Tarefa.</strong> Registre a saída de 3 Máquinas de Lavar em 2025-01-15. Atualize a quantidade em estoque do produto. Liste todas as movimentações de saída com nome do produto, quantidade e data.</p>
+  </div>
+</section>
+
+<!-- ==================== PARTE 4 ==================== -->
+<section class="parte" id="p4">
+  <div class="parte-cab"><span class="parte-num">04</span><h2>CRUD</h2></div>
+  <p class="abre">Quatro operações. Toda aplicação que fala com banco de dados faz alguma dessas quatro, o dia inteiro.</p>
+
+  <div class="tab-rolo">
+  <table>
+    <thead><tr><th>Operação</th><th>O que faz</th><th class="mono">Comando SQL</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Create</strong> — Criar</td><td>Insere novos dados</td><td class="mono">INSERT INTO</td></tr>
+      <tr><td><strong>Read</strong> — Ler</td><td>Consulta dados armazenados</td><td class="mono">SELECT</td></tr>
+      <tr><td><strong>Update</strong> — Atualizar</td><td>Modifica dados existentes</td><td class="mono">UPDATE</td></tr>
+      <tr><td><strong>Delete</strong> — Excluir</td><td>Remove dados</td><td class="mono">DELETE</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Partindo desta tabela:</p>
+<pre>CREATE TABLE clientes (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nome_completo VARCHAR(100),
+    email VARCHAR(100),
+    telefone VARCHAR(15),
+    data_cadastro DATE
+);</pre>
+
+  <h3 id="p4-1">Create</h3>
+<pre>INSERT INTO clientes (nome_completo, email, telefone, data_cadastro)
+VALUES ('Ana Souza', 'ana.souza@email.com', '(27) 99999-1234', '2025-01-10');</pre>
+
+  <h3 id="p4-2">Read</h3>
+<pre><span class="cm">-- Todos os clientes cadastrados</span>
+SELECT * FROM clientes;
+
+<span class="cm">-- Um cliente específico</span>
+SELECT nome_completo, email FROM clientes WHERE nome_completo = 'Ana Souza';</pre>
+
+  <h3 id="p4-3">Update</h3>
+<pre>UPDATE clientes
+SET telefone = '(27) 98888-5678'
+WHERE id_cliente = 1;</pre>
+
+  <h3 id="p4-4">Delete</h3>
+<pre>DELETE FROM clientes WHERE id_cliente = 1;</pre>
+
+  <div class="caixa alerta">
+    <span class="caixa-rot">Regra de sobrevivência</span>
+    <p><code class="inl">UPDATE</code> e <code class="inl">DELETE</code> sem <code class="inl">WHERE</code> atingem a tabela inteira. Antes de rodar qualquer um dos dois, troque o comando por um <code class="inl">SELECT</code> com o mesmo <code class="inl">WHERE</code> e confira quantas linhas voltam. Em produção, faça dentro de uma transação.</p>
+  </div>
+
+  <div class="caixa missao">
+    <span class="caixa-rot">Missão 4.7 · Cadastro de produtos</span>
+    <p>Um e-commerce quer gerenciar o estoque com esta tabela:</p>
+<pre>CREATE TABLE produtos (
+    id_produto INT AUTO_INCREMENT PRIMARY KEY,
+    nome_produto VARCHAR(100),
+    preco DECIMAL(10, 2),
+    quantidade INT,
+    categoria VARCHAR(50)
+);</pre>
+    <p><strong>Tarefa.</strong> Adicione um produto novo, consulte os produtos da categoria “Eletrônicos”, atualize a quantidade de um deles e remova um produto.</p>
+  </div>
+
+  <div class="caixa missao">
+    <span class="caixa-rot">Missão 4.8 · Gerenciamento de funcionários</span>
+    <p>Uma empresa quer gerenciar os dados dos funcionários:</p>
+<pre>CREATE TABLE funcionarios (
+    id_funcionario INT AUTO_INCREMENT PRIMARY KEY,
+    nome_completo VARCHAR(100),
+    cargo VARCHAR(50),
+    salario DECIMAL(10, 2),
+    data_admissao DATE
+);</pre>
+    <p><strong>Tarefa.</strong> Cadastre um funcionário, liste todos com cargo “Analista de Sistemas”, aumente o salário de um deles em 10% e exclua um funcionário.</p>
+  </div>
+</section>
+
+<!-- ==================== PARTE 5 ==================== -->
+<section class="parte" id="p5">
+  <div class="parte-cab"><span class="parte-num">05</span><h2>LGPD</h2></div>
+  <p class="abre">A parte que separa quem sabe montar um banco de quem pode responder por ele.</p>
+
+  <p>A <strong>Lei nº 13.709, de 14 de agosto de 2018</strong>, a Lei Geral de Proteção de Dados Pessoais, estabelece as regras de tratamento de dados pessoais no Brasil. Em 2019, a <strong>Lei nº 13.853</strong> a alterou e criou a <strong>ANPD</strong>, a Autoridade Nacional de Proteção de Dados. A base da LGPD são os direitos fundamentais de liberdade e privacidade previstos na Constituição.</p>
+
+  <h3 id="p5-1">5.1 Conceitos que caem em prova</h3>
+  <ul>
+    <li><strong>Dado pessoal</strong> — qualquer informação que identifique ou torne identificável uma pessoa natural: nome, CPF, endereço.</li>
+    <li><strong>Dado sensível</strong> — categoria mais íntima: origem racial, convicção religiosa, opinião política, dado biométrico, saúde. Exige cautela maior e consentimento explícito.</li>
+    <li><strong>Titular</strong> — a pessoa a quem os dados se referem. O cliente, o usuário, você.</li>
+    <li><strong>Tratamento</strong> — qualquer operação com dado pessoal: coletar, armazenar, consultar, usar, comunicar, eliminar.</li>
+  </ul>
+  <p><strong>Aplicabilidade.</strong> Vale para toda empresa, organização ou pessoa que trate dados no Brasil, não importa onde o controlador esteja. Empresa estrangeira também responde, se o tratamento ocorrer em território nacional ou se os dados forem de pessoas aqui.</p>
+
+  <h3 id="p5-2">5.2 Os princípios legais</h3>
+  <ul>
+    <li><strong>Finalidade</strong> — coletar para propósito legítimo, explícito e específico.</li>
+    <li><strong>Adequação</strong> — o tratamento tem que combinar com a finalidade informada.</li>
+    <li><strong>Necessidade</strong> — só o mínimo de dados que a finalidade exige.</li>
+    <li><strong>Livre acesso</strong> — o titular consulta seus dados quando quiser.</li>
+    <li><strong>Qualidade dos dados</strong> — exatos, claros, relevantes e atualizados.</li>
+    <li><strong>Transparência</strong> — o titular sabe o que é feito com o que é dele.</li>
+    <li><strong>Segurança</strong> — medidas técnicas de proteção.</li>
+    <li><strong>Prevenção</strong> — agir antes do dano acontecer.</li>
+    <li><strong>Não discriminação</strong> — o dado não pode virar instrumento de discriminação.</li>
+  </ul>
+
+  <h3 id="p5-3">5.3 Direitos do titular</h3>
+  <ul>
+    <li><strong>Acesso</strong> — saber quais dados seus a organização trata.</li>
+    <li><strong>Retificação</strong> — corrigir dado incompleto ou impreciso.</li>
+    <li><strong>Exclusão</strong> — pedir a eliminação, em determinadas circunstâncias.</li>
+    <li><strong>Portabilidade</strong> — levar os dados para outro fornecedor.</li>
+    <li><strong>Informação</strong> — ser informado sobre o tratamento.</li>
+    <li><strong>Revogação do consentimento</strong> — voltar atrás a qualquer momento.</li>
+  </ul>
+
+  <h3 id="p5-4">5.4 Transferência internacional</h3>
+  <p>Só é permitida para países ou organismos que ofereçam nível adequado de proteção, conforme a ANPD determinar. Se o destino não tiver essa proteção, o controlador precisa garantir salvaguardas — cláusulas contratuais específicas, por exemplo.</p>
+
+  <h3 id="p5-5">5.5 Quem é quem no tratamento</h3>
+  <ul>
+    <li><strong>Controlador</strong> — decide sobre o tratamento. A empresa que coleta e usa dados de clientes.</li>
+    <li><strong>Operador</strong> — trata os dados em nome do controlador. A terceirizada que hospeda o banco.</li>
+    <li><strong>Encarregado (DPO)</strong> — o profissional que garante o cumprimento da lei: orienta sobre conformidade, recebe reclamações dos titulares e faz a ponte entre organização, titulares e ANPD. Pode ser funcionário ou contratado de fora.</li>
+  </ul>
+  <p>Controlador e operador respondem, os dois, pela conformidade.</p>
+
+  <h3 id="p5-6">5.6 Segurança e boas práticas</h3>
+  <p>A lei exige medidas técnicas e administrativas contra acesso não autorizado, vazamento e dano. Na prática:</p>
+  <ul>
+    <li>criptografia e controle de acesso por perfil;</li>
+    <li>auditorias periódicas;</li>
+    <li>treinamento constante da equipe em segurança da informação.</li>
+  </ul>
+
+  <h3 id="p5-7">5.7 Fiscalização e penalidades</h3>
+  <p>A ANPD fiscaliza por investigação, relatório de auditoria e denúncia de titular. Também orienta os agentes de tratamento, aplica sanções, elabora regulamentação e coopera com autoridades internacionais.</p>
+  <div class="tab-rolo">
+  <table>
+    <thead><tr><th>Sanção</th><th>Quando</th></tr></thead>
+    <tbody>
+      <tr><td>Advertência</td><td>Infração de menor gravidade</td></tr>
+      <tr><td>Multa</td><td>Até 2% do faturamento, limitada a R$ 50 milhões por infração</td></tr>
+      <tr><td>Suspensão do tratamento</td><td>Impede o tratamento por período determinado</td></tr>
+      <tr><td>Eliminação dos dados</td><td>Casos de infração grave</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="caixa missao">
+    <span class="caixa-rot">Missão 5.9 · Coleta e armazenamento</span>
+    <p>Você implanta o cadastro de clientes de um e-commerce e precisa garantir coleta transparente e segura.</p>
+    <p><strong>Responda.</strong> Como os dados pessoais devem ser coletados segundo a LGPD? Que medidas de segurança protegem o que já está armazenado contra acesso não autorizado? Como garantir que o cliente entenda com clareza as finalidades da coleta?</p>
+  </div>
+
+  <div class="caixa missao">
+    <span class="caixa-rot">Missão 5.10 · Direitos do titular</span>
+    <p>Um cliente pede a exclusão de todos os dados dele nos sistemas da empresa, alegando que não quer mais promoções nem contato.</p>
+    <p><strong>Responda.</strong> Quais direitos previstos na LGPD ele está invocando? Que procedimentos a empresa precisa adotar para atender ao pedido? A empresa pode recusar — e em que circunstâncias isso seria permitido?</p>
+  </div>
+</section>
+
+<!-- ==================== PARTE 6 ==================== -->
+<section class="parte" id="p6">
+  <div class="parte-cab"><span class="parte-num">06</span><h2>Glossário</h2></div>
+  <p class="abre">Trinta e poucos termos que aparecem o tempo todo. Use a busca.</p>
+
+  <div class="busca">
+    <label for="q" class="rot" style="font-size:12px">Buscar termo</label>
+    <input id="q" type="search" placeholder="ex.: chave estrangeira, ACID, DDL..." autocomplete="off">
+    <span id="contador"></span>
+  </div>
+
+  <dl class="glos" id="glos">
+    <div><dt>ACID</dt><dd>Atomicidade, consistência, isolamento e durabilidade. O conjunto de propriedades que faz uma transação ser processada de forma confiável.</dd></div>
+    <div><dt>ANPD</dt><dd>Autoridade Nacional de Proteção de Dados, órgão que fiscaliza e regulamenta a LGPD no Brasil.</dd></div>
+    <div><dt>Atributo</dt><dd>Propriedade ou característica de uma entidade, como “Nome” ou “Preço”.</dd></div>
+    <div><dt>Backup</dt><dd>Cópia de segurança dos dados, feita para permitir recuperação depois de uma falha.</dd></div>
+    <div><dt>Banco de dados (BD)</dt><dd>Conjunto organizado de dados inter-relacionados, estruturado para acesso e manipulação eficientes.</dd></div>
+    <div><dt>Big data</dt><dd>Volume massivo, variado e complexo de dados, que exige tecnologia própria para armazenar, processar e analisar.</dd></div>
+    <div><dt>Chave estrangeira</dt><dd>Coluna que aponta para a chave primária de outra tabela, criando o vínculo entre as duas.</dd></div>
+    <div><dt>Chave primária</dt><dd>Atributo, ou conjunto deles, que identifica unicamente cada registro de uma tabela.</dd></div>
+    <div><dt>Commit</dt><dd>Comando TCL que confirma em definitivo as alterações de uma transação.</dd></div>
+    <div><dt>Consistência eventual</dt><dd>Modelo em que os nós de um sistema distribuído se sincronizam com o tempo, e não instantaneamente.</dd></div>
+    <div><dt>Consulta (query)</dt><dd>Comando executado para recuperar ou manipular dados.</dd></div>
+    <div><dt>CRUD</dt><dd>Create, Read, Update e Delete — as quatro operações básicas sobre dados armazenados.</dd></div>
+    <div><dt>Data warehouse</dt><dd>Repositório central de dados estruturados usado para análise e relatório, geralmente em larga escala.</dd></div>
+    <div><dt>DATE</dt><dd>Tipo de dado para armazenar datas.</dd></div>
+    <div><dt>DCL</dt><dd>Data Control Language. Gerencia permissões e restrições de acesso, com GRANT e REVOKE.</dd></div>
+    <div><dt>DDL</dt><dd>Data Definition Language. Define a estrutura do banco, com CREATE, ALTER e DROP.</dd></div>
+    <div><dt>DER</dt><dd>Diagrama de Entidade-Relacionamento. A representação gráfica do MER.</dd></div>
+    <div><dt>DML</dt><dd>Data Manipulation Language. Manipula registros, com INSERT, UPDATE e DELETE.</dd></div>
+    <div><dt>DPO</dt><dd>Data Protection Officer, o encarregado pelo tratamento de dados pessoais na organização.</dd></div>
+    <div><dt>DQL</dt><dd>Data Query Language. Consulta e extrai dados, com destaque para o SELECT.</dd></div>
+    <div><dt>Entidade</dt><dd>Elemento do mundo real representado no banco, como “Cliente” ou “Produto”.</dd></div>
+    <div><dt>Escalabilidade horizontal</dt><dd>Ganhar capacidade adicionando mais servidores.</dd></div>
+    <div><dt>Escalabilidade vertical</dt><dd>Ganhar capacidade adicionando recursos à mesma máquina: memória, processador.</dd></div>
+    <div><dt>GDPR</dt><dd>Regulamento europeu de proteção de dados e privacidade, aplicável a pessoas na União Europeia.</dd></div>
+    <div><dt>ID</dt><dd>Identificador único de um elemento, como o registro de uma tabela.</dd></div>
+    <div><dt>Indexação</dt><dd>Técnica que organiza os dados para acelerar consultas.</dd></div>
+    <div><dt>INTEGER</dt><dd>Tipo de dado para números inteiros.</dd></div>
+    <div><dt>LGPD</dt><dd>Lei Geral de Proteção de Dados Pessoais, que regula uso, armazenamento e tratamento de dados pessoais no Brasil.</dd></div>
+    <div><dt>MER</dt><dd>Modelo Entidade-Relacionamento. Modelo conceitual que representa a estrutura e as relações dos dados.</dd></div>
+    <div><dt>Normalização</dt><dd>Organização dos dados em tabelas para eliminar redundância e dependência inadequada.</dd></div>
+    <div><dt>NoSQL</dt><dd>Not Only SQL. Categoria de bancos que abandona o modelo relacional tradicional em favor de flexibilidade e escala.</dd></div>
+    <div><dt>RAM</dt><dd>Memória de acesso rápido, usada para armazenamento temporário. É onde vive um banco em memória.</dd></div>
+    <div><dt>Relacionamento</dt><dd>Associação entre duas ou mais entidades.</dd></div>
+    <div><dt>Restrição (constraint)</dt><dd>Regra aplicada a colunas para garantir integridade: PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE, CHECK.</dd></div>
+    <div><dt>Rollback</dt><dd>Comando TCL que desfaz as alterações de uma transação ainda não confirmada.</dd></div>
+    <div><dt>SGBD</dt><dd>Sistema Gerenciador de Banco de Dados. O software que gerencia armazenamento, organização e acesso aos dados.</dd></div>
+    <div><dt>Sintaxe</dt><dd>Regras que determinam como o código deve ser escrito.</dd></div>
+    <div><dt>SQL</dt><dd>Structured Query Language, a linguagem de consulta estruturada usada nos bancos relacionais.</dd></div>
+    <div><dt>Tabela</dt><dd>Estrutura fundamental do banco relacional, com linhas (registros) e colunas (atributos).</dd></div>
+    <div><dt>TCL</dt><dd>Transaction Control Language. Gerencia transações com COMMIT e ROLLBACK.</dd></div>
+    <div><dt>Teorema CAP</dt><dd>Em um sistema distribuído, não dá para ter ao mesmo tempo consistência, disponibilidade e tolerância a partição — escolha duas.</dd></div>
+    <div><dt>VARCHAR</dt><dd>Tipo de dado para texto de comprimento variável.</dd></div>
+  </dl>
+</section>
+
+<!-- ==================== PARTE 7 ==================== -->
+<section class="parte" id="p7">
+  <div class="parte-cab"><span class="parte-num">07</span><h2>Gabarito</h2></div>
+  <p class="abre">As respostas das oito missões. Lacrado por um motivo: consultar antes de tentar não ensina nada.</p>
+
+  <div class="lacre" id="lacre">
+    <p>Este envelope está fechado.</p>
+    <button class="btn" id="abrir" aria-expanded="false" aria-controls="respostas">Quebrar o lacre</button>
+  </div>
+
+  <div id="respostas" hidden>
+
+    <h3>Missão 2.7 — Qual cofre</h3>
+    <p><strong>Tipos avaliados.</strong> O relacional é o mais adequado para vendas e pedidos, por causa da integridade e do suporte a transações ACID. O não relacional atende bem a análise de grandes volumes e as previsões com machine learning. O em memória acelera análises e cálculos preditivos em tempo real. O distribuído entra quando a aplicação precisar escalar globalmente.</p>
+    <p><strong>Justificativa.</strong> A startup pode começar com um banco relacional, como PostgreSQL, para gerenciar vendas e pedidos. Para a análise preditiva, integra-se um NoSQL, como MongoDB, e usa-se Redis como cache em memória para melhorar o desempenho. Bancos distribuídos ficam para quando o negócio crescer globalmente.</p>
+
+    <h3>Missão 2.8 — Qual porteiro</h3>
+    <p><strong>Comparação.</strong> MySQL tem bom desempenho em aplicações de médio porte, mas suporte limitado a recursos avançados de transação. PostgreSQL é rico em recursos e ideal para sistemas que exigem alta integridade e segurança. SQL Server oferece excelente controle de concorrência e suporte empresarial, com custo elevado. MongoDB é flexível para dados semiestruturados, porém não garante transações ACID entre múltiplas coleções.</p>
+    <p><strong>Recomendação.</strong> PostgreSQL, pelo custo acessível, pelos recursos avançados de transação e pela robustez em segurança. Se surgir necessidade de lidar com dados não estruturados, integra-se o MongoDB para consultas específicas.</p>
+
+    <h3>Missão 3.9 — Reservas de hotel</h3>
+<pre>INSERT INTO reservas (id_quarto, nome_cliente, data_checkin, data_checkout, status_reserva)
+VALUES (1, 'Ana Souza', '2025-01-20', '2025-01-22', 'Confirmada');</pre>
+<pre>UPDATE quartos
+SET status_quarto = 'Ocupado'
+WHERE id_quarto = 1;</pre>
+<pre>SELECT r.id_reserva, q.tipo_quarto, r.nome_cliente, r.data_checkin, r.data_checkout
+FROM reservas r
+JOIN quartos q ON r.id_quarto = q.id_quarto
+WHERE r.status_reserva = 'Confirmada';</pre>
+
+    <h3>Missão 3.10 — Inventário de armazém</h3>
+<pre>INSERT INTO movimentacoes (id_produto, tipo_movimentacao, quantidade, data_movimentacao)
+VALUES (3, 'Saída', 3, '2025-01-15');</pre>
+<pre>UPDATE produtos
+SET quantidade_estoque = quantidade_estoque - 3
+WHERE id_produto = 3;</pre>
+<pre>SELECT m.id_movimentacao, p.nome_produto, m.quantidade, m.data_movimentacao
+FROM movimentacoes m
+JOIN produtos p ON m.id_produto = p.id_produto
+WHERE m.tipo_movimentacao = 'Saída';</pre>
+
+    <h3>Missão 4.7 — Cadastro de produtos</h3>
+<pre><span class="cm">-- Adicionar um novo produto</span>
+INSERT INTO produtos (nome_produto, preco, quantidade, categoria)
+VALUES ('Smartphone', 1500.00, 10, 'Eletrônicos');
+
+<span class="cm">-- Consultar produtos da categoria "Eletrônicos"</span>
+SELECT * FROM produtos WHERE categoria = 'Eletrônicos';
+
+<span class="cm">-- Atualizar a quantidade de um produto</span>
+UPDATE produtos SET quantidade = 15 WHERE id_produto = 1;
+
+<span class="cm">-- Remover um produto</span>
+DELETE FROM produtos WHERE id_produto = 1;</pre>
+
+    <h3>Missão 4.8 — Gerenciamento de funcionários</h3>
+<pre><span class="cm">-- Cadastrar um novo funcionário</span>
+INSERT INTO funcionarios (nome_completo, cargo, salario, data_admissao)
+VALUES ('João Pereira', 'Analista de Sistemas', 4500.00, '2025-01-01');
+
+<span class="cm">-- Listar por cargo</span>
+SELECT * FROM funcionarios WHERE cargo = 'Analista de Sistemas';
+
+<span class="cm">-- Aumentar o salário em 10%</span>
+UPDATE funcionarios SET salario = salario * 1.10 WHERE id_funcionario = 1;
+
+<span class="cm">-- Excluir um funcionário</span>
+DELETE FROM funcionarios WHERE id_funcionario = 1;</pre>
+
+    <h3>Missão 5.9 — Coleta e armazenamento</h3>
+    <p><strong>Coleta.</strong> Os dados devem ser coletados de forma explícita, transparente e para finalidade legítima. O titular precisa ser informado da finalidade e consentir de maneira clara e inequívoca. O consentimento é livre e pode ser revogado a qualquer momento. A coleta se restringe ao mínimo necessário para aquela finalidade.</p>
+    <p><strong>Segurança.</strong> Criptografia dos dados, autenticação de dois fatores, controle de acesso restrito e backup regular. Vale ainda auditar periodicamente para achar vulnerabilidade antes que alguém de fora ache.</p>
+    <p><strong>Transparência.</strong> Política de privacidade acessível em toda página de cadastro, explicando com clareza as finalidades. Melhor ainda: oferecer consentimento separado para cada tipo de uso, para que o cliente entenda o que está aceitando.</p>
+
+    <h3>Missão 5.10 — Direitos do titular</h3>
+    <p><strong>Direitos invocados.</strong> O direito de exclusão, previsto no artigo 18 da LGPD, que permite ao titular solicitar a eliminação dos dados quando não houver mais necessidade de tratamento ou quando o consentimento for revogado.</p>
+    <p><strong>Procedimento.</strong> A empresa verifica a solicitação, confirma que não existe obrigação legal ou contratual que exija manter os dados e então elimina as informações pessoais de forma integral e irreversível em todos os sistemas.</p>
+    <p><strong>Recusa.</strong> Só cabe quando existe base legal para continuar tratando, como o cumprimento de obrigação legal, fiscal ou contratual. Nesse caso a exclusão pode ser negada até a obrigação ser cumprida, e a recusa precisa ser comunicada ao cliente com a justificativa legal.</p>
+  </div>
+</section>
+
+
+</main>
+</div>
+
+<footer class="rodape env">
+  <p class="rot" style="font-size:13px">UC6 · Criar e Manter Banco de Dados · Técnico em Desenvolvimento de Sistemas</p>
+  <p style="margin-top:5px">Conteúdo adaptado do caderno A-279 do Senac/ES para uso em sala.</p>
+</footer>
+
+<a href="#" class="topo">↑ topo</a>
+
+<script>
+/* No celular o índice começa recolhido, senão empurra o texto para longe.
+   Quem fechar ou abrir manda: a partir daí a página respeita a escolha. */
+(function(){
+  var indice = document.getElementById('indice');
+  if(!indice) return;
+  /* a mesma medida que o CSS usa, para os dois nunca discordarem */
+  var largo = window.matchMedia('(min-width: 881px)');
+  var mexeu = false, esperado = null;
+
+  /* o evento chega depois, então comparamos com o que nós mesmos pedimos:
+     se o estado não é o que a página escolheu, foi o dedo do leitor. */
+  indice.addEventListener('toggle', function(){
+    if(indice.open !== esperado) mexeu = true;
+  });
+  function ajustar(){
+    if(mexeu) return;
+    esperado = largo.matches;
+    indice.open = esperado;
+  }
+  ajustar();
+  largo.addEventListener('change', ajustar);
+
+  /* ao escolher uma parte, o índice se recolhe e sai da frente */
+  indice.addEventListener('click', function(e){
+    if(e.target.closest('a') && !largo.matches) indice.open = false;
+  });
+})();
+
+/* índice: marca a parte que está na tela */
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.indice a'));
+  var alvos = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  if(!('IntersectionObserver' in window)) return;
+  var obs = new IntersectionObserver(function(entradas){
+    entradas.forEach(function(e){
+      if(!e.isIntersecting) return;
+      links.forEach(function(l,i){ l.classList.toggle('ativo', alvos[i] === e.target); });
+    });
+  }, {rootMargin:'-15% 0px -70% 0px'});
+  alvos.forEach(function(s){ if(s) obs.observe(s); });
+})();
+
+/* gabarito lacrado */
+(function(){
+  var btn = document.getElementById('abrir');
+  var caixa = document.getElementById('respostas');
+  btn.addEventListener('click', function(){
+    var aberto = !caixa.hidden;
+    caixa.hidden = aberto;
+    btn.setAttribute('aria-expanded', String(!aberto));
+    btn.textContent = aberto ? 'Quebrar o lacre' : 'Lacrar de novo';
+  });
+})();
+
+/* busca no glossário */
+(function(){
+  var campo = document.getElementById('q');
+  var itens = Array.prototype.slice.call(document.querySelectorAll('#glos > div'));
+  var contador = document.getElementById('contador');
+  function filtrar(){
+    var t = campo.value.trim().toLowerCase();
+    var n = 0;
+    itens.forEach(function(d){
+      var bate = !t || d.textContent.toLowerCase().indexOf(t) !== -1;
+      d.hidden = !bate;
+      if(bate) n++;
+    });
+    contador.textContent = t ? n + ' de ' + itens.length : itens.length + ' termos';
+  }
+  campo.addEventListener('input', filtrar);
+  filtrar();
+})();
+</script>
+
+<script src="assets/config.js"></script>
+<script type="module" src="assets/nav.js"></script>
+</body>
+</html>
