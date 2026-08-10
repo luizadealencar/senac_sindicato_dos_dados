@@ -2,24 +2,56 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#191E1B">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>O Caderno — UC6 Criar e Manter Banco de Dados</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;600;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/base.css">
 <style>
-.subtitulo{max-width:56ch}
+:root{
+  --papel:#E9EDE3;
+  --papel-barra:#DDE4D5;
+  --papel-linha:#C3CDB8;
+  --tinta:#191E1B;
+  --tinta-fraca:#3F4A3D;
+  --carimbo:#8E2323;
+  --latao:#9A7226;
+  --borda:#B4BFA9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--papel);
+  color:var(--tinta);
+  font-family:'Spectral',Georgia,serif;
+  font-size:18.5px;
+  line-height:1.7;
+  background-image:repeating-linear-gradient(180deg,transparent 0,transparent 31px,rgba(140,160,130,.18) 31px,rgba(140,160,130,.18) 32px);
+}
+.env{max-width:1060px;margin:0 auto;padding:0 24px}
+.rot{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-weight:600}
+.mono{font-family:'JetBrains Mono',monospace}
+.fraco{color:var(--tinta-fraca)}
+
+/* ---------- navegação ---------- */
+.nav{position:sticky;top:0;z-index:60;background:var(--tinta);color:var(--papel);border-bottom:3px solid var(--carimbo)}
+.nav-in{max-width:1060px;margin:0 auto;padding:10px 24px;display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center}
+.nav-marca{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:16px;margin-right:auto}
+.nav a{color:var(--papel);text-decoration:none;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:14px;font-weight:600;padding:4px 0;border-bottom:2px solid transparent}
+.nav a:hover,.nav a:focus-visible{border-bottom-color:var(--carimbo);outline:none}
+.nav a.aqui{border-bottom-color:var(--carimbo)}
+
+/* ---------- capa ---------- */
+.capa{padding:48px 0 34px}
+.classif{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:2px solid var(--tinta);border-bottom:2px solid var(--tinta);padding:8px 0;font-size:13.5px}
+.titulo{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:clamp(44px,10vw,96px);line-height:.88;margin:24px 0 12px}
+.titulo em{font-style:normal;color:var(--carimbo)}
+.subtitulo{max-width:56ch;font-size:20px}
 
 /* ---------- layout de leitura ---------- */
-.layout{display:grid;grid-template-columns:238px 1fr;gap:48px;align-items:start;padding-bottom:20px}
-/* sem isto a coluna de texto se recusa a encolher e o caderno vaza para fora
-   da tela do celular: item de grid nasce com min-width:auto */
-.layout>*{min-width:0}
+.layout{display:grid;grid-template-columns:238px minmax(0,1fr);gap:48px;align-items:start;padding-bottom:20px}
 
-.indice{position:sticky;top:70px;border:2px solid var(--tinta);background:var(--papel);padding:16px 16px 18px;max-height:calc(100vh - 96px);overflow:auto}
-.indice>summary{display:none}   /* no computador o índice fica sempre aberto */
+.indice{position:sticky;top:70px;border:2px solid var(--tinta);background:var(--papel);padding:16px 16px 18px;max-width:100%;max-height:calc(100vh - 96px);overflow:auto}
 .indice h2{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:13px;color:var(--tinta-fraca);margin-bottom:10px;font-weight:600}
 .indice ol{list-style:none}
 .indice li{border-top:1px solid var(--papel-linha)}
@@ -29,8 +61,14 @@
 .indice a:hover,.indice a:focus-visible{color:var(--carimbo);outline:none}
 .indice a.ativo{color:var(--carimbo)}
 .indice a.ativo::after{content:'◂';margin-left:4px}
+.indice a.indice-hoje{display:block;background:var(--carimbo);color:var(--papel);text-align:center;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-weight:700;font-size:14px;padding:8px;text-decoration:none;margin-bottom:12px}
+.indice-hoje:hover{background:var(--tinta)}
+.indice-grupo{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-fraca);margin:14px 0 4px;padding-top:12px;border-top:1px solid var(--borda)}
+.indice ol{list-style:none;margin:0;padding:0}
+.ancora{display:block;height:0;scroll-margin-top:60px}
 
 /* ---------- texto ---------- */
+main{min-width:0}
 .parte{border-top:2px solid var(--tinta);padding:46px 0 6px;scroll-margin-top:60px}
 .parte:first-child{border-top:none;padding-top:6px}
 .parte-cab{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
@@ -39,7 +77,8 @@
 .parte>p.abre{max-width:62ch;color:var(--tinta-fraca);margin-bottom:26px}
 h3{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:23px;line-height:1.1;margin:34px 0 10px;scroll-margin-top:60px}
 h4{font-family:'Saira Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:14px;color:var(--tinta-fraca);margin:24px 0 8px}
-p{margin-bottom:14px;max-width:70ch}
+p{margin-bottom:14px;max-width:70ch;text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto}
+.parte li{text-align:justify;hyphens:auto}
 .parte ul,.parte ol.lista{margin:0 0 16px 20px;max-width:70ch}
 .parte li{margin-bottom:6px}
 b,strong{font-weight:600}
@@ -49,7 +88,7 @@ a.ext{color:var(--carimbo)}
 pre{
   font-family:'JetBrains Mono',monospace;font-size:14.5px;line-height:1.6;
   background:var(--tinta);color:#CFE0C4;padding:14px 16px;margin:0 0 16px;
-  overflow-x:auto;border-left:4px solid var(--carimbo)
+  overflow-x:auto;max-width:100%;border-left:4px solid var(--carimbo)
 }
 pre .cm{color:#8FA487}
 code.inl{font-family:'JetBrains Mono',monospace;font-size:.88em;background:var(--papel-barra);padding:1px 5px;border:1px solid var(--papel-linha)}
@@ -70,11 +109,39 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 .caixa.alerta{border-color:var(--carimbo)}
 .caixa.alerta .caixa-rot{background:var(--carimbo)}
 .caixa.missao{box-shadow:6px 6px 0 var(--tinta)}
+/* cards dos 27 dias */
+.dia{border:2px solid var(--tinta);margin-bottom:22px;scroll-margin-top:60px;background:var(--papel)}
+.dia.hoje{box-shadow:7px 7px 0 var(--carimbo);border-color:var(--carimbo)}
+.dia-cab{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:var(--tinta);color:var(--papel);padding:11px 16px}
+.dia-n{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;letter-spacing:.08em}
+.dia-data{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#c9cbbe}
+.dia-ato{margin-left:auto;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:12px;font-weight:600;color:var(--latao)}
+.dia.hoje .dia-cab{background:var(--carimbo)}
+.dia-hoje-selo{background:var(--papel);color:var(--carimbo);font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:11px;padding:1px 8px}
+.dia-corpo{padding:15px 18px 18px}
+.dia-titulo{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:22px;line-height:1.05;margin:0 0 8px}
+.dia-vemos{color:var(--tinta-fraca);margin:0 0 4px}
+.dia-vemos a{color:var(--carimbo);text-decoration:none;border-bottom:1px solid var(--borda)}
+.dia-missao{border-left:4px solid var(--latao);background:var(--papel-2,#f3f4ed);padding:12px 14px;margin-top:14px}
+.dia-missao-rot{display:block;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:12.5px;font-weight:700;color:var(--latao);margin-bottom:5px}
+.dia-missao p{margin:0 0 10px}
+.dia-entregar{display:inline-block;background:var(--tinta);color:var(--papel);font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.09em;font-size:13.5px;font-weight:600;padding:8px 16px;text-decoration:none}
+.dia-entregar:hover{background:var(--carimbo)}
+.caixa.ferramenta{border-style:solid;border-color:var(--latao)}
+.caixa.ferramenta .caixa-rot{background:var(--latao)}
+.caixa a{color:var(--carimbo);text-decoration:none;border-bottom:1px solid var(--borda);font-weight:600}
+.caixa a:hover{border-bottom-color:var(--carimbo)}
 .caixa.missao .caixa-rot{background:var(--latao)}
 
 /* ---------- gabarito lacrado ---------- */
 .lacre{border:2px dashed var(--carimbo);padding:18px;text-align:center;margin-bottom:24px}
 .lacre p{max-width:none;color:var(--tinta-fraca);font-size:16.5px;margin-bottom:12px}
+.btn{
+  font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:14px;font-weight:600;
+  padding:10px 19px;border:2px solid var(--carimbo);background:var(--carimbo);color:var(--papel);cursor:pointer
+}
+.btn:hover{background:var(--papel);color:var(--carimbo)}
+.btn:focus-visible{outline:2px solid var(--tinta);outline-offset:3px}
 #respostas[hidden]{display:none}
 
 /* ---------- glossário ---------- */
@@ -92,45 +159,27 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 .glos div[hidden]{display:none}
 
 /* ---------- rodapé ---------- */
-.rodape{margin-top:40px}
-.topo{
-  position:fixed;z-index:40;
-  right:max(16px,env(safe-area-inset-right));
-  bottom:max(16px,env(safe-area-inset-bottom));
-  background:var(--tinta);color:var(--papel);border:none;
-  font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.08em;
-  padding:12px 15px;min-height:44px;cursor:pointer;text-decoration:none;
-  display:inline-flex;align-items:center
-}
+.credito strong{color:var(--latao)}
+.credito a{text-decoration:none}
+.credito a:hover strong,.credito a:focus-visible strong{text-decoration:underline}
+.rodape{border-top:2px solid var(--tinta);padding:26px 0 46px;font-size:14.5px;color:var(--tinta-fraca);margin-top:40px}
+.topo{position:fixed;right:18px;bottom:18px;z-index:40;background:var(--tinta);color:var(--papel);border:none;font-family:'JetBrains Mono',monospace;font-size:13px;padding:11px 14px;cursor:pointer;text-decoration:none;letter-spacing:.08em}
 .topo:hover{background:var(--carimbo)}
 
 @media(max-width:880px){
-  .layout{grid-template-columns:1fr;gap:0}
+  body{font-size:17.5px}
+  .layout{display:block}
+  .indice{position:static;max-height:none;margin-bottom:34px}
   .glos div{grid-template-columns:1fr;gap:2px}
-  .parte{padding:32px 0 6px;scroll-margin-top:56px}
-  h3{font-size:21px;margin:26px 0 9px;scroll-margin-top:56px}
-  pre{font-size:13.5px;padding:12px 13px}
-  table{font-size:15.5px;min-width:420px}
-  th,td{padding:7px 10px}
-  .caixa{padding:14px 15px;margin:18px 0}
-  .caixa.missao{box-shadow:4px 4px 0 var(--tinta)}
-  .busca input{font-size:16.5px;min-height:46px}
-
-  /* o índice vira gaveta, para não empurrar o conteúdo lá para baixo */
-  .indice{position:static;max-height:none;margin-bottom:28px;padding:0;overflow:visible}
-  .indice>summary{
-    display:flex;justify-content:space-between;align-items:center;gap:10px;
-    padding:14px 16px;min-height:52px;cursor:pointer;list-style:none;
-    background:var(--tinta);color:var(--papel);
-    font-family:'Saira Condensed',sans-serif;text-transform:uppercase;
-    letter-spacing:.12em;font-size:14px;font-weight:600
-  }
-  .indice>summary::-webkit-details-marker{display:none}
-  .indice>summary::after{content:'+';font-family:'JetBrains Mono',monospace;font-size:20px;line-height:1}
-  .indice[open]>summary::after{content:'−'}
-  .indice>h2{display:none}
-  .indice>ol{padding:4px 16px 12px}
-  .indice a{padding:12px 0;font-size:16.5px}
+  .env{padding:0 18px}
+}
+@media(max-width:560px){
+  p,.parte li{text-align:left;hyphens:manual}
+  body{font-size:17px}
+  table{font-size:15px}
+  th,td{padding:7px 9px}
+  .topo{right:12px;bottom:12px;padding:9px 11px}
+  .busca input{min-width:0}
 }
 @media print{
   .nav,.indice,.topo,.lacre{display:none}
@@ -139,66 +188,80 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
   #respostas[hidden]{display:block!important}
 }
 </style>
+<script src="curriculo.js"></script>
 </head>
 <body>
 
-<nav class="nav" id="nav" data-pagina="caderno.html"></nav>
+<nav class="nav">
+  <div class="nav-in">
+    <span class="nav-marca">Sindicato dos Dados</span>
+    <a href="index.html#hoje">Hoje</a>
+    <a href="index.html#atos">Atos</a>
+    <a href="index.html#arsenal">Arsenal</a>
+    <a href="index.html#placar">Placar</a>
+    <a href="index.html#filiados">Filiados</a>
+    <a href="index.html#eventos">Eventos</a>
+    <a href="caderno.html" class="aqui">Caderno</a>
+  </div>
+</nav>
 
 
 <header class="capa env">
   <div class="classif rot">
     <span>Dossiê A-279 · Material de estudo</span>
-    <span>7 partes</span>
+    <span id="capaDias">27 dias · 108 horas</span>
     <span>Consulta liberada durante as operações</span>
   </div>
   <h1 class="titulo">O <em>Caderno</em></h1>
-  <p class="subtitulo">Todo o conteúdo da unidade curricular em um lugar só. Sem PDF, sem impressão, sem desculpa. Use o índice ao lado, ou dê <span class="mono">Ctrl+F</span> e procure pelo que precisa.</p>
+  <p class="subtitulo">O curso inteiro, dia a dia. Cada dia traz o que a gente vê em sala e a missão que sua célula entrega no fim — sempre fazendo o banco da empresa de vocês andar. No fim, a Consulta rápida com toda a teoria.</p>
 </header>
 
 <div class="env layout">
 
-<details class="indice" id="indice" open>
-  <summary>Índice do caderno</summary>
+<aside class="indice" aria-label="Índice do caderno">
   <h2>Índice</h2>
+  <a class="indice-hoje" id="irHoje" href="#dia-1">Ir para o dia de hoje →</a>
+  <p class="indice-grupo">Os 27 dias</p>
+  <ol id="indiceAtos"></ol>
+  <p class="indice-grupo">Consulta rápida</p>
   <ol>
-    <li><a href="#p1"><span>01</span>Antes de começar</a></li>
-    <li><a href="#p2"><span>02</span>Banco de dados</a></li>
-    <li><a href="#p3"><span>03</span>SQL</a></li>
-    <li><a href="#p4"><span>04</span>CRUD</a></li>
-    <li><a href="#p5"><span>05</span>LGPD</a></li>
-    <li><a href="#p6"><span>06</span>Glossário</a></li>
-    <li><a href="#p7"><span>07</span>Gabarito</a></li>
+    <li><a href="#ref-banco"><span>A</span>Banco de dados</a></li>
+    <li><a href="#ref-modelagem"><span>B</span>Modelagem</a></li>
+    <li><a href="#ref-sql"><span>C</span>SQL</a></li>
+    <li><a href="#ref-crud"><span>D</span>CRUD</a></li>
+    <li><a href="#ref-lgpd"><span>E</span>LGPD</a></li>
   </ol>
-</details>
+</aside>
 
 <main>
 
-<!-- ==================== PARTE 1 ==================== -->
+<!-- ==================== COMO FUNCIONA ==================== -->
 <section class="parte" id="p1">
-  <div class="parte-cab"><span class="parte-num">01</span><h2>Antes de começar</h2></div>
-  <p class="abre">O que esta unidade curricular cobra de você, em que ordem, e como usar este caderno sem se perder.</p>
+  <div class="parte-cab"><span class="parte-num">00</span><h2>Como funciona</h2></div>
+  <p class="abre">São 108 horas para sair daqui capaz de projetar, criar, alimentar e defender um banco de dados — e você faz isso construindo um de verdade.</p>
 
-  <p>São 108 horas para sair daqui capaz de projetar, criar, alimentar e defender um banco de dados. A teoria aparece sempre colada a um problema: você aprende a modelar porque precisa entregar um modelo, aprende SQL porque precisa consultar um banco que você mesmo construiu, e aprende LGPD porque alguém vai perguntar o que você guarda e por quê.</p>
-
-  <p>Ao final, espera-se que você consiga:</p>
-  <ul>
-    <li>editar e manter bancos de dados conforme a demanda que chegar;</li>
-    <li>diferenciar os tipos de banco e dizer onde cada um se aplica;</li>
-    <li>escolher e configurar um SGBD adequado ao cenário;</li>
-    <li>projetar e implementar um banco alinhado aos requisitos de uma aplicação real.</li>
-  </ul>
-
-  <p>A avaliação não é prova. São os quatro indicadores acima, marcados operação a operação, e a entrega final: uma aplicação que integra tabelas, manipula dados e demonstra domínio das ferramentas estudadas.</p>
+  <p>O curso todo gira em torno de um projeto: <strong>cada célula inventa uma empresa e constrói o banco de dados dela</strong>, do primeiro rascunho à aplicação rodando. Cada dia abaixo tem duas partes: o que a gente vê em sala (as 3h30) e a <strong>missão</strong> dos últimos 30 minutos, entregue no site. Uma missão por dia, sempre empurrando o banco da sua empresa mais um passo.</p>
 
   <div class="caixa">
-    <span class="caixa-rot">Como usar</span>
-    <p>Cada parte deste caderno corresponde a um trecho do percurso. As <strong>missões</strong> (caixas com sombra) são as situações de aprendizagem — elas valem indicador. O gabarito existe, está na Parte 07, e vem lacrado de propósito: tente antes de abrir.</p>
+    <span class="caixa-rot">Como entregar</span>
+    <p>No fim de cada dia, clique em <strong>Entregar no site</strong> no card do dia. Abre uma página no GitHub já com o número da missão — descreva o que a célula fez, cole o SQL, ou arraste prints e imagens direto na caixa. Uma entrega por célula.</p>
   </div>
 </section>
 
-<!-- ==================== PARTE 2 ==================== -->
-<section class="parte" id="p2">
-  <div class="parte-cab"><span class="parte-num">02</span><h2>Banco de dados</h2></div>
+<!-- ==================== OS 27 DIAS ==================== -->
+<section class="parte" id="dias">
+  <div class="parte-cab"><span class="parte-num">27</span><h2>Os 27 dias</h2></div>
+  <div id="osDias"></div>
+</section>
+
+<!-- ==================== CONSULTA RÁPIDA ==================== -->
+<section class="parte" id="consulta">
+  <div class="parte-cab"><span class="parte-num">§</span><h2>Consulta rápida</h2></div>
+  <p class="abre">A teoria toda, para revisar quando a missão pedir. Os cards dos dias apontam para cá.</p>
+</section>
+
+<section class="parte" id="ref-banco">
+  <div class="parte-cab"><span class="parte-num">A</span><h2>Banco de dados</h2></div>
   <p class="abre">O que é, quais tipos existem, quem gerencia e como se desenha um antes de escrever qualquer código.</p>
 
   <h3 id="p2-1">2.1 O que é um banco de dados</h3>
@@ -227,11 +290,6 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
     <li><code class="inl">data_cadastro</code> — marca quando a relação começou. Serve para histórico, segmentação e análise de crescimento.</li>
     <li><code class="inl">status_cliente</code> — diz se o cliente está ativo ou inativo. É o que permite, por exemplo, disparar campanha só para quem ainda compra.</li>
   </ul>
-
-  <div class="caixa alerta">
-    <span class="caixa-rot">Pegadinha</span>
-    <p>A apostila impressa diz, num descuido de revisão, que a chave primária “permite duplicações”. É o contrário: ela <strong>impede</strong>. Se aparecer numa prova, a resposta certa é sempre unicidade e proibição de nulo.</p>
-  </div>
 
   <h3 id="p2-2">2.2 Nomenclatura: como batizar tabelas e colunas</h3>
   <p>Padrão de nome não é frescura. É o que faz outra pessoa abrir seu banco daqui a seis meses e entender tudo em cinco minutos.</p>
@@ -297,7 +355,8 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
   </ul>
   <p class="fraco">Os mais usados no mercado: Oracle, MySQL, SQL Server, PostgreSQL, MongoDB e MariaDB.</p>
 
-  <h3 id="p2-5">2.5 Modelagem: o desenho antes do código</h3>
+  <span id="ref-modelagem" class="ancora"></span>
+  <h3 id="p2-5">Modelagem: o desenho antes do código</h3>
   <p>Modelar é criar a representação estrutural do banco: o que será guardado, como as informações se relacionam e como serão acessadas. A primeira fase é a <strong>modelagem conceitual</strong>, feita com o Modelo Entidade-Relacionamento (MER), proposto por Peter Chen em 1976. Ele descreve a estrutura de forma abstrata, sem se preocupar ainda com a implementação física.</p>
 
   <h4>Componentes do MER</h4>
@@ -307,6 +366,15 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
     <li><strong>Relacionamento</strong> — associação entre entidades. “Um Cliente realiza Pedidos” é um relacionamento entre Cliente e Pedido.</li>
     <li><strong>Cardinalidade</strong> — quantas instâncias de uma entidade se ligam a quantas da outra.</li>
   </ul>
+
+  <div class="caixa ferramenta">
+    <span class="caixa-rot">Ferramentas · desenhar o modelo</span>
+    <p>Para praticar o MER e o DER sem instalar nada:</p>
+    <ul>
+      <li><strong>brModelo</strong> — <a href="http://www.sis4.com/brModelo/" target="_blank" rel="noopener">sis4.com/brModelo</a>. O clássico brasileiro de modelagem conceitual e lógica; feito para ensino.</li>
+      <li><strong>dbdiagram.io</strong> — <a href="https://dbdiagram.io/" target="_blank" rel="noopener">dbdiagram.io</a>. Você digita as entidades e ele desenha o diagrama e já gera o SQL de criação.</li>
+    </ul>
+  </div>
 
   <h4>As três cardinalidades</h4>
   <ul>
@@ -366,22 +434,12 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
   </ul>
   <p class="fraco">Ferramentas conhecidas: SQL Server Integration Services (SSIS), Oracle Data Integrator (ODI), pgLoader e MongoDB Atlas Data Lake.</p>
 
-  <div class="caixa missao">
-    <span class="caixa-rot">Missão 2.7 · Qual cofre</span>
-    <p>Você é consultor de TI contratado por uma startup. Ela quer uma aplicação para gerenciar vendas, acompanhar pedidos e analisar dados de clientes — e, no futuro, prever demanda com machine learning.</p>
-    <p><strong>Pesquise</strong> os principais tipos de banco (relacional, não relacional, em memória, distribuído) e levante características, vantagens, desvantagens e exemplos de uso. <strong>Entregue</strong> uma resenha crítica indicando qual tipo atende melhor a startup, com justificativa de negócio, cenários de uso e as limitações da sua escolha.</p>
-  </div>
-
-  <div class="caixa missao">
-    <span class="caixa-rot">Missão 2.8 · Qual porteiro</span>
-    <p>Uma organização educacional quer trocar de SGBD para melhorar segurança, desempenho em consultas e gerenciamento de transações, e pediu um relatório.</p>
-    <p><strong>Pesquise</strong> MySQL, PostgreSQL, SQL Server e MongoDB, comparando segurança, controle de concorrência, suporte a transações e indexação. <strong>Entregue</strong> uma resenha crítica com pontos fortes e fracos de cada um no contexto dessa instituição, terminando com uma recomendação fundamentada no perfil dela.</p>
-  </div>
-</section>
+  
+  </section>
 
 <!-- ==================== PARTE 3 ==================== -->
-<section class="parte" id="p3">
-  <div class="parte-cab"><span class="parte-num">03</span><h2>SQL</h2></div>
+<section class="parte" id="ref-sql">
+  <div class="parte-cab"><span class="parte-num">C</span><h2>SQL</h2></div>
   <p class="abre">A língua franca dos bancos relacionais. Cinco categorias de comando, e você usa todas antes do fim da unidade.</p>
 
   <p>SQL, de <em>Structured Query Language</em>, é uma linguagem padronizada para gerenciar e manipular dados em bancos relacionais. Ela é <strong>declarativa</strong>: você descreve <em>o que</em> quer, e o SGBD decide <em>como</em> buscar. Por ser padrão, os mesmos conceitos servem em MySQL, PostgreSQL, Oracle ou SQL Server — muda pouca coisa de dialeto.</p>
@@ -401,6 +459,16 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
   </div>
 
   <p>SQL também é peça de segurança e conformidade: controle de acesso, auditoria e proteção contra vazamento passam por ela — o que a coloca no centro de qualquer conversa sobre LGPD, assunto da Parte 05.</p>
+
+  <div class="caixa ferramenta">
+    <span class="caixa-rot">Ferramentas · rodar SQL online</span>
+    <p>Tudo que aparece daqui para baixo você pode testar no navegador, sem instalar SGBD nenhum:</p>
+    <ul>
+      <li><strong>Programiz SQL</strong> — <a href="https://www.programiz.com/sql/online-compiler/" target="_blank" rel="noopener">programiz.com/sql</a>. Editor com banco de exemplo já carregado; ótimo para o primeiro contato.</li>
+      <li><strong>OneCompiler</strong> — <a href="https://onecompiler.com/mysql" target="_blank" rel="noopener">onecompiler.com/mysql</a>. Roda MySQL de verdade e deixa você criar suas próprias tabelas.</li>
+      <li><strong>DB Fiddle</strong> — <a href="https://www.db-fiddle.com/" target="_blank" rel="noopener">db-fiddle.com</a>. Escolhe a versão do banco e compartilha o link do que você montou.</li>
+    </ul>
+  </div>
 
   <h3 id="p3-1">3.1 DDL — criando o banco e a tabela</h3>
   <p>Vamos construir de verdade a tabela <code class="inl">clientes</code> mostrada na Parte 02. O SGBD e a ferramenta de administração ficam a critério da turma.</p>
@@ -582,64 +650,12 @@ CREATE TABLE vendas (
 );</pre>
   <p>Aqui, preço zero ou negativo é rejeitado pelo banco, não pelo formulário.</p>
 
-  <div class="caixa missao">
-    <span class="caixa-rot">Missão 3.9 · Reservas de hotel</span>
-    <p>Um hotel gerencia as reservas dos quartos com duas tabelas.</p>
-    <div class="tab-rolo">
-    <table>
-      <caption>Tabela: quartos</caption>
-      <thead><tr><th class="mono">id_quarto</th><th class="mono">tipo_quarto</th><th class="mono">preco_diaria</th><th class="mono">status_quarto</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>Single</td><td>150.00</td><td>Disponível</td></tr>
-        <tr><td>2</td><td>Double</td><td>200.00</td><td>Ocupado</td></tr>
-        <tr><td>3</td><td>Suíte</td><td>350.00</td><td>Disponível</td></tr>
-      </tbody>
-    </table>
-    </div>
-    <div class="tab-rolo">
-    <table>
-      <caption>Tabela: reservas</caption>
-      <thead><tr><th class="mono">id_reserva</th><th class="mono">id_quarto</th><th class="mono">nome_cliente</th><th class="mono">data_checkin</th><th class="mono">data_checkout</th><th class="mono">status_reserva</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>2</td><td>João Santos</td><td>2025-01-10</td><td>2025-01-12</td><td>Confirmada</td></tr>
-        <tr><td>2</td><td>3</td><td>Maria Oliveira</td><td>2025-01-14</td><td>2025-01-16</td><td>Pendente</td></tr>
-      </tbody>
-    </table>
-    </div>
-    <p><strong>Tarefa.</strong> Insira uma reserva para Ana Souza no quarto Single (<code class="inl">id_quarto = 1</code>), check-in em 2025-01-20, check-out em 2025-01-22, status Confirmada. Atualize o status do quarto para Ocupado. Depois, liste todas as reservas confirmadas mostrando o tipo do quarto, o nome do cliente e as duas datas.</p>
-  </div>
-
-  <div class="caixa missao">
-    <span class="caixa-rot">Missão 3.10 · Inventário de armazém</span>
-    <p>Uma empresa de logística controla o estoque com duas tabelas.</p>
-    <div class="tab-rolo">
-    <table>
-      <caption>Tabela: produtos</caption>
-      <thead><tr><th class="mono">id_produto</th><th class="mono">nome_produto</th><th class="mono">quantidade_estoque</th><th class="mono">preco_unitario</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>Televisores</td><td>50</td><td>1200.00</td></tr>
-        <tr><td>2</td><td>Geladeiras</td><td>30</td><td>2500.00</td></tr>
-        <tr><td>3</td><td>Máquinas de Lavar</td><td>20</td><td>1800.00</td></tr>
-      </tbody>
-    </table>
-    </div>
-    <div class="tab-rolo">
-    <table>
-      <caption>Tabela: movimentacoes</caption>
-      <thead><tr><th class="mono">id_movimentacao</th><th class="mono">id_produto</th><th class="mono">tipo_movimentacao</th><th class="mono">quantidade</th><th class="mono">data_movimentacao</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>1</td><td>Entrada</td><td>10</td><td>2025-01-10</td></tr>
-        <tr><td>2</td><td>2</td><td>Saída</td><td>5</td><td>2025-01-11</td></tr>
-      </tbody>
-    </table>
-    </div>
-    <p><strong>Tarefa.</strong> Registre a saída de 3 Máquinas de Lavar em 2025-01-15. Atualize a quantidade em estoque do produto. Liste todas as movimentações de saída com nome do produto, quantidade e data.</p>
-  </div>
-</section>
+  
+  </section>
 
 <!-- ==================== PARTE 4 ==================== -->
-<section class="parte" id="p4">
-  <div class="parte-cab"><span class="parte-num">04</span><h2>CRUD</h2></div>
+<section class="parte" id="ref-crud">
+  <div class="parte-cab"><span class="parte-num">D</span><h2>CRUD</h2></div>
   <p class="abre">Quatro operações. Toda aplicação que fala com banco de dados faz alguma dessas quatro, o dia inteiro.</p>
 
   <div class="tab-rolo">
@@ -663,23 +679,24 @@ CREATE TABLE vendas (
     data_cadastro DATE
 );</pre>
 
-  <h3 id="p4-1">Create</h3>
+  <h3 id="p4-1">Create — <span class="mono">INSERT</span></h3>
+  <p>Atenção à pegadinha clássica: o <strong>Create</strong> do CRUD não usa o comando <code class="inl">CREATE</code>. O <code class="inl">CREATE</code> do SQL monta a <em>estrutura</em> (a tabela, ali em cima); o <strong>Create</strong> do CRUD <em>insere dados</em> nessa estrutura, e o comando para isso é o <code class="inl">INSERT</code>.</p>
 <pre>INSERT INTO clientes (nome_completo, email, telefone, data_cadastro)
 VALUES ('Ana Souza', 'ana.souza@email.com', '(27) 99999-1234', '2025-01-10');</pre>
 
-  <h3 id="p4-2">Read</h3>
+  <h3 id="p4-2">Read — <span class="mono">SELECT</span></h3>
 <pre><span class="cm">-- Todos os clientes cadastrados</span>
 SELECT * FROM clientes;
 
 <span class="cm">-- Um cliente específico</span>
 SELECT nome_completo, email FROM clientes WHERE nome_completo = 'Ana Souza';</pre>
 
-  <h3 id="p4-3">Update</h3>
+  <h3 id="p4-3">Update — <span class="mono">UPDATE</span></h3>
 <pre>UPDATE clientes
 SET telefone = '(27) 98888-5678'
 WHERE id_cliente = 1;</pre>
 
-  <h3 id="p4-4">Delete</h3>
+  <h3 id="p4-4">Delete — <span class="mono">DELETE</span></h3>
 <pre>DELETE FROM clientes WHERE id_cliente = 1;</pre>
 
   <div class="caixa alerta">
@@ -687,36 +704,12 @@ WHERE id_cliente = 1;</pre>
     <p><code class="inl">UPDATE</code> e <code class="inl">DELETE</code> sem <code class="inl">WHERE</code> atingem a tabela inteira. Antes de rodar qualquer um dos dois, troque o comando por um <code class="inl">SELECT</code> com o mesmo <code class="inl">WHERE</code> e confira quantas linhas voltam. Em produção, faça dentro de uma transação.</p>
   </div>
 
-  <div class="caixa missao">
-    <span class="caixa-rot">Missão 4.7 · Cadastro de produtos</span>
-    <p>Um e-commerce quer gerenciar o estoque com esta tabela:</p>
-<pre>CREATE TABLE produtos (
-    id_produto INT AUTO_INCREMENT PRIMARY KEY,
-    nome_produto VARCHAR(100),
-    preco DECIMAL(10, 2),
-    quantidade INT,
-    categoria VARCHAR(50)
-);</pre>
-    <p><strong>Tarefa.</strong> Adicione um produto novo, consulte os produtos da categoria “Eletrônicos”, atualize a quantidade de um deles e remova um produto.</p>
-  </div>
-
-  <div class="caixa missao">
-    <span class="caixa-rot">Missão 4.8 · Gerenciamento de funcionários</span>
-    <p>Uma empresa quer gerenciar os dados dos funcionários:</p>
-<pre>CREATE TABLE funcionarios (
-    id_funcionario INT AUTO_INCREMENT PRIMARY KEY,
-    nome_completo VARCHAR(100),
-    cargo VARCHAR(50),
-    salario DECIMAL(10, 2),
-    data_admissao DATE
-);</pre>
-    <p><strong>Tarefa.</strong> Cadastre um funcionário, liste todos com cargo “Analista de Sistemas”, aumente o salário de um deles em 10% e exclua um funcionário.</p>
-  </div>
-</section>
+  
+  </section>
 
 <!-- ==================== PARTE 5 ==================== -->
-<section class="parte" id="p5">
-  <div class="parte-cab"><span class="parte-num">05</span><h2>LGPD</h2></div>
+<section class="parte" id="ref-lgpd">
+  <div class="parte-cab"><span class="parte-num">E</span><h2>LGPD</h2></div>
   <p class="abre">A parte que separa quem sabe montar um banco de quem pode responder por ele.</p>
 
   <p>A <strong>Lei nº 13.709, de 14 de agosto de 2018</strong>, a Lei Geral de Proteção de Dados Pessoais, estabelece as regras de tratamento de dados pessoais no Brasil. Em 2019, a <strong>Lei nº 13.853</strong> a alterou e criou a <strong>ANPD</strong>, a Autoridade Nacional de Proteção de Dados. A base da LGPD são os direitos fundamentais de liberdade e privacidade previstos na Constituição.</p>
@@ -786,158 +779,8 @@ WHERE id_cliente = 1;</pre>
   </table>
   </div>
 
-  <div class="caixa missao">
-    <span class="caixa-rot">Missão 5.9 · Coleta e armazenamento</span>
-    <p>Você implanta o cadastro de clientes de um e-commerce e precisa garantir coleta transparente e segura.</p>
-    <p><strong>Responda.</strong> Como os dados pessoais devem ser coletados segundo a LGPD? Que medidas de segurança protegem o que já está armazenado contra acesso não autorizado? Como garantir que o cliente entenda com clareza as finalidades da coleta?</p>
-  </div>
-
-  <div class="caixa missao">
-    <span class="caixa-rot">Missão 5.10 · Direitos do titular</span>
-    <p>Um cliente pede a exclusão de todos os dados dele nos sistemas da empresa, alegando que não quer mais promoções nem contato.</p>
-    <p><strong>Responda.</strong> Quais direitos previstos na LGPD ele está invocando? Que procedimentos a empresa precisa adotar para atender ao pedido? A empresa pode recusar — e em que circunstâncias isso seria permitido?</p>
-  </div>
-</section>
-
-<!-- ==================== PARTE 6 ==================== -->
-<section class="parte" id="p6">
-  <div class="parte-cab"><span class="parte-num">06</span><h2>Glossário</h2></div>
-  <p class="abre">Trinta e poucos termos que aparecem o tempo todo. Use a busca.</p>
-
-  <div class="busca">
-    <label for="q" class="rot" style="font-size:12px">Buscar termo</label>
-    <input id="q" type="search" placeholder="ex.: chave estrangeira, ACID, DDL..." autocomplete="off">
-    <span id="contador"></span>
-  </div>
-
-  <dl class="glos" id="glos">
-    <div><dt>ACID</dt><dd>Atomicidade, consistência, isolamento e durabilidade. O conjunto de propriedades que faz uma transação ser processada de forma confiável.</dd></div>
-    <div><dt>ANPD</dt><dd>Autoridade Nacional de Proteção de Dados, órgão que fiscaliza e regulamenta a LGPD no Brasil.</dd></div>
-    <div><dt>Atributo</dt><dd>Propriedade ou característica de uma entidade, como “Nome” ou “Preço”.</dd></div>
-    <div><dt>Backup</dt><dd>Cópia de segurança dos dados, feita para permitir recuperação depois de uma falha.</dd></div>
-    <div><dt>Banco de dados (BD)</dt><dd>Conjunto organizado de dados inter-relacionados, estruturado para acesso e manipulação eficientes.</dd></div>
-    <div><dt>Big data</dt><dd>Volume massivo, variado e complexo de dados, que exige tecnologia própria para armazenar, processar e analisar.</dd></div>
-    <div><dt>Chave estrangeira</dt><dd>Coluna que aponta para a chave primária de outra tabela, criando o vínculo entre as duas.</dd></div>
-    <div><dt>Chave primária</dt><dd>Atributo, ou conjunto deles, que identifica unicamente cada registro de uma tabela.</dd></div>
-    <div><dt>Commit</dt><dd>Comando TCL que confirma em definitivo as alterações de uma transação.</dd></div>
-    <div><dt>Consistência eventual</dt><dd>Modelo em que os nós de um sistema distribuído se sincronizam com o tempo, e não instantaneamente.</dd></div>
-    <div><dt>Consulta (query)</dt><dd>Comando executado para recuperar ou manipular dados.</dd></div>
-    <div><dt>CRUD</dt><dd>Create, Read, Update e Delete — as quatro operações básicas sobre dados armazenados.</dd></div>
-    <div><dt>Data warehouse</dt><dd>Repositório central de dados estruturados usado para análise e relatório, geralmente em larga escala.</dd></div>
-    <div><dt>DATE</dt><dd>Tipo de dado para armazenar datas.</dd></div>
-    <div><dt>DCL</dt><dd>Data Control Language. Gerencia permissões e restrições de acesso, com GRANT e REVOKE.</dd></div>
-    <div><dt>DDL</dt><dd>Data Definition Language. Define a estrutura do banco, com CREATE, ALTER e DROP.</dd></div>
-    <div><dt>DER</dt><dd>Diagrama de Entidade-Relacionamento. A representação gráfica do MER.</dd></div>
-    <div><dt>DML</dt><dd>Data Manipulation Language. Manipula registros, com INSERT, UPDATE e DELETE.</dd></div>
-    <div><dt>DPO</dt><dd>Data Protection Officer, o encarregado pelo tratamento de dados pessoais na organização.</dd></div>
-    <div><dt>DQL</dt><dd>Data Query Language. Consulta e extrai dados, com destaque para o SELECT.</dd></div>
-    <div><dt>Entidade</dt><dd>Elemento do mundo real representado no banco, como “Cliente” ou “Produto”.</dd></div>
-    <div><dt>Escalabilidade horizontal</dt><dd>Ganhar capacidade adicionando mais servidores.</dd></div>
-    <div><dt>Escalabilidade vertical</dt><dd>Ganhar capacidade adicionando recursos à mesma máquina: memória, processador.</dd></div>
-    <div><dt>GDPR</dt><dd>Regulamento europeu de proteção de dados e privacidade, aplicável a pessoas na União Europeia.</dd></div>
-    <div><dt>ID</dt><dd>Identificador único de um elemento, como o registro de uma tabela.</dd></div>
-    <div><dt>Indexação</dt><dd>Técnica que organiza os dados para acelerar consultas.</dd></div>
-    <div><dt>INTEGER</dt><dd>Tipo de dado para números inteiros.</dd></div>
-    <div><dt>LGPD</dt><dd>Lei Geral de Proteção de Dados Pessoais, que regula uso, armazenamento e tratamento de dados pessoais no Brasil.</dd></div>
-    <div><dt>MER</dt><dd>Modelo Entidade-Relacionamento. Modelo conceitual que representa a estrutura e as relações dos dados.</dd></div>
-    <div><dt>Normalização</dt><dd>Organização dos dados em tabelas para eliminar redundância e dependência inadequada.</dd></div>
-    <div><dt>NoSQL</dt><dd>Not Only SQL. Categoria de bancos que abandona o modelo relacional tradicional em favor de flexibilidade e escala.</dd></div>
-    <div><dt>RAM</dt><dd>Memória de acesso rápido, usada para armazenamento temporário. É onde vive um banco em memória.</dd></div>
-    <div><dt>Relacionamento</dt><dd>Associação entre duas ou mais entidades.</dd></div>
-    <div><dt>Restrição (constraint)</dt><dd>Regra aplicada a colunas para garantir integridade: PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE, CHECK.</dd></div>
-    <div><dt>Rollback</dt><dd>Comando TCL que desfaz as alterações de uma transação ainda não confirmada.</dd></div>
-    <div><dt>SGBD</dt><dd>Sistema Gerenciador de Banco de Dados. O software que gerencia armazenamento, organização e acesso aos dados.</dd></div>
-    <div><dt>Sintaxe</dt><dd>Regras que determinam como o código deve ser escrito.</dd></div>
-    <div><dt>SQL</dt><dd>Structured Query Language, a linguagem de consulta estruturada usada nos bancos relacionais.</dd></div>
-    <div><dt>Tabela</dt><dd>Estrutura fundamental do banco relacional, com linhas (registros) e colunas (atributos).</dd></div>
-    <div><dt>TCL</dt><dd>Transaction Control Language. Gerencia transações com COMMIT e ROLLBACK.</dd></div>
-    <div><dt>Teorema CAP</dt><dd>Em um sistema distribuído, não dá para ter ao mesmo tempo consistência, disponibilidade e tolerância a partição — escolha duas.</dd></div>
-    <div><dt>VARCHAR</dt><dd>Tipo de dado para texto de comprimento variável.</dd></div>
-  </dl>
-</section>
-
-<!-- ==================== PARTE 7 ==================== -->
-<section class="parte" id="p7">
-  <div class="parte-cab"><span class="parte-num">07</span><h2>Gabarito</h2></div>
-  <p class="abre">As respostas das oito missões. Lacrado por um motivo: consultar antes de tentar não ensina nada.</p>
-
-  <div class="lacre" id="lacre">
-    <p>Este envelope está fechado.</p>
-    <button class="btn" id="abrir" aria-expanded="false" aria-controls="respostas">Quebrar o lacre</button>
-  </div>
-
-  <div id="respostas" hidden>
-
-    <h3>Missão 2.7 — Qual cofre</h3>
-    <p><strong>Tipos avaliados.</strong> O relacional é o mais adequado para vendas e pedidos, por causa da integridade e do suporte a transações ACID. O não relacional atende bem a análise de grandes volumes e as previsões com machine learning. O em memória acelera análises e cálculos preditivos em tempo real. O distribuído entra quando a aplicação precisar escalar globalmente.</p>
-    <p><strong>Justificativa.</strong> A startup pode começar com um banco relacional, como PostgreSQL, para gerenciar vendas e pedidos. Para a análise preditiva, integra-se um NoSQL, como MongoDB, e usa-se Redis como cache em memória para melhorar o desempenho. Bancos distribuídos ficam para quando o negócio crescer globalmente.</p>
-
-    <h3>Missão 2.8 — Qual porteiro</h3>
-    <p><strong>Comparação.</strong> MySQL tem bom desempenho em aplicações de médio porte, mas suporte limitado a recursos avançados de transação. PostgreSQL é rico em recursos e ideal para sistemas que exigem alta integridade e segurança. SQL Server oferece excelente controle de concorrência e suporte empresarial, com custo elevado. MongoDB é flexível para dados semiestruturados, porém não garante transações ACID entre múltiplas coleções.</p>
-    <p><strong>Recomendação.</strong> PostgreSQL, pelo custo acessível, pelos recursos avançados de transação e pela robustez em segurança. Se surgir necessidade de lidar com dados não estruturados, integra-se o MongoDB para consultas específicas.</p>
-
-    <h3>Missão 3.9 — Reservas de hotel</h3>
-<pre>INSERT INTO reservas (id_quarto, nome_cliente, data_checkin, data_checkout, status_reserva)
-VALUES (1, 'Ana Souza', '2025-01-20', '2025-01-22', 'Confirmada');</pre>
-<pre>UPDATE quartos
-SET status_quarto = 'Ocupado'
-WHERE id_quarto = 1;</pre>
-<pre>SELECT r.id_reserva, q.tipo_quarto, r.nome_cliente, r.data_checkin, r.data_checkout
-FROM reservas r
-JOIN quartos q ON r.id_quarto = q.id_quarto
-WHERE r.status_reserva = 'Confirmada';</pre>
-
-    <h3>Missão 3.10 — Inventário de armazém</h3>
-<pre>INSERT INTO movimentacoes (id_produto, tipo_movimentacao, quantidade, data_movimentacao)
-VALUES (3, 'Saída', 3, '2025-01-15');</pre>
-<pre>UPDATE produtos
-SET quantidade_estoque = quantidade_estoque - 3
-WHERE id_produto = 3;</pre>
-<pre>SELECT m.id_movimentacao, p.nome_produto, m.quantidade, m.data_movimentacao
-FROM movimentacoes m
-JOIN produtos p ON m.id_produto = p.id_produto
-WHERE m.tipo_movimentacao = 'Saída';</pre>
-
-    <h3>Missão 4.7 — Cadastro de produtos</h3>
-<pre><span class="cm">-- Adicionar um novo produto</span>
-INSERT INTO produtos (nome_produto, preco, quantidade, categoria)
-VALUES ('Smartphone', 1500.00, 10, 'Eletrônicos');
-
-<span class="cm">-- Consultar produtos da categoria "Eletrônicos"</span>
-SELECT * FROM produtos WHERE categoria = 'Eletrônicos';
-
-<span class="cm">-- Atualizar a quantidade de um produto</span>
-UPDATE produtos SET quantidade = 15 WHERE id_produto = 1;
-
-<span class="cm">-- Remover um produto</span>
-DELETE FROM produtos WHERE id_produto = 1;</pre>
-
-    <h3>Missão 4.8 — Gerenciamento de funcionários</h3>
-<pre><span class="cm">-- Cadastrar um novo funcionário</span>
-INSERT INTO funcionarios (nome_completo, cargo, salario, data_admissao)
-VALUES ('João Pereira', 'Analista de Sistemas', 4500.00, '2025-01-01');
-
-<span class="cm">-- Listar por cargo</span>
-SELECT * FROM funcionarios WHERE cargo = 'Analista de Sistemas';
-
-<span class="cm">-- Aumentar o salário em 10%</span>
-UPDATE funcionarios SET salario = salario * 1.10 WHERE id_funcionario = 1;
-
-<span class="cm">-- Excluir um funcionário</span>
-DELETE FROM funcionarios WHERE id_funcionario = 1;</pre>
-
-    <h3>Missão 5.9 — Coleta e armazenamento</h3>
-    <p><strong>Coleta.</strong> Os dados devem ser coletados de forma explícita, transparente e para finalidade legítima. O titular precisa ser informado da finalidade e consentir de maneira clara e inequívoca. O consentimento é livre e pode ser revogado a qualquer momento. A coleta se restringe ao mínimo necessário para aquela finalidade.</p>
-    <p><strong>Segurança.</strong> Criptografia dos dados, autenticação de dois fatores, controle de acesso restrito e backup regular. Vale ainda auditar periodicamente para achar vulnerabilidade antes que alguém de fora ache.</p>
-    <p><strong>Transparência.</strong> Política de privacidade acessível em toda página de cadastro, explicando com clareza as finalidades. Melhor ainda: oferecer consentimento separado para cada tipo de uso, para que o cliente entenda o que está aceitando.</p>
-
-    <h3>Missão 5.10 — Direitos do titular</h3>
-    <p><strong>Direitos invocados.</strong> O direito de exclusão, previsto no artigo 18 da LGPD, que permite ao titular solicitar a eliminação dos dados quando não houver mais necessidade de tratamento ou quando o consentimento for revogado.</p>
-    <p><strong>Procedimento.</strong> A empresa verifica a solicitação, confirma que não existe obrigação legal ou contratual que exija manter os dados e então elimina as informações pessoais de forma integral e irreversível em todos os sistemas.</p>
-    <p><strong>Recusa.</strong> Só cabe quando existe base legal para continuar tratando, como o cumprimento de obrigação legal, fiscal ou contratual. Nesse caso a exclusão pode ser negada até a obrigação ser cumprida, e a recusa precisa ser comunicada ao cliente com a justificativa legal.</p>
-  </div>
-</section>
-
+  
+  </section>
 
 </main>
 </div>
@@ -945,37 +788,79 @@ DELETE FROM funcionarios WHERE id_funcionario = 1;</pre>
 <footer class="rodape env">
   <p class="rot" style="font-size:13px">UC6 · Criar e Manter Banco de Dados · Técnico em Desenvolvimento de Sistemas</p>
   <p style="margin-top:5px">Conteúdo adaptado do caderno A-279 do Senac/ES para uso em sala.</p>
+  <p class="credito" style="margin-top:8px">Inspirado no projeto desenvolvido por <a href="https://github.com/rafaelapessin" target="_blank" rel="noopener"><strong>Rafaela Pessin</strong></a>, a quem vão os créditos e o agradecimento.</p>
 </footer>
 
 <a href="#" class="topo">↑ topo</a>
 
 <script>
-/* No celular o índice começa recolhido, senão empurra o texto para longe.
-   Quem fechar ou abrir manda: a partir daí a página respeita a escolha. */
+/* ====== os 27 dias (fonte: curriculo.js) ====== */
 (function(){
-  var indice = document.getElementById('indice');
-  if(!indice) return;
-  /* a mesma medida que o CSS usa, para os dois nunca discordarem */
-  var largo = window.matchMedia('(min-width: 881px)');
-  var mexeu = false, esperado = null;
+  var C = window.CURRICULO;
+  if (!C) return;
+  var esc = function(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+  var hoje = C.diaDeHoje();
 
-  /* o evento chega depois, então comparamos com o que nós mesmos pedimos:
-     se o estado não é o que a página escolheu, foi o dedo do leitor. */
-  indice.addEventListener('toggle', function(){
-    if(indice.open !== esperado) mexeu = true;
-  });
-  function ajustar(){
-    if(mexeu) return;
-    esperado = largo.matches;
-    indice.open = esperado;
+  // capa: total de dias
+  var cap = document.getElementById('capaDias');
+  if (cap) cap.textContent = C.dias.length + ' dias · 108 horas';
+
+  // ir para hoje
+  var ir = document.getElementById('irHoje');
+  if (ir) ir.setAttribute('href', '#dia-' + hoje);
+
+  // cards
+  var alvo = document.getElementById('osDias');
+  var refNome = {'#ref-banco':'Banco de dados','#ref-modelagem':'Modelagem','#ref-sql':'SQL','#ref-crud':'CRUD','#ref-lgpd':'LGPD'};
+  alvo.innerHTML = C.dias.map(function(dia){
+    var eHoje = dia.d === hoje;
+    var data = C.dataBR(dia.d);
+    var titulo = 'Miss\u00e3o \u00b7 Dia ' + dia.d + ' \u00b7 ' + dia.titulo;
+    var corpo = '### Dia ' + dia.d + ' \u2014 ' + dia.titulo + '\n\n'
+              + '**Miss\u00e3o:** ' + dia.missao + '\n\n'
+              + '**C\u00e9lula:** (nome do time)\n'
+              + '**Integrantes:** \n\n'
+              + '**O que fizemos:**\n(descreva, cole o SQL, ou arraste imagens/prints aqui)\n';
+    var url = 'https://github.com/' + C.repo + '/issues/new'
+            + '?labels=' + encodeURIComponent('entrega')
+            + '&title=' + encodeURIComponent(titulo)
+            + '&body='  + encodeURIComponent(corpo);
+    var refLink = dia.ref ? '<a href="'+dia.ref+'">'+esc(refNome[dia.ref]||'Consulta')+'</a>' : '';
+    return ''
+      + '<article class="dia'+(eHoje?' hoje':'')+'" id="dia-'+dia.d+'">'
+      +   '<div class="dia-cab">'
+      +     '<span class="dia-n">DIA '+String(dia.d).padStart(2,'0')+'</span>'
+      +     (data?'<span class="dia-data">'+data+'</span>':'')
+      +     (eHoje?'<span class="dia-hoje-selo">Hoje</span>':'')
+      +     '<span class="dia-ato">Ato '+dia.ato+'</span>'
+      +   '</div>'
+      +   '<div class="dia-corpo">'
+      +     '<h3 class="dia-titulo">'+esc(dia.titulo)+'</h3>'
+      +     '<p class="dia-vemos">'+esc(dia.vemos)+(refLink?' <span class="fraco">Revisar em: '+refLink+'.</span>':'')+'</p>'
+      +     '<div class="dia-missao">'
+      +       '<span class="dia-missao-rot">Miss\u00e3o \u00b7 18h30 \u00b7 30 min</span>'
+      +       '<p>'+esc(dia.missao)+'</p>'
+      +       '<a class="dia-entregar" href="'+url+'" target="_blank" rel="noopener">Entregar no site</a>'
+      +     '</div>'
+      +   '</div>'
+      + '</article>';
+  }).join('');
+
+  // indice por ato (agrupa os dias)
+  var ol = document.getElementById('indiceAtos');
+  if (ol){
+    var vistos = {};
+    var linhas = [];
+    C.dias.forEach(function(dia){
+      if (vistos[dia.ato]) return;
+      vistos[dia.ato] = true;
+      var primeiro = C.dias.filter(function(x){return x.ato===dia.ato;})[0];
+      var ultimos = C.dias.filter(function(x){return x.ato===dia.ato;});
+      var faixa = ultimos.length>1 ? (ultimos[0].d+'–'+ultimos[ultimos.length-1].d) : String(primeiro.d);
+      linhas.push('<li><a href="#dia-'+primeiro.d+'"><span>'+dia.ato+'</span>Ato '+dia.ato+' · dias '+faixa+'</a></li>');
+    });
+    ol.innerHTML = linhas.join('');
   }
-  ajustar();
-  largo.addEventListener('change', ajustar);
-
-  /* ao escolher uma parte, o índice se recolhe e sai da frente */
-  indice.addEventListener('click', function(e){
-    if(e.target.closest('a') && !largo.matches) indice.open = false;
-  });
 })();
 
 /* índice: marca a parte que está na tela */
@@ -991,40 +876,6 @@ DELETE FROM funcionarios WHERE id_funcionario = 1;</pre>
   }, {rootMargin:'-15% 0px -70% 0px'});
   alvos.forEach(function(s){ if(s) obs.observe(s); });
 })();
-
-/* gabarito lacrado */
-(function(){
-  var btn = document.getElementById('abrir');
-  var caixa = document.getElementById('respostas');
-  btn.addEventListener('click', function(){
-    var aberto = !caixa.hidden;
-    caixa.hidden = aberto;
-    btn.setAttribute('aria-expanded', String(!aberto));
-    btn.textContent = aberto ? 'Quebrar o lacre' : 'Lacrar de novo';
-  });
-})();
-
-/* busca no glossário */
-(function(){
-  var campo = document.getElementById('q');
-  var itens = Array.prototype.slice.call(document.querySelectorAll('#glos > div'));
-  var contador = document.getElementById('contador');
-  function filtrar(){
-    var t = campo.value.trim().toLowerCase();
-    var n = 0;
-    itens.forEach(function(d){
-      var bate = !t || d.textContent.toLowerCase().indexOf(t) !== -1;
-      d.hidden = !bate;
-      if(bate) n++;
-    });
-    contador.textContent = t ? n + ' de ' + itens.length : itens.length + ' termos';
-  }
-  campo.addEventListener('input', filtrar);
-  filtrar();
-})();
 </script>
-
-<script src="assets/config.js"></script>
-<script type="module" src="assets/nav.js"></script>
 </body>
 </html>
