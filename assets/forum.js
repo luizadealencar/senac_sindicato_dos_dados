@@ -10,6 +10,7 @@ import {
 const $ = s => document.querySelector(s);
 
 const CATEGORIAS = {
+  entrega:  { rot: 'Entrega',         novo: true },
   duvida:   { rot: 'Dúvida',          novo: true },
   material: { rot: 'Material',        novo: true },
   vitoria:  { rot: 'Vitória',         novo: true },
@@ -18,6 +19,7 @@ const CATEGORIAS = {
 
 const FILTROS = [
   { id: 'todos',    rot: 'Tudo' },
+  { id: 'entrega',  rot: 'Entregas' },
   { id: 'duvida',   rot: 'Dúvidas' },
   { id: 'material', rot: 'Materiais' },
   { id: 'vitoria',  rot: 'Vitórias' },
@@ -29,8 +31,8 @@ const FILTROS = [
 const CAMPOS_AUTOR = 'id,nome,github,celula,avatar_url,papel';
 /* a lista de colunas vai numa URL: qualquer espaço aqui derruba a consulta */
 const CAMPOS_CASO = [
-  'id,titulo,corpo,categoria,imagem_url,fixado,resolvido,criado_em,editado_em,autor_id',
-  `autor:perfis(${CAMPOS_AUTOR})`,
+  'id,titulo,corpo,categoria,missao,imagem_url,fixado,resolvido,criado_em,editado_em,autor_id',
+  `autor:perfis!autor_id(${CAMPOS_AUTOR})`,
   'respostas(count)',
   'reacoes(count)'
 ].join(',');
@@ -133,9 +135,16 @@ function montarFiltros() {
 
 function montarCategorias() {
   const podeAviso = eu.papel === 'docente';
-  $('#selCategoria').innerHTML = Object.entries(CATEGORIAS)
+  const sel = $('#selCategoria');
+  sel.innerHTML = Object.entries(CATEGORIAS)
     .filter(([, c]) => c.novo || podeAviso)
     .map(([id, c]) => `<option value="${id}">${esc(c.rot)}</option>`).join('');
+
+  // o campo "número da missão" só aparece quando o tipo é Entrega
+  const campo = $('#campoMissao');
+  const alternar = () => { if (campo) campo.hidden = sel.value !== 'entrega'; };
+  sel.addEventListener('change', alternar);
+  alternar();
 }
 
 function ligarEventos() {
@@ -261,7 +270,7 @@ function cartaoCaso(c) {
 
   const selos = [
     c.fixado ? '<span class="etiq fix">Fixado</span>' : '',
-    `<span class="etiq ${esc(c.categoria)}">${esc(cat.rot)}</span>`,
+    `<span class="etiq ${esc(c.categoria)}">${esc(cat.rot)}${c.categoria === 'entrega' && c.missao ? ' · Missão ' + c.missao : ''}</span>`,
     c.resolvido ? '<span class="etiq ok">Resolvido</span>' : ''
   ].join('');
 
@@ -307,6 +316,7 @@ async function publicarCaso(e) {
       titulo: f.titulo.value.trim(),
       corpo: f.corpo.value.trim(),
       categoria: f.categoria.value,
+      missao: f.categoria.value === 'entrega' && f.missao.value ? Number(f.missao.value) : null,
       imagem_url
     }).select('id').single();
 
@@ -382,7 +392,7 @@ async function abrirCaso(id, { rolar = true } = {}) {
 
   const [{ data: caso, error }, { data: respostas }] = await Promise.all([
     sb.from('topicos').select(CAMPOS_CASO).eq('id', id).maybeSingle(),
-    sb.from('respostas').select(`*,autor:perfis(${CAMPOS_AUTOR})`).eq('topico_id', id).order('criado_em')
+    sb.from('respostas').select(`*,autor:perfis!autor_id(${CAMPOS_AUTOR})`).eq('topico_id', id).order('criado_em')
   ]);
 
   if (error || !caso) {
