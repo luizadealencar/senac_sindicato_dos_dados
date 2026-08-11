@@ -21,6 +21,9 @@ window.SINDICATO_CONFIG = {
      Projetos antigos ainda usam a chave "anon", que também funciona. */
   SUPABASE_KEY: "sb_publishable_V8yWahav736c5DkX51KDUg_eUP91Y-P",
 
-  /* As células em que um aluno pode se alistar. Mexa à vontade. */
-  CELULAS: ["Alfa", "Bravo", "Charlie", "Delta"]
+  /* Sugestões de nome de célula (aparecem enquanto o aluno digita). O aluno
+     pode criar um nome novo; conforme os times se cadastram, os nomes deles
+     entram na lista sozinhos. Deixe [] para começar sem sugestão nenhuma, ou
+     ponha exemplos: ["Guardiões do SELECT", "Força Bruta"]. */
+  CELULAS: []
 };

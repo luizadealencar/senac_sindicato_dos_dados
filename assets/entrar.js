@@ -33,10 +33,19 @@ if (!configurado) {
 
 /* ---------- montagem ---------- */
 
-function preencherCelulas() {
-  const opcoes = CELULAS.map(c => `<option value="${esc(c)}">Célula ${esc(c)}</option>`).join('');
-  $('#selCelula').innerHTML = opcoes;
-  $('#selCelula2').innerHTML = opcoes;
+async function preencherCelulas() {
+  // sugestões: as do config.js + as células que os colegas já criaram no banco.
+  const nomes = new Set(CELULAS);
+  if (sb) {
+    try {
+      const { data } = await sb.from('perfis').select('celula').eq('filiado', true);
+      (data || []).forEach(p => { if (p.celula) nomes.add(p.celula.trim()); });
+    } catch { /* segue só com as do config */ }
+  }
+  const lista = [...nomes].filter(Boolean).sort((a, b) => a.localeCompare(b, 'pt'));
+  const opcoes = lista.map(c => `<option value="${esc(c)}">`).join('');
+  const dl = $('#celulasSugeridas');
+  if (dl) dl.innerHTML = opcoes;
 }
 
 function mostrar(qual) {
