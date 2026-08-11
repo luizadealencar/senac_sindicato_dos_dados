@@ -127,6 +127,9 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 .dia-missao p{margin:0 0 10px}
 .dia-entregar{display:inline-block;background:var(--tinta);color:var(--papel);font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.09em;font-size:13.5px;font-weight:600;padding:8px 16px;text-decoration:none}
 .dia-entregar:hover{background:var(--carimbo)}
+.dia-missao.andamento{border-left-color:var(--borda);background:transparent;padding:10px 14px}
+.dia-missao.andamento .dia-missao-rot{color:var(--tinta-fraca)}
+.dia-missao.andamento a{color:var(--carimbo)}
 .caixa.ferramenta{border-style:solid;border-color:var(--latao)}
 .caixa.ferramenta .caixa-rot{background:var(--latao)}
 .caixa a{color:var(--carimbo);text-decoration:none;border-bottom:1px solid var(--borda);font-weight:600}
@@ -240,11 +243,11 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
   <div class="parte-cab"><span class="parte-num">00</span><h2>Como funciona</h2></div>
   <p class="abre">São 108 horas para sair daqui capaz de projetar, criar, alimentar e defender um banco de dados — e você faz isso construindo um de verdade.</p>
 
-  <p>O curso todo gira em torno de um projeto: <strong>cada célula inventa uma empresa e constrói o banco de dados dela</strong>, do primeiro rascunho à aplicação rodando. Cada dia abaixo tem duas partes: o que a gente vê em sala (as 3h30) e a <strong>missão</strong> dos últimos 30 minutos, entregue no site. Uma missão por dia, sempre empurrando o banco da sua empresa mais um passo.</p>
+  <p>O curso todo gira em torno de um projeto: <strong>cada célula inventa uma empresa e constrói o banco de dados dela</strong>, do primeiro rascunho à aplicação rodando. Cada dia mostra o que a gente vê em sala. Espalhadas pelos dias estão as <strong>missões</strong> — algumas de um dia, outras de dois ou três — que a célula faz no ritmo dela e entrega no site quando termina. Cada missão empurra o banco da empresa de vocês mais um passo.</p>
 
   <div class="caixa">
     <span class="caixa-rot">Como entregar</span>
-    <p>No fim de cada dia, clique em <strong>Entregar no site</strong> no card do dia. Abre uma página no GitHub já com o número da missão — descreva o que a célula fez, cole o SQL, ou arraste prints e imagens direto na caixa. Uma entrega por célula.</p>
+    <p>Quando a missão estiver pronta, clique em <strong>Entregar no site</strong> no card dela. Abre uma página no GitHub já com o nome da missão — descreva o que a célula fez, cole o SQL, ou arraste prints e imagens direto na caixa. Uma entrega por célula, sem hora marcada.</p>
   </div>
 </section>
 
@@ -537,7 +540,67 @@ SELECT nome_completo, email FROM clientes WHERE status_cliente = 'ativo';
 <span class="cm">-- Cadastrados depois de uma data</span>
 SELECT * FROM clientes WHERE data_cadastro &gt; '2025-01-10';</pre>
 
-  <h3 id="p3-4">3.4 TCL — transações</h3>
+  <h3 id="p3-4">3.4 DQL — ordenar, agrupar e agregar</h3>
+  <p>Consultar não é só filtrar linha. Boa parte de um relatório vem de <strong>ordenar</strong>, <strong>contar</strong> e <strong>agrupar</strong>. As funções de agregação (<span class="mono">COUNT</span>, <span class="mono">SUM</span>, <span class="mono">AVG</span>, <span class="mono">MAX</span>, <span class="mono">MIN</span>) resumem várias linhas em um número.</p>
+<pre><span class="cm">-- Ordenar do mais novo para o mais antigo, só os 5 primeiros</span>
+SELECT nome_completo, data_cadastro
+FROM clientes
+ORDER BY data_cadastro DESC
+LIMIT 5;
+
+<span class="cm">-- Quantos clientes há em cada status</span>
+SELECT status_cliente, COUNT(*) AS total
+FROM clientes
+GROUP BY status_cliente;
+
+<span class="cm">-- Só os grupos com mais de 10 clientes (HAVING filtra o agrupamento)</span>
+SELECT status_cliente, COUNT(*) AS total
+FROM clientes
+GROUP BY status_cliente
+HAVING COUNT(*) &gt; 10;
+
+<span class="cm">-- Valores distintos, sem repetir</span>
+SELECT DISTINCT status_cliente FROM clientes;</pre>
+  <div class="caixa">
+    <span class="caixa-rot">A ordem que o SQL executa</span>
+    <p>Você escreve <span class="mono">SELECT ... FROM ... WHERE ... GROUP BY ... HAVING ... ORDER BY</span>, mas o banco executa em outra ordem: primeiro <span class="mono">FROM</span>, depois <span class="mono">WHERE</span> (filtra linha), depois <span class="mono">GROUP BY</span> e as agregações, depois <span class="mono">HAVING</span> (filtra grupo) e só no fim <span class="mono">ORDER BY</span>. É por isso que <span class="mono">WHERE</span> não enxerga <span class="mono">COUNT(*)</span> — nesse momento a contagem ainda não existe. Para filtrar por agregação, use <span class="mono">HAVING</span>.</p>
+  </div>
+
+  <span id="ref-join" class="ancora"></span>
+  <h3 id="p3-5">3.5 JOIN — cruzando tabelas</h3>
+  <p>Num banco normalizado, a informação fica repartida em tabelas ligadas por chaves. Uma consulta útil quase sempre precisa <strong>juntar</strong> tabelas. Suponha uma segunda tabela, <span class="mono">pedidos</span>, que aponta para <span class="mono">clientes</span> pela chave estrangeira:</p>
+<pre><span class="cm">-- Cada pedido pertence a um cliente (FK id_cliente)</span>
+CREATE TABLE pedidos (
+    id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    valor DECIMAL(10,2) NOT NULL,
+    data_pedido DATE DEFAULT (CURRENT_DATE),
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+);</pre>
+  <p>Com as duas tabelas, o <span class="mono">JOIN</span> combina as linhas onde as chaves batem:</p>
+<pre><span class="cm">-- INNER JOIN: só clientes que TÊM pedido</span>
+SELECT c.nome_completo, p.valor, p.data_pedido
+FROM clientes c
+INNER JOIN pedidos p ON p.id_cliente = c.id_cliente;
+
+<span class="cm">-- LEFT JOIN: TODOS os clientes, com ou sem pedido</span>
+<span class="cm">-- (quem não tem pedido aparece com valor NULL)</span>
+SELECT c.nome_completo, p.valor
+FROM clientes c
+LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente;
+
+<span class="cm">-- JOIN + agregação: quanto cada cliente já gastou</span>
+SELECT c.nome_completo, COUNT(p.id_pedido) AS qtd_pedidos, SUM(p.valor) AS total_gasto
+FROM clientes c
+LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente
+GROUP BY c.id_cliente, c.nome_completo
+ORDER BY total_gasto DESC;</pre>
+  <div class="caixa">
+    <span class="caixa-rot">INNER x LEFT, sem decorar</span>
+    <p><strong>INNER JOIN</strong> devolve só as linhas com correspondência nas duas tabelas — cliente sem pedido some. <strong>LEFT JOIN</strong> mantém tudo da tabela da esquerda (<span class="mono">clientes</span>) e completa com <span class="mono">NULL</span> o que não casou. Regra prática: se a pergunta é "todos os X, mesmo os sem Y", é LEFT JOIN.</p>
+  </div>
+
+  <h3 id="p3-6">3.6 TCL — transações</h3>
   <p>Transação é um pacote: ou tudo acontece, ou nada acontece. <code class="inl">COMMIT</code> confirma; <code class="inl">ROLLBACK</code> desfaz o que ainda não foi confirmado.</p>
 <pre><span class="cm">-- Abrir a transação</span>
 START TRANSACTION;
@@ -551,7 +614,7 @@ COMMIT;</pre>
 UPDATE clientes SET status_cliente = 'ativo' WHERE id_cliente = 1;
 ROLLBACK;</pre>
 
-  <h3 id="p3-5">3.5 DCL — permissões</h3>
+  <h3 id="p3-7">3.7 DCL — permissões</h3>
 <pre><span class="cm">-- Criar um usuário</span>
 CREATE USER 'usuario_consulta'@'localhost' IDENTIFIED BY 'senha123';
 
@@ -561,7 +624,7 @@ GRANT SELECT ON sistema_clientes.clientes TO 'usuario_consulta'@'localhost';
 <span class="cm">-- Revogar essa permissão</span>
 REVOKE SELECT ON sistema_clientes.clientes FROM 'usuario_consulta'@'localhost';</pre>
 
-  <h3 id="p3-6">3.6 Chave primária</h3>
+  <h3 id="p3-8">3.8 Chave primária</h3>
   <p>Um ou mais campos que identificam de forma única cada registro. Cada tabela tem <strong>uma só</strong>.</p>
   <ul><li>Valores únicos.</li><li>Não aceita nulo.</li></ul>
 <pre>CREATE TABLE clientes (
@@ -570,7 +633,7 @@ REVOKE SELECT ON sistema_clientes.clientes FROM 'usuario_consulta'@'localhost';<
     email VARCHAR(255)
 );</pre>
 
-  <h3 id="p3-7">3.7 Chave estrangeira</h3>
+  <h3 id="p3-9">3.9 Chave estrangeira</h3>
   <p>Coluna que aponta para a chave primária de outra tabela. É ela que sustenta a <strong>integridade referencial</strong> — sem ela, você acaba com pedido de cliente que não existe.</p>
   <ul><li>Mantém a relação entre tabelas.</li><li>Aceita nulo, a menos que você declare <code class="inl">NOT NULL</code>.</li></ul>
 <pre>CREATE TABLE pedidos (
@@ -580,7 +643,7 @@ REVOKE SELECT ON sistema_clientes.clientes FROM 'usuario_consulta'@'localhost';<
     FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
 );</pre>
 
-  <h3 id="p3-8">3.8 Índices</h3>
+  <h3 id="p3-10">3.10 Índices</h3>
   <p>Estrutura auxiliar que acelera a busca, principalmente em tabela grande. Custa espaço e deixa a escrita um pouco mais lenta — por isso índice se cria com critério, não em toda coluna.</p>
   <ul>
     <li><strong>Primário</strong> — criado automaticamente para a chave primária.</li>
@@ -589,7 +652,7 @@ REVOKE SELECT ON sistema_clientes.clientes FROM 'usuario_consulta'@'localhost';<
   </ul>
 <pre>CREATE INDEX idx_email ON clientes(email);</pre>
 
-  <h3 id="p3-9">3.9 Relacionamentos na prática</h3>
+  <h3 id="p3-11">3.11 Relacionamentos na prática</h3>
   <ul>
     <li><strong>1:1</strong> — um registro corresponde a exatamente um registro de outra tabela.</li>
     <li><strong>1:N</strong> — um registro se liga a vários de outra tabela.</li>
@@ -608,7 +671,7 @@ CREATE TABLE funcionarios (
     FOREIGN KEY (id_departamento) REFERENCES departamentos(id_departamento)
 );</pre>
 
-  <h3 id="p3-10">3.10 Normalização</h3>
+  <h3 id="p3-12">3.12 Normalização</h3>
   <p>Organizar os dados para eliminar redundância e dependência indevida. Cada etapa se chama forma normal.</p>
   <ul>
     <li><strong>1FN</strong> — acabar com grupos repetidos: cada célula guarda um único valor.</li>
@@ -634,7 +697,7 @@ CREATE TABLE vendas (
     FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
 );</pre>
 
-  <h3 id="p3-11">3.11 Restrições</h3>
+  <h3 id="p3-13">3.13 Restrições</h3>
   <p>Regras que o banco aplica sozinho, sem depender da aplicação lembrar delas.</p>
   <ul>
     <li><code class="inl">PRIMARY KEY</code> — identifica unicamente o registro.</li>
@@ -815,17 +878,37 @@ WHERE id_cliente = 1;</pre>
   alvo.innerHTML = C.dias.map(function(dia){
     var eHoje = dia.d === hoje;
     var data = C.dataBR(dia.d);
-    var titulo = 'Miss\u00e3o \u00b7 Dia ' + dia.d + ' \u00b7 ' + dia.titulo;
-    var corpo = '### Dia ' + dia.d + ' \u2014 ' + dia.titulo + '\n\n'
-              + '**Miss\u00e3o:** ' + dia.missao + '\n\n'
-              + '**C\u00e9lula:** (nome do time)\n'
-              + '**Integrantes:** \n\n'
-              + '**O que fizemos:**\n(descreva, cole o SQL, ou arraste imagens/prints aqui)\n';
-    var url = 'https://github.com/' + C.repo + '/issues/new'
-            + '?labels=' + encodeURIComponent('entrega')
-            + '&title=' + encodeURIComponent(titulo)
-            + '&body='  + encodeURIComponent(corpo);
+    var m = C.missaoDoDia(dia.d);
+    var multi = m && m.fim > m.ini;
+    var faixa = multi ? ' (dias ' + m.ini + '\u2013' + m.fim + ')' : '';
     var refLink = dia.ref ? '<a href="'+dia.ref+'">'+esc(refNome[dia.ref]||'Consulta')+'</a>' : '';
+
+    // bloco da missão: completo no 1º dia da missão; nos demais, um lembrete curto
+    var blocoMissao = '';
+    if (m && dia.d === m.ini){
+      var titulo = 'Entrega \u00b7 ' + m.titulo + faixa;
+      var corpo = '### ' + m.titulo + faixa + '\n\n'
+                + '**Miss\u00e3o:** ' + m.texto + '\n\n'
+                + '**C\u00e9lula:** (nome do time)\n'
+                + '**Integrantes:** \n\n'
+                + '**O que fizemos:**\n(descreva, cole o SQL, ou arraste imagens/prints aqui)\n';
+      var url = 'https://github.com/' + C.repo + '/issues/new'
+              + '?labels=' + encodeURIComponent('entrega')
+              + '&title=' + encodeURIComponent(titulo)
+              + '&body='  + encodeURIComponent(corpo);
+      blocoMissao = '<div class="dia-missao">'
+        + '<span class="dia-missao-rot">Miss\u00e3o \u00b7 ' + esc(m.titulo) + (multi ? esc(faixa) : '') + '</span>'
+        + '<p>' + esc(m.texto) + '</p>'
+        + (multi ? '<p class="fraco" style="font-size:14px;margin:-4px 0 10px">Entrega no fim do dia ' + m.fim + '. Pode ir enviando parciais.</p>' : '')
+        + '<a class="dia-entregar" href="' + url + '" target="_blank" rel="noopener">Entregar no site</a>'
+        + '</div>';
+    } else if (m){
+      blocoMissao = '<div class="dia-missao andamento">'
+        + '<span class="dia-missao-rot">Miss\u00e3o em andamento</span>'
+        + '<p><strong>' + esc(m.titulo) + '</strong>' + esc(faixa) + ' \u2014 come\u00e7ou no dia ' + m.ini + ', entrega no dia ' + m.fim + '. <a href="#dia-' + m.ini + '">ver a miss\u00e3o</a></p>'
+        + '</div>';
+    }
+
     return ''
       + '<article class="dia'+(eHoje?' hoje':'')+'" id="dia-'+dia.d+'">'
       +   '<div class="dia-cab">'
@@ -837,11 +920,7 @@ WHERE id_cliente = 1;</pre>
       +   '<div class="dia-corpo">'
       +     '<h3 class="dia-titulo">'+esc(dia.titulo)+'</h3>'
       +     '<p class="dia-vemos">'+esc(dia.vemos)+(refLink?' <span class="fraco">Revisar em: '+refLink+'.</span>':'')+'</p>'
-      +     '<div class="dia-missao">'
-      +       '<span class="dia-missao-rot">Miss\u00e3o \u00b7 18h30 \u00b7 30 min</span>'
-      +       '<p>'+esc(dia.missao)+'</p>'
-      +       '<a class="dia-entregar" href="'+url+'" target="_blank" rel="noopener">Entregar no site</a>'
-      +     '</div>'
+      +     blocoMissao
       +   '</div>'
       + '</article>';
   }).join('');
@@ -876,6 +955,20 @@ WHERE id_cliente = 1;</pre>
   }, {rootMargin:'-15% 0px -70% 0px'});
   alvos.forEach(function(s){ if(s) obs.observe(s); });
 })();
+
+/* trava: enquanto o repositório não for configurado no curriculo.js, os botões
+   avisam em vez de abrir uma página 404 no GitHub. */
+(function(){
+  var C = window.CURRICULO;
+  if (!C || !/SEU-USUARIO/i.test(C.repo)) return;
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('#btEntregar, #btFiliar, .dia-entregar');
+    if (!a) return;
+    e.preventDefault();
+    alert('Falta configurar o repositório.\n\nAbra o arquivo curriculo.js e troque a linha\n  repo: "SEU-USUARIO/senac_sindicato_dos_dados"\npelo seu usuário do GitHub. Depois publique o site pelo GitHub Pages.\n\nAberto direto do computador (file://) o cadastro e o placar não funcionam — precisa estar publicado.');
+  }, true);
+})();
+
 </script>
 </body>
 </html>

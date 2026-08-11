@@ -96,9 +96,9 @@ body{
 .eventos{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px}
 .evento{border:2px solid var(--tinta);padding:16px 18px;display:flex;flex-direction:column;gap:8px;background:var(--papel)}
 .evento-tipo{align-self:flex-start;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.11em;font-size:11.5px;font-weight:700;padding:3px 9px;border:1.5px solid var(--tinta)}
-.evento-tipo.curso{color:var(--latao);border-color:var(--latao)}
-.evento-tipo.cert{color:#2f6b3f;border-color:#2f6b3f}
-.evento-tipo.evento{color:var(--carimbo);border-color:var(--carimbo)}
+.evento-tipo.t-curso{color:var(--latao);border-color:var(--latao)}
+.evento-tipo.t-cert{color:#2f6b3f;border-color:#2f6b3f}
+.evento-tipo.t-evento{color:var(--carimbo);border-color:var(--carimbo)}
 .evento h3{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;font-size:20px;font-weight:800;line-height:1.08;margin:0}
 .evento-meta{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--tinta-fraca)}
 .evento p{font-size:14.5px;color:var(--tinta-fraca);margin:0;flex:1}
@@ -305,7 +305,7 @@ body{
         <div class="hoje-linha"><dt>Em sala</dt><dd id="hjSala">—</dd></div>
       </dl>
       <div class="missao-hoje">
-        <span class="missao-rot rot">Missão · 18h30 · 30 min</span>
+        <span class="missao-rot rot">Missão da célula</span>
         <p id="hjMissao">—</p>
         <a id="btEntregar" class="bt-entregar" href="#" target="_blank" rel="noopener">Entregar no site</a>
         <a class="ver-dia" href="caderno.html#dias">ver o dia completo no caderno →</a>
@@ -342,7 +342,7 @@ body{
 
 <section class="secao env" id="placar">
   <div class="secao-cab"><span class="secao-num">III</span><h2>Placar das células</h2></div>
-  <p class="secao-sub">Os times se formam sozinhos conforme vocês se inscrevem. Cada entrega validada vale XP, e o total do time é a soma das entregas de todos os membros.</p>
+  <p class="secao-sub">Os times se formam sozinhos conforme vocês se inscrevem. O XP de cada célula é lançado pela docente conforme as missões vão sendo entregues.</p>
   <div class="celulas" id="celulas"></div>
 </section>
 
@@ -355,7 +355,7 @@ body{
     <h3>Filie-se ao Sindicato</h3>
     <p style="margin-bottom:4px">Entre com sua conta do GitHub e preencha a ficha. É o mesmo login que você usa para versionar código &mdash; o avatar e o nome vêm do seu perfil, sem precisar enviar foto.</p>
     <a id="btFiliar" class="bt-entregar" href="#" target="_blank" rel="noopener" style="margin-top:8px">Filiar-se pelo GitHub</a>
-    <p class="fraco" style="font-size:16px;margin:14px 0 0">Combinem o <b>nome do time</b> antes e escrevam igual: quem usa o mesmo nome cai na mesma célula do placar. As <span class="mono">entregas</span> quem marca sou eu, conforme vocês entregam.</p>
+    <p class="fraco" style="font-size:16px;margin:14px 0 0">Combinem o <b>nome do time</b> antes e escrevam igual: quem usa o mesmo nome cai na mesma célula do placar. O <span class="mono">XP</span> quem lança sou eu, conforme as missões chegam.</p>
     <details style="margin-top:14px">
       <summary class="mono" style="cursor:pointer;font-size:14px">Prefere pelo código? Abra aqui o passo a passo do pull request</summary>
       <ol style="margin-top:10px">
@@ -392,11 +392,11 @@ const DADOS = {
   alunos: [
     /* celula = nome do time, escolhido pelos próprios alunos (combinem e escrevam igual).
        entregas = o que cada um já entregou e você validou. Você preenche, não o aluno. */
-    {nome:"Laranja",              github:"octocat",      celula:"Docente", entregas:[]},
-    {nome:"Maria Fernanda Alves", github:"torvalds",     celula:"Guardiões do SELECT", entregas:["Op 01","Op 02","Op 05"]},
-    {nome:"João Pedro Ramos",     github:"gaearon",      celula:"Guardiões do SELECT", entregas:["Op 01","Op 03"]},
-    {nome:"Beatriz Nogueira",     github:"sindresorhus", celula:"Força Bruta",         entregas:["Op 01","Op 02","Op 03","Op 04"]},
-    {nome:"Diego Martins",        github:"kentcdodds",   celula:"Força Bruta",         entregas:["Op 01","Op 02"]}
+    {nome:"Laranja",              github:"octocat",      celula:"Docente"},
+    {nome:"Maria Fernanda Alves", github:"torvalds",     celula:"Guardiões do SELECT"},
+    {nome:"João Pedro Ramos",     github:"gaearon",      celula:"Guardiões do SELECT"},
+    {nome:"Beatriz Nogueira",     github:"sindresorhus", celula:"Força Bruta"},
+    {nome:"Diego Martins",        github:"kentcdodds",   celula:"Força Bruta"}
   ],
 
   atos: [
@@ -456,10 +456,11 @@ const DADOS = {
     {t:"Lei nº 13.709 — LGPD",u:"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm",d:"O texto da lei. Fonte oficial para o Tribunal do Ato V."}
   ],
 
-  /* Placar: cada entrega validada vale XP_ENTREGA pontos.
-     O XP do time é a soma das entregas de todos os membros.
-     Times em foraDoPlacar aparecem no quadro de filiados, mas não competem. */
-  xpPorEntrega: 10,
+  /* Placar. O XP de cada célula é lançado por você no placar.json (mais simples de
+     editar no GitHub). Este bloco 'pontos' é só uma reserva para quando o placar.json
+     não é lido (ex.: abrindo o arquivo local). foraDoPlacar: times que aparecem nos
+     filiados mas não competem. */
+  pontos: { "guardiões do select": 60, "força bruta": 40 },
   foraDoPlacar: ["Docente", "—"],
 
   /* Radar de eventos. tipo: "evento" | "curso" | "cert". gratis: true mostra o selo. */
@@ -467,15 +468,24 @@ const DADOS = {
     {tipo:"evento", nome:"Data & AI Saturday Vitória 2026", quando:"2026 · Vitória/ES", local:"Grande Vitória",
      desc:"Encontro da comunidade de dados e IA do ES: palestras e networking. Ótimo para conhecer gente da área aqui perto.",
      url:"https://www.sympla.com.br/evento/data-ai-saturday-vitoria-2026-1156/3443729", gratis:true},
-    {tipo:"curso", nome:"Banco de Dados — Curso em Vídeo", quando:"On-line · no seu ritmo", local:"YouTube",
-     desc:"Trilha gratuita de BD e SQL em português, do modelo relacional ao SQL na prática.",
-     url:"https://www.cursoemvideo.com/curso/banco-de-dados/", gratis:true},
-    {tipo:"cert", nome:"Oracle Database Foundations", quando:"On-line · trilha + prova", local:"Oracle Academy",
-     desc:"Trilha introdutória com certificado. Boa primeira credencial de banco de dados para o currículo.",
-     url:"https://academy.oracle.com/", gratis:true},
-    {tipo:"cert", nome:"PostgreSQL — freeCodeCamp", quando:"On-line · projetos", local:"freeCodeCamp",
-     desc:"Curso prático de bancos relacionais e PostgreSQL, com certificado gratuito ao final.",
-     url:"https://www.freecodecamp.org/learn/relational-database/", gratis:true}
+    {tipo:"curso", nome:"Administrando Banco de Dados — Fundação Bradesco", quando:"On-line · no seu ritmo", local:"Escola Virtual Bradesco",
+     desc:"Curso gratuito com certificado reconhecido. Busque \u201cbanco de dados\u201d no catálogo da Escola Virtual. Basta ter CPF.",
+     url:"https://www.ev.org.br/cursos", gratis:true},
+    {tipo:"curso", nome:"Introdução à LGPD — ENAP", quando:"On-line · 10h · com certificado", local:"Escola Virtual de Governo",
+     desc:"Direto no Ato V do curso: fundamentos da LGPD, direitos do titular e hipóteses de tratamento. Gratuito e certificado.",
+     url:"https://www.escolavirtual.gov.br/curso/153", gratis:true},
+    {tipo:"cert", nome:"Relational Database — freeCodeCamp", quando:"On-line · projetos práticos", local:"freeCodeCamp",
+     desc:"Bancos relacionais e SQL na prática, com Bash e PostgreSQL. Certificação gratuita ao final. Em inglês.",
+     url:"https://www.freecodecamp.org/learn/relational-database/", gratis:true},
+    {tipo:"curso", nome:"Proteção de Dados Pessoais no Setor Público — ENAP", quando:"On-line · 15h · com certificado", local:"Escola Virtual de Governo",
+     desc:"Aprofunda a LGPD: ciclo de vida do dado, medidas de segurança e relatório de impacto. Complementa o Ato V. Gratuito.",
+     url:"https://www.escolavirtual.gov.br/curso/290", gratis:true},
+    {tipo:"curso", nome:"Governo Data-Driven — ENAP", quando:"On-line · 4h · com certificado", local:"Escola Virtual de Governo",
+     desc:"Cultura orientada a dados e tomada de decisão com base neles. Bom para enxergar o valor do banco além do SQL. Gratuito.",
+     url:"https://www.escolavirtual.gov.br/curso/1263", gratis:true},
+    {tipo:"curso", nome:"Introdução à Ciência de Dados — ENAP/Serpro", quando:"On-line · trilha · com certificado", local:"Escola Virtual de Governo",
+     desc:"Trilha de ciência de dados: tratamento, estatística, classificação e agrupamento. O passo além do banco, para quem quer seguir em dados. Gratuito.",
+     url:"https://www.escolavirtual.gov.br/catalogo?query=ci%C3%AAncia%20de%20dados", gratis:true}
   ]
 };
 
@@ -496,13 +506,17 @@ const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':
   $('#tHoje').textContent = dia.titulo;
   $('#hjAto').textContent = 'Ato ' + dia.ato + (C.atos[dia.ato] ? ' · ' + C.atos[dia.ato] : '');
   $('#hjSala').textContent = dia.vemos;
-  $('#hjMissao').textContent = dia.missao;
+  const m = C.missaoDoDia(dia.d);
+  const faixa = m && m.fim > m.ini ? ' (dias ' + m.ini + '\u2013' + m.fim + ')' : '';
+  $('#hjMissao').textContent = m ? m.texto : '\u2014';
+  const rot = document.querySelector('.missao-rot');
+  if (rot && m) rot.textContent = 'Miss\u00e3o \u00b7 ' + m.titulo + faixa;
 
   // botão: abre uma issue no GitHub já preenchida com a missão do dia
-  const titulo = 'Missão · Dia ' + dia.d + ' · ' + dia.titulo;
+  const titulo = 'Entrega · ' + (m ? m.titulo : dia.titulo) + (faixa ? ' ' + faixa : '');
   const corpo = [
-    '### Dia ' + dia.d + ' — ' + dia.titulo, '',
-    '**Missão:** ' + dia.missao, '',
+    '### ' + (m ? m.titulo : dia.titulo) + (faixa ? ' ' + faixa : ''), '',
+    '**Missão:** ' + (m ? m.texto : ''), '',
     '**Célula:** (nome do time)',
     '**Integrantes:** ', '',
     '**O que fizemos:**',
@@ -554,27 +568,30 @@ $('#links').innerHTML = DADOS.links.map(l => `
     <strong>${esc(l.t)}</strong><span>${esc(l.d)}</span>
   </a></li>`).join('');
 
-/* placar: os times e o XP saem das entregas dos alunos */
+/* placar: os times saem dos alunos; o XP é lançado pela docente no placar.json.
+   DADOS.pontos e DADOS.alunos servem de reserva quando os .json não são lidos
+   (ex.: abrindo o arquivo local). Chaves de pontos casam pelo nome da célula,
+   ignorando maiúsculas/minúsculas e espaços. */
 function montarPlacar(){
-  const XP = DADOS.xpPorEntrega || 10;
   const fora = new Set((DADOS.foraDoPlacar || []).map(s => s.trim().toLowerCase()));
   const patenteDe = xp =>
     xp >= 300 ? "Lenda" : xp >= 180 ? "Veterano" : xp >= 90 ? "Operador" : xp >= 30 ? "Agente" : "Novato";
 
-  const contar = e => Array.isArray(e) ? e.length : (Number(e) || 0);
+  // mapa de pontos com chaves normalizadas
+  const pontos = {};
+  Object.keys(DADOS.pontos || {}).forEach(k => { pontos[k.trim().toLowerCase()] = Number(DADOS.pontos[k]) || 0; });
+
   const mapa = new Map();
   (DADOS.alunos || []).forEach(a => {
     const bruto = (a.celula || "").trim();
     if (!bruto) return;
-    const chave = bruto.toLowerCase();       // agrupa ignorando caixa/espacos
+    const chave = bruto.toLowerCase();
     if (fora.has(chave)) return;
-    if (!mapa.has(chave)) mapa.set(chave, {nome: bruto, membros: [], entregas: 0});
-    const c = mapa.get(chave);
-    c.membros.push(a.nome || ("@" + a.github) || "?");
-    c.entregas += contar(a.entregas);
+    if (!mapa.has(chave)) mapa.set(chave, {nome: bruto, chave, membros: []});
+    mapa.get(chave).membros.push(a.nome || ("@" + a.github) || "?");
   });
 
-  const celulas = [...mapa.values()].map(c => ({...c, xp: c.entregas * XP}));
+  const celulas = [...mapa.values()].map(c => ({...c, xp: pontos[c.chave] || 0}));
   celulas.sort((a, b) => b.xp - a.xp || b.membros.length - a.membros.length || a.nome.localeCompare(b.nome, "pt"));
 
   const alvo = $("#celulas");
@@ -587,7 +604,7 @@ function montarPlacar(){
       <span class="celula-pos">${i + 1}º</span>
       <div class="celula-xp">${c.xp} XP</div>
       <h3>${esc(c.nome)}</h3>
-      <p>${c.membros.length} ${c.membros.length === 1 ? "membro" : "membros"} · ${c.entregas} ${c.entregas === 1 ? "entrega" : "entregas"}</p>
+      <p>${c.membros.length} ${c.membros.length === 1 ? "membro" : "membros"}</p>
       <p class="celula-roster">${c.membros.map(esc).join(" · ")}</p>
       <span class="patente">${esc(patenteDe(c.xp))}</span>
     </div>`).join("");
@@ -640,16 +657,14 @@ function montarFiliados(){
 /* turma: usa alunos.json quando existir (GitHub Pages), senão a lista embutida.
    Assim o cadastro automático via GitHub (Action) alimenta o mesmo quadro. */
 (function(){
-  montarPlacar(); montarFiliados();               // desenha já com a lista embutida
-  fetch('alunos.json', {cache:'no-store'})
-    .then(r => r.ok ? r.json() : null)
-    .then(lista => {
-      if (Array.isArray(lista) && lista.length){
-        DADOS.alunos = lista;                       // alunos.json vence quando presente
-        montarPlacar(); montarFiliados();
-      }
-    })
-    .catch(() => {});                               // file:// ou sem arquivo: fica a embutida
+  montarPlacar(); montarFiliados();               // desenha já com os dados embutidos
+  const pega = (arq) => fetch(arq, {cache:'no-store'}).then(r => r.ok ? r.json() : null).catch(() => null);
+  Promise.all([pega('alunos.json'), pega('placar.json')]).then(([lista, pontos]) => {
+    let mudou = false;
+    if (Array.isArray(lista) && lista.length){ DADOS.alunos = lista; mudou = true; }
+    if (pontos && typeof pontos === 'object'){ DADOS.pontos = pontos; mudou = true; }
+    if (mudou){ montarPlacar(); montarFiliados(); }
+  });
 })();
 
 /* radar de eventos */
@@ -659,13 +674,27 @@ function montarFiliados(){
   if(!alvo) return;
   alvo.innerHTML = (DADOS.eventos || []).map(e => `
     <article class="evento${e.gratis ? " gratis" : ""}">
-      <span class="evento-tipo ${e.tipo}">${esc(rotulo[e.tipo] || e.tipo)}</span>
+      <span class="evento-tipo t-${e.tipo}">${esc(rotulo[e.tipo] || e.tipo)}</span>
       <h3>${esc(e.nome)}</h3>
       <span class="evento-meta">${esc(e.quando)}${e.local ? " · " + esc(e.local) : ""}</span>
       <p>${esc(e.desc || "")}</p>
       ${e.url ? `<a class="evento-link" href="${esc(e.url)}" target="_blank" rel="noopener">Abrir página →</a>` : ""}
     </article>`).join("");
 })();
+
+/* trava: enquanto o repositório não for configurado no curriculo.js, os botões
+   avisam em vez de abrir uma página 404 no GitHub. */
+(function(){
+  var C = window.CURRICULO;
+  if (!C || !/SEU-USUARIO/i.test(C.repo)) return;
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('#btEntregar, #btFiliar, .dia-entregar');
+    if (!a) return;
+    e.preventDefault();
+    alert('Falta configurar o repositório.\n\nAbra o arquivo curriculo.js e troque a linha\n  repo: "SEU-USUARIO/senac_sindicato_dos_dados"\npelo seu usuário do GitHub. Depois publique o site pelo GitHub Pages.\n\nAberto direto do computador (file://) o cadastro e o placar não funcionam — precisa estar publicado.');
+  }, true);
+})();
+
 </script>
 </body>
 </html>
