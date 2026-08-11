@@ -54,6 +54,7 @@
   letter-spacing:.12em;font-size:11px;font-weight:600;padding:3px 8px;border:1.5px solid currentColor;
   line-height:1.35;white-space:nowrap
 }
+.etiq.entrega{color:var(--papel);background:var(--tinta);border-color:var(--tinta)}
 .etiq.duvida{color:var(--carimbo)}
 .etiq.material{color:var(--tinta-fraca)}
 .etiq.vitoria{color:var(--latao)}
@@ -246,6 +247,11 @@
           <select name="categoria" id="selCategoria"></select>
         </label>
       </div>
+
+      <label class="campo" id="campoMissao" hidden><span>Número da missão do dia</span>
+        <input type="number" name="missao" min="1" max="27" step="1" inputmode="numeric" placeholder="Ex.: 3">
+        <span class="dica">De 1 a 27. Só para entregas — seu nome, sua célula e a data entram sozinhos.</span>
+      </label>
 
       <div class="anexo" data-anexo="novo">
         <div class="anexo-topo">
