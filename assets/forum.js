@@ -9,23 +9,9 @@ import {
 
 const $ = s => document.querySelector(s);
 
-const CATEGORIAS = {
-  entrega:  { rot: 'Entrega',         novo: true },
-  duvida:   { rot: 'Dúvida',          novo: true },
-  material: { rot: 'Material',        novo: true },
-  vitoria:  { rot: 'Vitória',         novo: true },
-  aviso:    { rot: 'Aviso da chefia', novo: false }   // só a chefia publica
-};
-
 const FILTROS = [
-  { id: 'todos',    rot: 'Tudo' },
-  { id: 'entrega',  rot: 'Entregas' },
-  { id: 'duvida',   rot: 'Dúvidas' },
-  { id: 'material', rot: 'Materiais' },
-  { id: 'vitoria',  rot: 'Vitórias' },
-  { id: 'aviso',    rot: 'Avisos' },
-  { id: 'aberto',   rot: 'Sem resposta' },
-  { id: 'meus',     rot: 'Meus' }
+  { id: 'todos', rot: 'Todas' },
+  { id: 'meus',  rot: 'Minhas' }
 ];
 
 const CAMPOS_AUTOR = 'id,nome,github,celula,avatar_url,papel';
@@ -90,7 +76,7 @@ async function abrirPorta() {
   $('#areaLista').hidden = false;
 
   montarFiltros();
-  montarCategorias();
+  montarCelulas();
   ligarEventos();
   anexoNovo = ligarAnexo($('[data-anexo="novo"]'), $('#formNovo'));
   anexoResposta = ligarAnexo($('[data-anexo="resposta"]'), $('#formResposta'));
@@ -133,25 +119,25 @@ function montarFiltros() {
   });
 }
 
-function montarCategorias() {
-  const podeAviso = eu.papel === 'docente';
-  const sel = $('#selCategoria');
-  sel.innerHTML = Object.entries(CATEGORIAS)
-    .filter(([, c]) => c.novo || podeAviso)
-    .map(([id, c]) => `<option value="${id}">${esc(c.rot)}</option>`).join('');
-
-  // o campo "número da missão" só aparece quando o tipo é Entrega
-  const campo = $('#campoMissao');
-  const alternar = () => { if (campo) campo.hidden = sel.value !== 'entrega'; };
-  sel.addEventListener('change', alternar);
-  alternar();
+async function montarCelulas() {
+  const sel = $('#selCelulaEntrega');
+  if (!sel) return;
+  const nomes = new Set();
+  if (eu.celula) nomes.add(eu.celula.trim());
+  try {
+    const { data } = await sb.from('perfis').select('celula').eq('filiado', true);
+    (data || []).forEach(p => { if (p.celula) nomes.add(p.celula.trim()); });
+  } catch { /* segue com o que tem */ }
+  const lista = [...nomes].filter(Boolean).sort((a, b) => a.localeCompare(b, 'pt'));
+  sel.innerHTML = lista.map(c =>
+    `<option value="${esc(c)}"${c === eu.celula ? ' selected' : ''}>${esc(c)}</option>`).join('');
 }
 
 function ligarEventos() {
   $('#btnNovo').addEventListener('click', () => {
     const f = $('#formNovo');
     f.hidden = !f.hidden;
-    if (!f.hidden) f.titulo.focus();
+    if (!f.hidden) { const s = $('#selCelulaEntrega'); if (s) s.focus(); }
   });
   $('#btnCancelar').addEventListener('click', fecharNovo);
   $('#formNovo').addEventListener('submit', publicarCaso);
@@ -226,9 +212,7 @@ async function carregarCasos() {
 function filtrar() {
   let lista = casos;
 
-  if (filtro === 'aberto')      lista = lista.filter(c => conta(c.respostas) === 0);
-  else if (filtro === 'meus')   lista = lista.filter(c => c.autor_id === eu.id);
-  else if (filtro !== 'todos')  lista = lista.filter(c => c.categoria === filtro);
+  if (filtro === 'meus') lista = lista.filter(c => c.autor_id === eu.id);
 
   if (termo) {
     lista = lista.filter(c =>
@@ -249,10 +233,10 @@ function pintarLista() {
 
   if (!lista.length) {
     alvo.innerHTML = `<div class="vazio">
-      <b>${casos.length ? 'Nada com esse filtro' : 'Ninguém falou nada ainda'}</b>
+      <b>${casos.length ? 'Nada com esse filtro' : 'Nenhuma entrega ainda'}</b>
       <p>${casos.length
-        ? 'Tente outra palavra ou volte para "Tudo".'
-        : 'Seja o primeiro a abrir um caso. A primeira dúvida da turma vale XP.'}</p>
+        ? 'Tente outra palavra ou volte para "Todas".'
+        : 'Assim que uma célula enviar a primeira missão, ela aparece aqui.'}</p>
     </div>`;
     return;
   }
@@ -266,12 +250,11 @@ function pintarLista() {
 function cartaoCaso(c) {
   const nResp = conta(c.respostas);
   const nReac = conta(c.reacoes);
-  const cat = CATEGORIAS[c.categoria] || CATEGORIAS.duvida;
 
   const selos = [
-    c.fixado ? '<span class="etiq fix">Fixado</span>' : '',
-    `<span class="etiq ${esc(c.categoria)}">${esc(cat.rot)}${c.categoria === 'entrega' && c.missao ? ' · Missão ' + c.missao : ''}</span>`,
-    c.resolvido ? '<span class="etiq ok">Resolvido</span>' : ''
+    `<span class="etiq entrega">${c.missao ? 'Missão ' + c.missao : 'Entrega'}</span>`,
+    `<span class="etiq material">Célula ${esc(c.autor?.celula || '—')}</span>`,
+    c.resolvido ? '<span class="etiq ok">Avaliada</span>' : ''
   ].join('');
 
   return `
@@ -309,14 +292,23 @@ async function publicarCaso(e) {
   recado(caixa, '');
 
   try {
+    const celula = f.celula.value.trim();
+    const missao = Number(f.missao.value);
+
+    // se o aluno escolheu uma célula diferente da ficha, atualiza a ficha
+    if (celula && celula !== eu.celula) {
+      await sb.from('perfis').update({ celula }).eq('id', eu.id);
+      eu.celula = celula;
+    }
+
     const imagem_url = await subirSeTiver(anexoNovo, caixa, botao);
 
     const { data, error } = await sb.from('topicos').insert({
       autor_id: eu.id,
-      titulo: f.titulo.value.trim(),
+      titulo: 'Missão ' + missao + ' · ' + celula,
       corpo: f.corpo.value.trim(),
-      categoria: f.categoria.value,
-      missao: f.categoria.value === 'entrega' && f.missao.value ? Number(f.missao.value) : null,
+      categoria: 'entrega',
+      missao,
       imagem_url
     }).select('id').single();
 
@@ -329,7 +321,7 @@ async function publicarCaso(e) {
     recado(caixa, traduzirErro(err));
   } finally {
     botao.disabled = false;
-    botao.textContent = 'Publicar';
+    botao.textContent = 'Enviar entrega';
   }
 }
 
@@ -407,7 +399,6 @@ async function abrirCaso(id, { rolar = true } = {}) {
   $('#contagem').hidden = false;
   $('#formResposta').hidden = false;
 
-  const cat = CATEGORIAS[caso.categoria] || CATEGORIAS.duvida;
   const meu = caso.autor_id === eu.id;
   const mando = meu || eu.papel === 'docente';
   const reagi = minhasReacoes.has(caso.id);
@@ -423,9 +414,8 @@ async function abrirCaso(id, { rolar = true } = {}) {
             · <time datetime="${esc(caso.criado_em)}" title="${esc(dataCompleta(caso.criado_em))}">${esc(quando(caso.criado_em))}</time></span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          ${caso.fixado ? '<span class="etiq fix">Fixado</span>' : ''}
-          <span class="etiq ${esc(caso.categoria)}">${esc(cat.rot)}</span>
-          ${caso.resolvido ? '<span class="etiq ok">Resolvido</span>' : ''}
+          <span class="etiq entrega">${caso.missao ? 'Missão ' + caso.missao : 'Entrega'}</span>
+          ${caso.resolvido ? '<span class="etiq ok">Avaliada</span>' : ''}
         </div>
       </div>
 
