@@ -15,7 +15,7 @@
    ========================================================================== */
 window.CURRICULO = {
   /* Troque para "seu-usuario/seu-repositorio". Usado no botão de entrega. */
-  repo: "SEU-USUARIO/senac_sindicato_dos_dados",
+  repo: "luizadealencar/senac_sindicato_dos_dados",
 
   /* Calendário: conta segunda a sexta a partir de inicio, pulando os feriados. */
   inicio: "2026-08-17",
