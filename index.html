@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;600;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css">
 <style>
 :root{
   --papel:#E9EDE3;
@@ -36,16 +37,6 @@ body{
 .fraco{color:var(--tinta-fraca)}
 
 /* ---------- barra de navegação ---------- */
-.nav{
-  position:sticky;top:0;z-index:50;
-  background:var(--tinta);color:var(--papel);
-  border-bottom:3px solid var(--carimbo);
-}
-.nav-in{max-width:1060px;margin:0 auto;padding:10px 24px;display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center}
-.nav-marca{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:16px;margin-right:auto}
-.nav a{color:var(--papel);text-decoration:none;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:14px;font-weight:600;padding:4px 0;border-bottom:2px solid transparent}
-.nav a:hover,.nav a:focus-visible{border-bottom-color:var(--carimbo);outline:none}
-.nav a.aqui{border-bottom-color:var(--carimbo)}
 
 /* ---------- capa ---------- */
 .capa{padding:56px 0 40px;position:relative;overflow:hidden}
@@ -215,6 +206,8 @@ body{
   font-size:12px;letter-spacing:.2em;color:var(--carimbo);border:2px solid var(--carimbo);
   padding:2px 26px;transform:rotate(14deg);opacity:.32;pointer-events:none
 }
+.fich.chefia{box-shadow:5px 5px 0 var(--carimbo)}
+.fich.chefia::after{content:"Chefia";color:var(--latao);border-color:var(--latao);opacity:.5}
 .fich-topo{display:flex;align-items:center;gap:13px}
 .fich-topo>div{padding-right:46px;min-width:0}
 .fich-sem{width:60px;height:60px;flex:none;border:2px dashed var(--borda);background:var(--papel-barra);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:22px;color:var(--tinta-fraca)}
@@ -272,18 +265,7 @@ body{
 </head>
 <body>
 
-<nav class="nav">
-  <div class="nav-in">
-    <span class="nav-marca">Sindicato dos Dados</span>
-    <a href="#hoje">Hoje</a>
-    <a href="#atos">Atos</a>
-    <a href="#arsenal">Arsenal</a>
-    <a href="#placar">Placar</a>
-    <a href="#filiados">Filiados</a>
-    <a href="#eventos">Eventos</a>
-    <a href="caderno.html">Caderno</a>
-  </div>
-</nav>
+<nav class="nav" id="nav" data-pagina="index.html"></nav>
 
 
 <header class="capa env" id="hoje">
@@ -348,14 +330,14 @@ body{
 
 <section class="secao env" id="filiados">
   <div class="secao-cab"><span class="secao-num">IV</span><h2>Quadro de filiados</h2></div>
-  <p class="secao-sub">Quem assinou o contrato do Sindicato. Cada ficha entra aqui por pull request &mdash; o mesmo fluxo que voc&ecirc; vai usar em qualquer equipe.</p>
+  <p class="secao-sub">Quem assinou o contrato do Sindicato. Cada aluno se fília em <span class="mono">entrar.html</span> e a ficha aparece aqui sozinha, puxada do banco.</p>
   <div class="quadro" id="quadro" aria-live="polite"></div>
 
   <div class="filiar">
     <h3>Filie-se ao Sindicato</h3>
-    <p style="margin-bottom:4px">Preencha a ficha no formulário: seu nome e o nome do time (célula). Leva um minuto e não precisa de conta nenhuma.</p>
-    <a id="btFiliar" class="bt-entregar" href="#" target="_blank" rel="noopener" style="margin-top:8px">Preencher a ficha</a>
-    <p class="fraco" style="font-size:16px;margin:14px 0 0">Combinem o <b>nome do time</b> antes e escrevam igual: quem usa o mesmo nome cai na mesma célula do placar. O <span class="mono">XP</span> quem lança sou eu, conforme as missões chegam.</p>
+    <p style="margin-bottom:4px">Crie sua conta com e-mail e senha (ou entre pelo GitHub), escolha sua célula e digite o <b>código da turma</b> que a docente passa em sala. Sua ficha entra no quadro na hora.</p>
+    <a id="btFiliar" class="bt-entregar" href="entrar.html" style="margin-top:8px">Filiar-se</a>
+    <p class="fraco" style="font-size:16px;margin:14px 0 0">O <span class="mono">XP</span> de cada célula quem lança é a docente, conforme as missões chegam.</p>
   </div>
 </section>
 
@@ -503,16 +485,14 @@ const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':
   const rot = document.querySelector('.missao-rot');
   if (rot && m) rot.textContent = 'Miss\u00e3o \u00b7 ' + m.titulo + faixa;
 
-  // botão de entrega: abre o Google Form de entrega (o aluno diz a missão e anexa)
-  if (C.configurado(C.formEntrega)) {
-    $('#btEntregar').href = C.formEntrega;
-  } else {
-    $('#btEntregar').href = '#';
-  }
+  // entrega da missão: vai para a Sala dos Fundos (fórum), onde a célula
+  // abre o caso com texto e imagens.
+  const bt = $('#btEntregar');
+  if (bt) bt.href = 'forum.html';
 
-  // botão de filiação: abre o Google Form de filiação
+  // filiação: vai para a tela de cadastro/login (Supabase).
   const bf = $('#btFiliar');
-  if (bf) bf.href = C.configurado(C.formFiliacao) ? C.formFiliacao : '#';
+  if (bf) bf.href = 'entrar.html';
 })();
 
 /* atos */
@@ -550,159 +530,6 @@ $('#links').innerHTML = DADOS.links.map(l => `
     <strong>${esc(l.t)}</strong><span>${esc(l.d)}</span>
   </a></li>`).join('');
 
-/* placar: os times saem dos alunos; o XP é lançado pela docente no placar.json.
-   DADOS.pontos e DADOS.alunos servem de reserva quando os .json não são lidos
-   (ex.: abrindo o arquivo local). Chaves de pontos casam pelo nome da célula,
-   ignorando maiúsculas/minúsculas e espaços. */
-function montarPlacar(){
-  const fora = new Set((DADOS.foraDoPlacar || []).map(s => s.trim().toLowerCase()));
-  const patenteDe = xp =>
-    xp >= 300 ? "Lenda" : xp >= 180 ? "Veterano" : xp >= 90 ? "Operador" : xp >= 30 ? "Agente" : "Novato";
-
-  // mapa de pontos com chaves normalizadas
-  const pontos = {};
-  Object.keys(DADOS.pontos || {}).forEach(k => { pontos[k.trim().toLowerCase()] = Number(DADOS.pontos[k]) || 0; });
-
-  const mapa = new Map();
-  (DADOS.alunos || []).forEach(a => {
-    const bruto = (a.celula || "").trim();
-    if (!bruto) return;
-    const chave = bruto.toLowerCase();
-    if (fora.has(chave)) return;
-    if (!mapa.has(chave)) mapa.set(chave, {nome: bruto, chave, membros: []});
-    mapa.get(chave).membros.push(a.nome || ("@" + a.github) || "?");
-  });
-
-  const celulas = [...mapa.values()].map(c => ({...c, xp: pontos[c.chave] || 0}));
-  celulas.sort((a, b) => b.xp - a.xp || b.membros.length - a.membros.length || a.nome.localeCompare(b.nome, "pt"));
-
-  const alvo = $("#celulas");
-  if (!celulas.length) {
-    alvo.innerHTML = `<p class="secao-sub" style="grid-column:1/-1">Nenhum time ainda. Assim que os alunos se inscreverem com um nome de time, o placar se monta sozinho.</p>`;
-    return;
-  }
-  alvo.innerHTML = celulas.map((c, i) => `
-    <div class="celula">
-      <span class="celula-pos">${i + 1}º</span>
-      <div class="celula-xp">${c.xp} XP</div>
-      <h3>${esc(c.nome)}</h3>
-      <p>${c.membros.length} ${c.membros.length === 1 ? "membro" : "membros"}</p>
-      <p class="celula-roster">${c.membros.map(esc).join(" · ")}</p>
-      <span class="patente">${esc(patenteDe(c.xp))}</span>
-    </div>`).join("");
-}
-
-/* nav: marca a seção que está na tela */
-(function(){
-  const links = [...document.querySelectorAll('.nav a[href^="#"]')];
-  const alvos = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
-  if(!alvos.length || !('IntersectionObserver' in window)) return;
-  const visiveis = new Set();
-  const obs = new IntersectionObserver(es => {
-    es.forEach(e => e.isIntersecting ? visiveis.add(e.target.id) : visiveis.delete(e.target.id));
-    const atual = alvos.map(s => s.id).find(id => visiveis.has(id));
-    links.forEach(a => a.classList.toggle('aqui', a.getAttribute('href') === '#' + atual));
-  }, {rootMargin:'-45% 0px -50% 0px'});
-  alvos.forEach(s => obs.observe(s));
-})();
-
-/* quadro de filiados */
-function montarFiliados(){
-  const cartao = (a, n) => `
-    <article class="fich">
-      <div class="fich-topo">
-        <img src="https://github.com/${encodeURIComponent(a.github||'')}.png?size=160" alt="" loading="lazy">
-        <div>
-          <span class="fich-mat">MAT ${String(n+1).padStart(3,'0')}</span>
-          <h3>${esc(a.nome||'Sem nome')}</h3>
-        </div>
-      </div>
-      <div class="fich-baixo">
-        <a href="https://github.com/${encodeURIComponent(a.github||'')}" target="_blank" rel="noopener">@${esc(a.github||'')}</a>
-        <span class="fich-cel">Célula ${esc(a.celula||'\u2014')}</span>
-      </div>
-    </article>`;
-
-  const lista = DADOS.alunos || [];
-  $('#quadro').innerHTML = lista.map(cartao).join('') +
-    `<article class="fich vaga"><b>Vaga aberta</b><span>Sua ficha ainda não está aqui. As instruções estão logo abaixo.</span></article>`;
-
-  /* usuário do GitHub errado vira caixa neutra, em vez de imagem quebrada */
-  $('#quadro').querySelectorAll('img').forEach(im => im.addEventListener('error', () => {
-    const cx = document.createElement('span');
-    cx.className = 'fich-sem'; cx.textContent = '?';
-    cx.title = 'Usu\u00e1rio do GitHub n\u00e3o encontrado';
-    im.replaceWith(cx);
-  }));
-}
-
-/* turma: monta o Quadro de Filiados e o Placar. Fontes, em ordem de prioridade:
-   1) planilhaCSV (respostas do Google Form publicadas como CSV) — automático;
-   2) alunos.json / placar.json (arquivos que você edita à mão);
-   3) listas embutidas no DADOS (reserva). */
-(function(){
-  montarPlacar(); montarFiliados();               // desenha já com os dados embutidos
-  const C = window.CURRICULO || {};
-
-  // ---- parser simples de CSV (lida com aspas e vírgulas dentro de campo) ----
-  function parseCSV(texto){
-    const linhas = []; let campo = '', linha = [], dentro = false;
-    for (let i = 0; i < texto.length; i++){
-      const ch = texto[i];
-      if (dentro){
-        if (ch === '"'){ if (texto[i+1] === '"'){ campo += '"'; i++; } else dentro = false; }
-        else campo += ch;
-      } else if (ch === '"') dentro = true;
-      else if (ch === ','){ linha.push(campo); campo = ''; }
-      else if (ch === '\n'){ linha.push(campo); linhas.push(linha); linha = []; campo = ''; }
-      else if (ch !== '\r') campo += ch;
-    }
-    if (campo.length || linha.length){ linha.push(campo); linhas.push(linha); }
-    return linhas.filter(l => l.some(c => c.trim() !== ''));
-  }
-
-  // ---- transforma a planilha (com cabeçalho) em alunos[] e pontos{} ----
-  function daPlanilha(texto){
-    const linhas = parseCSV(texto);
-    if (linhas.length < 2) return null;
-    const cab = linhas[0].map(h => h.trim().toLowerCase());
-    const idx = n => cab.findIndex(h => h === n || h.indexOf(n) !== -1);
-    const iNome = idx('nome'), iGit = idx('github'), iCel = idx('celula') >= 0 ? idx('celula') : idx('célula'), iXp = idx('xp');
-    const alunos = [], pontos = {};
-    for (let k = 1; k < linhas.length; k++){
-      const r = linhas[k];
-      const nome = (iNome >= 0 ? r[iNome] : '').trim();
-      const celula = (iCel >= 0 ? r[iCel] : '').trim();
-      const github = (iGit >= 0 ? r[iGit] : '').trim().replace(/^@/, '');
-      if (nome && celula) alunos.push({ nome, github, celula });
-      if (celula && iXp >= 0){ const xp = Number(r[iXp]); if (!isNaN(xp)) pontos[celula] = xp; }
-    }
-    return { alunos, pontos };
-  }
-
-  const pegaJSON = (arq) => fetch(arq, {cache:'no-store'}).then(r => r.ok ? r.json() : null).catch(() => null);
-  const pegaCSV  = (url) => fetch(url, {cache:'no-store'}).then(r => r.ok ? r.text() : null).catch(() => null);
-
-  if (C.configurado && C.configurado(C.planilhaCSV)){
-    pegaCSV(C.planilhaCSV).then(txt => {
-      const d = txt && daPlanilha(txt);
-      if (d && d.alunos.length){
-        DADOS.alunos = d.alunos;
-        if (Object.keys(d.pontos).length) DADOS.pontos = d.pontos;
-        montarPlacar(); montarFiliados();
-      }
-    });
-    return;   // com planilha, ignora os .json (a planilha é a fonte)
-  }
-
-  Promise.all([pegaJSON('alunos.json'), pegaJSON('placar.json')]).then(([lista, pontos]) => {
-    let mudou = false;
-    if (Array.isArray(lista) && lista.length){ DADOS.alunos = lista; mudou = true; }
-    if (pontos && typeof pontos === 'object'){ DADOS.pontos = pontos; mudou = true; }
-    if (mudou){ montarPlacar(); montarFiliados(); }
-  });
-})();
-
 /* radar de eventos */
 (function(){
   const rotulo = {evento:"Evento", curso:"Curso", cert:"Certificação"};
@@ -717,26 +544,9 @@ function montarFiliados(){
       ${e.url ? `<a class="evento-link" href="${esc(e.url)}" target="_blank" rel="noopener">Abrir página →</a>` : ""}
     </article>`).join("");
 })();
-
-/* trava: enquanto o repositório não for configurado no curriculo.js, os botões
-   avisam em vez de abrir uma página 404 no GitHub. */
-(function(){
-  var C = window.CURRICULO;
-  if (!C) return;
-  const faltaFil = !C.configurado(C.formFiliacao);
-  const faltaEnt = !C.configurado(C.formEntrega);
-  if (!faltaFil && !faltaEnt) return;
-  document.addEventListener('click', function(e){
-    var a = e.target.closest('#btEntregar, #btFiliar, .dia-entregar');
-    if (!a) return;
-    var ehFil = a.id === 'btFiliar';
-    if (ehFil ? faltaFil : faltaEnt){
-      e.preventDefault();
-      alert('Falta configurar o formulário' + (ehFil ? ' de filiação' : ' de entrega') + '.\n\nCrie o Google Form e cole o link no arquivo curriculo.js, na linha ' + (ehFil ? 'formFiliacao' : 'formEntrega') + '. Depois publique o site.\n\nAberto direto do computador (file://) o placar e a lista de filiados também não carregam — precisa estar publicado.');
-    }
-  }, true);
-})();
-
 </script>
+<script type="module" src="assets/nav.js"></script>
+<script type="module" src="assets/quadro.js"></script>
+<script type="module" src="assets/placar.js"></script>
 </body>
 </html>

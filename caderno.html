@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;600;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css">
 <style>
 :root{
   --papel:#E9EDE3;
@@ -34,12 +35,6 @@ body{
 .fraco{color:var(--tinta-fraca)}
 
 /* ---------- navegação ---------- */
-.nav{position:sticky;top:0;z-index:60;background:var(--tinta);color:var(--papel);border-bottom:3px solid var(--carimbo)}
-.nav-in{max-width:1060px;margin:0 auto;padding:10px 24px;display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center}
-.nav-marca{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:16px;margin-right:auto}
-.nav a{color:var(--papel);text-decoration:none;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:14px;font-weight:600;padding:4px 0;border-bottom:2px solid transparent}
-.nav a:hover,.nav a:focus-visible{border-bottom-color:var(--carimbo);outline:none}
-.nav a.aqui{border-bottom-color:var(--carimbo)}
 
 /* ---------- capa ---------- */
 .capa{padding:48px 0 34px}
@@ -195,18 +190,7 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 </head>
 <body>
 
-<nav class="nav">
-  <div class="nav-in">
-    <span class="nav-marca">Sindicato dos Dados</span>
-    <a href="index.html#hoje">Hoje</a>
-    <a href="index.html#atos">Atos</a>
-    <a href="index.html#arsenal">Arsenal</a>
-    <a href="index.html#placar">Placar</a>
-    <a href="index.html#filiados">Filiados</a>
-    <a href="index.html#eventos">Eventos</a>
-    <a href="caderno.html" class="aqui">Caderno</a>
-  </div>
-</nav>
+<nav class="nav" id="nav" data-pagina="caderno.html"></nav>
 
 
 <header class="capa env">
@@ -886,7 +870,7 @@ WHERE id_cliente = 1;</pre>
     // bloco da missão: completo no 1º dia da missão; nos demais, um lembrete curto
     var blocoMissao = '';
     if (m && dia.d === m.ini){
-      var url = C.configurado(C.formEntrega) ? C.formEntrega : '#';
+      var url = 'forum.html';
       blocoMissao = '<div class="dia-missao">'
         + '<span class="dia-missao-rot">Miss\u00e3o \u00b7 ' + esc(m.titulo) + (multi ? esc(faixa) : '') + '</span>'
         + '<p>' + esc(m.texto) + '</p>'
@@ -946,20 +930,7 @@ WHERE id_cliente = 1;</pre>
   }, {rootMargin:'-15% 0px -70% 0px'});
   alvos.forEach(function(s){ if(s) obs.observe(s); });
 })();
-
-/* trava: enquanto o repositório não for configurado no curriculo.js, os botões
-   avisam em vez de abrir uma página 404 no GitHub. */
-(function(){
-  var C = window.CURRICULO;
-  if (!C || C.configurado(C.formEntrega)) return;
-  document.addEventListener('click', function(e){
-    var a = e.target.closest('.dia-entregar');
-    if (!a) return;
-    e.preventDefault();
-    alert('Falta configurar o formulário de entrega.\n\nCrie o Google Form e cole o link no arquivo curriculo.js, na linha formEntrega. Depois publique o site.');
-  }, true);
-})();
-
 </script>
+<script type="module" src="assets/nav.js"></script>
 </body>
 </html>

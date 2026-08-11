@@ -14,27 +14,8 @@
      missao  a ÚNICA entrega do dia, feita nos últimos 30 min e enviada no site
    ========================================================================== */
 window.CURRICULO = {
-  /* =========================================================================
-     ENTREGA SEM GITHUB — via Google Forms (o aluno não precisa de conta GitHub).
-     Crie dois formulários no Google Forms e cole os links "para enviar" aqui:
-       1) FILIAÇÃO: pergunte Nome e Nome do time (célula).
-       2) ENTREGA: pergunte Nome do time, Nº da missão e deixe um campo de
-          texto longo + um campo "enviar arquivo" (para prints/imagens).
-     Enquanto estiver com COLE_AQUI, os botões avisam em vez de abrir. */
-  formFiliacao: "https://docs.google.com/forms/d/e/1FAIpQLSfYh6CkBBeHmrRCxEovmiT1TUE9WwKXgP24PppQBySpcaTt0w/viewform?usp=publish-editor",
-  formEntrega:  "https://docs.google.com/forms/d/e/1FAIpQLSendmSV_JdaVOMXAqefqojaOlikU8Gcd7v13QWsXfipqQd4eg/viewform?usp=header",
-
-  /* OPCIONAL, mas recomendado: publique a planilha de respostas da filiação como
-     CSV (na planilha: Arquivo › Compartilhar › Publicar na web › escolha a aba e
-     "Valores separados por vírgula (.csv)") e cole o link aqui. Use colunas com
-     cabeçalho: nome, github, celula, xp. Se preencher, o Quadro de Filiados e o
-     Placar se montam sozinhos a partir das respostas — sem editar arquivo nenhum.
-     (O github é opcional; serve só para puxar o avatar.) */
-  planilhaCSV: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTb17yUu9DmRqvOOuRrPy1ebRvMVRPvkZ71VFJOqZNkoHquUvf_4e3e7a-Z4k5Fa4CWWCST6sDWjI8m/pub?gid=1573232710&single=true&output=csv",
-
-  /* Caminho alternativo por GitHub (Pull Request), para quem tiver conta.
-     Se você não for usar GitHub, pode deixar como está. */
-  repo: "luizadealencar/senac_sindicato_dos_dados",
+  /* Troque para "seu-usuario/seu-repositorio". Usado no botão de entrega. */
+  repo: "seu-usuario/sindicato-dos-dados",
 
   /* Calendário: conta segunda a sexta a partir de inicio, pulando os feriados. */
   inicio: "2026-08-17",
@@ -147,8 +128,6 @@ window.CURRICULO = {
       if (cont === 0 && d > new Date(this.inicio + "T00:00:00").setFullYear(2100)) return null;
     }
   },
-
-  configurado: function(v){ return !!v && !/COLE_AQUI/i.test(v); },
 
   missaoDoDia: function(n){
     return (this.missoes || []).find(function(m){ return n >= m.ini && n <= m.fim; }) || null;
