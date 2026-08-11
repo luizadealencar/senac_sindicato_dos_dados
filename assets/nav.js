@@ -7,15 +7,14 @@
 import { sessao, sair, avatar, ligarAvatares, esc, configurado } from './sindicato.js';
 
 const ITENS = [
-  { t: 'Hoje',        casa: 'index.html', ancora: '#hoje' },
-  { t: 'Atos',        casa: 'index.html', ancora: '#atos' },
-  { t: 'Livro-Caixa', casa: 'index.html', ancora: '#livro' },
-  { t: 'Arsenal',     casa: 'index.html', ancora: '#arsenal' },
-  { t: 'Placar',      casa: 'index.html', ancora: '#placar' },
-  { t: 'Filiados',    casa: 'index.html', ancora: '#filiados' },
-  { t: 'Ficha',       casa: 'index.html', ancora: '#ficha' },
-  { t: 'Caderno',     casa: 'caderno.html' },
-  { t: 'Fórum',       casa: 'forum.html' }
+  { t: 'Hoje',      casa: 'index.html', ancora: '#hoje' },
+  { t: 'Atos',      casa: 'index.html', ancora: '#atos' },
+  { t: 'Arsenal',   casa: 'index.html', ancora: '#arsenal' },
+  { t: 'Placar',    casa: 'index.html', ancora: '#placar' },
+  { t: 'Filiados',  casa: 'index.html', ancora: '#filiados' },
+  { t: 'Eventos',   casa: 'index.html', ancora: '#eventos' },
+  { t: 'Caderno',   casa: 'caderno.html' },
+  { t: 'Fórum',     casa: 'forum.html' }
 ];
 
 const nav = document.getElementById('nav');
