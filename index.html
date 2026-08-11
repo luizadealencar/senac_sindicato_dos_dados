@@ -29,7 +29,7 @@ body{
   line-height:1.68;
   background-image:repeating-linear-gradient(180deg,transparent 0,transparent 31px,rgba(140,160,130,.18) 31px,rgba(140,160,130,.18) 32px);
 }
-.env{max-width:1060px;margin:0 auto;padding:0 24px}
+.env{max-width:1060px;margin:0 auto;padding-left:26px;padding-right:26px}
 
 /* ---------- utilitários de texto ---------- */
 .rot{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-weight:600}
@@ -39,7 +39,7 @@ body{
 /* ---------- barra de navegação ---------- */
 
 /* ---------- capa ---------- */
-.capa{padding:56px 0 40px;position:relative;overflow:hidden}
+.capa{padding-top:56px;padding-bottom:40px;position:relative;overflow:hidden}
 .classif{
   display:flex;justify-content:space-between;gap:6px 16px;flex-wrap:wrap;
   border-top:2px solid var(--tinta);border-bottom:2px solid var(--tinta);
@@ -99,7 +99,7 @@ body{
 
 /* ---------- seções ---------- */
 html{scroll-padding-top:64px}
-.secao{padding:60px 0;border-top:2px solid var(--tinta)}
+.secao{padding-top:54px;padding-bottom:54px;border-top:2px solid var(--tinta)}
 .secao-cab{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap}
 .secao-num{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--carimbo);font-weight:700}
 .secao h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:clamp(30px,5.5vw,46px);line-height:1}
@@ -234,7 +234,7 @@ html{scroll-padding-top:64px}
 .credito strong{color:var(--latao)}
 .credito a{text-decoration:none}
 .credito a:hover strong,.credito a:focus-visible strong{text-decoration:underline}
-.rodape{border-top:2px solid var(--tinta);padding:26px 0 46px;font-size:14.5px;color:var(--tinta-fraca)}
+.rodape{border-top:2px solid var(--tinta);padding-top:26px;padding-bottom:46px;font-size:14.5px;color:var(--tinta-fraca)}
 
 @media(max-width:820px){
   body{font-size:17.5px}
@@ -252,7 +252,7 @@ html{scroll-padding-top:64px}
 @media(max-width:560px){
   body{font-size:17px}
   .hoje-linha dd,.cheat p,.celula p,.evento p,.cc-txt,.ato-corpo p,#hjMissao{text-align:left;hyphens:manual}
-  .env{padding:0 18px}
+  .env{padding-left:22px;padding-right:22px}
   .hoje{box-shadow:5px 5px 0 var(--tinta);padding:18px 18px 20px}
   .hoje-linha{flex-direction:column;gap:2px}
   .hoje-linha dt{padding-top:0}
@@ -260,7 +260,7 @@ html{scroll-padding-top:64px}
   .filiar{box-shadow:5px 5px 0 var(--tinta);padding:18px 18px 20px}
   .filiar pre{max-width:100%}
   .mencao div{flex:1 1 100%}
-  .secao{padding:38px 0}
+  .secao{padding-top:34px;padding-bottom:34px}
   .capa{padding-bottom:8px}
   .hoje{margin-top:20px}
   .secao-cab{margin-bottom:6px}
@@ -387,7 +387,7 @@ const DADOS = {
     { num:"III", nome:"As chaves", dias:"Dias 12–19",
       objetivo:"Escrever SQL com fluência nas cinco categorias da linguagem.",
       conteudos:["DDL: CREATE, ALTER, DROP e tipos de dados","Restrições: NOT NULL, UNIQUE, CHECK, DEFAULT","Índices: primário, único, não único","DML: INSERT, UPDATE, DELETE","DQL: SELECT, WHERE, ORDER BY, DISTINCT, GROUP BY, funções de agregação","JOIN entre tabelas","TCL: transações, COMMIT, ROLLBACK","DCL: usuários, GRANT, REVOKE"],
-      atividades:["Deck de cartas SQL — montar a query mais elegante em cinco minutos","Caça ao bug — script quebrado no GitHub, quem abre a Issue certa primeiro leva XP","Boss: SQL Murder Mystery, resolvido só com SELECT e JOIN"],
+      atividades:["Deck de cartas SQL — montar a query mais elegante em cinco minutos","Caça ao bug — script quebrado no GitHub, quem abre a Issue certa primeiro leva XP","Boss: um caso de detetive no SQLNoir, em português, resolvido só com SELECT, WHERE e JOIN"],
       entrega:"Banco da célula criado, populado e consultado. Script versionado com histórico de commits legível." },
 
     { num:"IV", nome:"A operação", dias:"Dias 20–22",
@@ -417,11 +417,9 @@ const DADOS = {
   ],
 
   links: [
-    {t:"SQL Murder Mystery",u:"https://mystery.knightlab.com/",d:"Resolver um assassinato escrevendo consultas. Roda no navegador, sem cadastro. É o Boss do Ato III."},
+    {t:"SQLNoir",u:"https://www.sqlnoir.com/pt-br/cases",d:"Jogo de detetive com SQL, em português. Interrogue os suspeitos com consultas até achar o culpado. É o Boss do Ato III."},
     {t:"SQL Island",u:"https://sql-island.informatik.uni-kl.de/",d:"RPG em que você sobrevive numa ilha escrevendo SQL. Ótimo primeiro contato."},
-    {t:"DB Fiddle",u:"https://www.db-fiddle.com/",d:"Escreva e execute SQL sem instalar nada. Use na primeira semana."},
     {t:"dbdiagram.io",u:"https://dbdiagram.io/",d:"Desenhe o modelo e ele gera o SQL de criação das tabelas."},
-    {t:"SQLBolt",u:"https://sqlbolt.com/",d:"Exercícios curtos e progressivos, com correção imediata."},
     {t:"Programiz SQL",u:"https://www.programiz.com/sql/online-compiler/",d:"Editor de SQL no navegador com banco de exemplo pronto. Bom para o primeiro contato."},
     {t:"OneCompiler MySQL",u:"https://onecompiler.com/mysql",d:"Roda MySQL de verdade e deixa criar suas próprias tabelas, sem instalar nada."},
     {t:"brModelo",u:"http://www.sis4.com/brModelo/",d:"O clássico brasileiro de modelagem. Desenhe o MER e o DER antes de escrever SQL."},
