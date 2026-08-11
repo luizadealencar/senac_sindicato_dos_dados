@@ -152,8 +152,10 @@ form[hidden],section[hidden],div[hidden]{display:none}
           </div>
 
           <div class="dupla">
-            <label class="campo"><span>Célula</span>
-              <select name="celula" id="selCelula" required></select>
+            <label class="campo"><span>Célula (nome do time)</span>
+              <input type="text" name="celula" id="inCelula" list="celulasSugeridas" required
+                     minlength="2" maxlength="30" autocomplete="off" placeholder="Ex.: Guardiões do SELECT">
+              <span class="dica">Combinem um nome e escrevam <b>igual</b>. Se o time já criou, ele aparece na lista.</span>
             </label>
             <label class="campo"><span>GitHub <span style="text-transform:none;letter-spacing:0">(opcional)</span></span>
               <input type="text" name="github" autocomplete="off" maxlength="39" placeholder="seu-usuario" pattern="[A-Za-z0-9\-]{1,39}">
@@ -191,8 +193,9 @@ form[hidden],section[hidden],div[hidden]{display:none}
           <label class="campo mono"><span>Código da turma</span>
             <input type="text" name="codigo" autocomplete="off" required maxlength="40" placeholder="XXXXXXXX">
           </label>
-          <label class="campo"><span>Célula</span>
-            <select name="celula" id="selCelula2" required></select>
+          <label class="campo"><span>Célula (nome do time)</span>
+            <input type="text" name="celula" id="inCelula2" list="celulasSugeridas" required
+                   minlength="2" maxlength="30" autocomplete="off" placeholder="Ex.: Guardiões do SELECT">
           </label>
           <button class="btn" type="submit">Carimbar a ficha</button>
         </form>
@@ -219,6 +222,7 @@ form[hidden],section[hidden],div[hidden]{display:none}
     </aside>
 
   </div>
+  <datalist id="celulasSugeridas"></datalist>
 </main>
 
 <footer class="rodape env">
