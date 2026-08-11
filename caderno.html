@@ -126,6 +126,20 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 .dia-missao.andamento{border-left-color:var(--borda);background:transparent;padding:10px 14px}
 .dia-missao.andamento .dia-missao-rot{color:var(--tinta-fraca)}
 .dia-missao.andamento a{color:var(--carimbo)}
+.diagrama{border:2px solid var(--tinta);background:var(--papel-barra);padding:16px 16px 10px;margin:14px 0 22px}
+.diagrama svg{display:block;width:100%;height:auto;max-width:660px;margin:0 auto}
+.diagrama figcaption{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:12.5px;color:var(--tinta-fraca);text-align:center;margin-top:8px}
+.dg-ent{fill:var(--papel);stroke:var(--tinta);stroke-width:2}
+.dg-rel{fill:var(--papel);stroke:var(--carimbo);stroke-width:2}
+.dg-atr{fill:var(--papel);stroke:var(--borda);stroke-width:1.5}
+.dg-lin{stroke:var(--tinta);stroke-width:1.6;fill:none}
+.dg-card{fill:var(--carimbo);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700}
+.dg-ent-t{fill:var(--tinta);font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:15px;letter-spacing:.04em}
+.dg-rel-t{fill:var(--carimbo);font-family:'Saira Condensed',sans-serif;font-weight:600;text-transform:uppercase;font-size:12px}
+.dg-atr-t{fill:var(--tinta-fraca);font-family:'Spectral',Georgia,serif;font-size:13px}
+.dg-col{font-family:'JetBrains Mono',monospace;font-size:13px;fill:var(--tinta)}
+.dg-pk{fill:var(--carimbo);font-weight:700}
+.dg-cab{fill:var(--tinta);font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:14px}
 .caixa.ferramenta{border-style:solid;border-color:var(--latao)}
 .caixa.ferramenta .caixa-rot{background:var(--latao)}
 .caixa a{color:var(--carimbo);text-decoration:none;border-bottom:1px solid var(--borda);font-weight:600}
@@ -371,6 +385,37 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
     <li><strong>N:M</strong> — várias de A para várias de B. Um aluno se matricula em vários cursos, e um curso tem vários alunos.</li>
   </ul>
 
+
+  <figure class="diagrama">
+    <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="As três cardinalidades">
+      <!-- 1:1 -->
+      <rect class="dg-ent" x="30" y="26" width="150" height="44" rx="3"/>
+      <text class="dg-ent-t" x="105" y="53" text-anchor="middle">Pessoa</text>
+      <line class="dg-lin" x1="180" y1="48" x2="380" y2="48"/>
+      <text class="dg-card" x="196" y="40">1</text>
+      <text class="dg-card" x="356" y="40">1</text>
+      <rect class="dg-ent" x="380" y="26" width="150" height="44" rx="3"/>
+      <text class="dg-ent-t" x="455" y="53" text-anchor="middle">RG</text>
+      <!-- 1:N -->
+      <rect class="dg-ent" x="30" y="128" width="150" height="44" rx="3"/>
+      <text class="dg-ent-t" x="105" y="155" text-anchor="middle">Cliente</text>
+      <line class="dg-lin" x1="180" y1="150" x2="380" y2="150"/>
+      <text class="dg-card" x="196" y="142">1</text>
+      <text class="dg-card" x="352" y="142">N</text>
+      <rect class="dg-ent" x="380" y="128" width="150" height="44" rx="3"/>
+      <text class="dg-ent-t" x="455" y="155" text-anchor="middle">Pedido</text>
+      <!-- N:M -->
+      <rect class="dg-ent" x="30" y="230" width="150" height="44" rx="3"/>
+      <text class="dg-ent-t" x="105" y="257" text-anchor="middle">Aluno</text>
+      <line class="dg-lin" x1="180" y1="252" x2="380" y2="252"/>
+      <text class="dg-card" x="194" y="244">N</text>
+      <text class="dg-card" x="354" y="244">M</text>
+      <rect class="dg-ent" x="380" y="230" width="150" height="44" rx="3"/>
+      <text class="dg-ent-t" x="455" y="257" text-anchor="middle">Curso</text>
+    </svg>
+    <figcaption>As três cardinalidades: um-para-um, um-para-muitos, muitos-para-muitos</figcaption>
+  </figure>
+
   <h4>DER e seus símbolos</h4>
   <p>O Diagrama de Entidade-Relacionamento é a representação gráfica do MER.</p>
   <div class="tab-rolo">
@@ -385,12 +430,112 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
   </table>
   </div>
 
+
+  <figure class="diagrama">
+    <svg viewBox="0 0 560 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Símbolos do DER">
+      <rect class="dg-ent" x="30" y="40" width="120" height="44" rx="3"/>
+      <text class="dg-ent-t" x="90" y="67" text-anchor="middle">Entidade</text>
+      <text class="dg-atr-t" x="90" y="105" text-anchor="middle">retângulo</text>
+
+      <ellipse class="dg-atr" cx="280" cy="62" rx="66" ry="26"/>
+      <text class="dg-atr-t" x="280" y="67" text-anchor="middle" style="font-size:14px">Atributo</text>
+      <text class="dg-atr-t" x="280" y="105" text-anchor="middle">elipse</text>
+
+      <polygon class="dg-rel" points="470,36 528,62 470,88 412,62"/>
+      <text class="dg-rel-t" x="470" y="66" text-anchor="middle">Relação</text>
+      <text class="dg-atr-t" x="470" y="105" text-anchor="middle">losango</text>
+    </svg>
+    <figcaption>Os símbolos do diagrama entidade-relacionamento (notação de Chen)</figcaption>
+  </figure>
+
   <h4>Exemplo completo: sistema de vendas</h4>
   <p>Três entidades. <strong>Cliente</strong> (Nome, Email, Endereço), <strong>Pedido</strong> (Data, Valor Total) e <strong>Produto</strong> (Nome, Preço). Dois relacionamentos:</p>
   <ul>
     <li><strong>Cliente realiza Pedido (1:N)</strong> — um cliente faz muitos pedidos, cada pedido é de um cliente.</li>
     <li><strong>Pedido contém Produto (N:M)</strong> — um pedido tem vários produtos, e um produto aparece em vários pedidos. Na hora de implementar, esse N:M vira uma tabela intermediária, algo como <code class="inl">itens_pedido</code>.</li>
   </ul>
+
+
+  <figure class="diagrama">
+    <svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MER do sistema de vendas">
+      <!-- atributos Cliente -->
+      <ellipse class="dg-atr" cx="42" cy="60" rx="34" ry="18"/><text class="dg-atr-t" x="42" y="65" text-anchor="middle">Nome</text>
+      <ellipse class="dg-atr" cx="112" cy="60" rx="34" ry="18"/><text class="dg-atr-t" x="112" y="65" text-anchor="middle">Email</text>
+      <line class="dg-lin" x1="55" y1="74" x2="75" y2="150"/><line class="dg-lin" x1="105" y1="74" x2="80" y2="150"/>
+      <!-- Cliente -->
+      <rect class="dg-ent" x="20" y="150" width="110" height="52" rx="3"/>
+      <text class="dg-ent-t" x="75" y="182" text-anchor="middle">Cliente</text>
+      <!-- realiza -->
+      <line class="dg-lin" x1="130" y1="176" x2="140" y2="176"/>
+      <text class="dg-card" x="132" y="168">1</text>
+      <polygon class="dg-rel" points="185,146 232,176 185,206 138,176"/>
+      <text class="dg-rel-t" x="185" y="180" text-anchor="middle">realiza</text>
+      <line class="dg-lin" x1="232" y1="176" x2="245" y2="176"/>
+      <text class="dg-card" x="235" y="168">N</text>
+      <!-- atributos Pedido -->
+      <ellipse class="dg-atr" cx="272" cy="60" rx="34" ry="18"/><text class="dg-atr-t" x="272" y="65" text-anchor="middle">Data</text>
+      <ellipse class="dg-atr" cx="342" cy="60" rx="34" ry="18"/><text class="dg-atr-t" x="342" y="65" text-anchor="middle">Valor</text>
+      <line class="dg-lin" x1="285" y1="74" x2="300" y2="150"/><line class="dg-lin" x1="335" y1="74" x2="305" y2="150"/>
+      <!-- Pedido -->
+      <rect class="dg-ent" x="245" y="150" width="110" height="52" rx="3"/>
+      <text class="dg-ent-t" x="300" y="182" text-anchor="middle">Pedido</text>
+      <!-- contém -->
+      <line class="dg-lin" x1="355" y1="176" x2="365" y2="176"/>
+      <text class="dg-card" x="357" y="168">N</text>
+      <polygon class="dg-rel" points="410,146 457,176 410,206 363,176"/>
+      <text class="dg-rel-t" x="410" y="180" text-anchor="middle">contém</text>
+      <line class="dg-lin" x1="457" y1="176" x2="470" y2="176"/>
+      <text class="dg-card" x="460" y="168">M</text>
+      <!-- atributos Produto -->
+      <ellipse class="dg-atr" cx="497" cy="60" rx="34" ry="18"/><text class="dg-atr-t" x="497" y="65" text-anchor="middle">Nome</text>
+      <ellipse class="dg-atr" cx="567" cy="60" rx="34" ry="18"/><text class="dg-atr-t" x="567" y="65" text-anchor="middle">Preço</text>
+      <line class="dg-lin" x1="510" y1="74" x2="525" y2="150"/><line class="dg-lin" x1="560" y1="74" x2="530" y2="150"/>
+      <!-- Produto -->
+      <rect class="dg-ent" x="470" y="150" width="110" height="52" rx="3"/>
+      <text class="dg-ent-t" x="525" y="182" text-anchor="middle">Produto</text>
+    </svg>
+    <figcaption>MER do sistema de vendas: Cliente 1:N Pedido N:M Produto</figcaption>
+  </figure>
+
+
+  <p>Na <strong>modelagem lógica</strong>, esse desenho vira tabelas. O relacionamento 1:N coloca a chave do lado &ldquo;1&rdquo; como <strong>chave estrangeira</strong> no lado &ldquo;N&rdquo;; o N:M vira uma <strong>tabela intermediária</strong> (<code class="inl">itens_pedido</code>) com as duas chaves.</p>
+  <figure class="diagrama">
+    <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Modelo lógico em tabelas">
+      <!-- clientes -->
+      <rect class="dg-ent" x="18" y="30" width="150" height="96" rx="2"/>
+      <line class="dg-lin" x1="18" y1="56" x2="168" y2="56"/>
+      <text class="dg-cab" x="28" y="49">clientes</text>
+      <text class="dg-col dg-pk" x="28" y="76">id_cliente (PK)</text>
+      <text class="dg-col" x="28" y="97">nome</text>
+      <text class="dg-col" x="28" y="118">email</text>
+      <!-- pedidos -->
+      <rect class="dg-ent" x="245" y="30" width="160" height="96" rx="2"/>
+      <line class="dg-lin" x1="245" y1="56" x2="405" y2="56"/>
+      <text class="dg-cab" x="255" y="49">pedidos</text>
+      <text class="dg-col dg-pk" x="255" y="76">id_pedido (PK)</text>
+      <text class="dg-col" x="255" y="97" fill="#8E2323">id_cliente (FK)</text>
+      <text class="dg-col" x="255" y="118">data, valor</text>
+      <!-- FK clientes<-pedidos -->
+      <path class="dg-lin" d="M245 92 L206 92 L206 76 L168 76"/>
+      <!-- produtos -->
+      <rect class="dg-ent" x="470" y="30" width="152" height="96" rx="2"/>
+      <line class="dg-lin" x1="470" y1="56" x2="622" y2="56"/>
+      <text class="dg-cab" x="480" y="49">produtos</text>
+      <text class="dg-col dg-pk" x="480" y="76">id_produto (PK)</text>
+      <text class="dg-col" x="480" y="97">nome</text>
+      <text class="dg-col" x="480" y="118">preco</text>
+      <!-- itens_pedido (tabela N:M) -->
+      <rect class="dg-ent" x="245" y="168" width="160" height="74" rx="2"/>
+      <line class="dg-lin" x1="245" y1="194" x2="405" y2="194"/>
+      <text class="dg-cab" x="255" y="187">itens_pedido</text>
+      <text class="dg-col" x="255" y="214" fill="#8E2323">id_pedido (FK)</text>
+      <text class="dg-col" x="255" y="234" fill="#8E2323">id_produto (FK)</text>
+      <!-- ligações da intermediária -->
+      <path class="dg-lin" d="M325 168 L325 126"/>
+      <path class="dg-lin" d="M405 205 L438 205 L438 100 L470 100"/>
+    </svg>
+    <figcaption>Modelo lógico: chaves primárias (PK) e estrangeiras (FK); o N:M virou itens_pedido</figcaption>
+  </figure>
 
   <h3 id="p2-6">2.6 Conversão de banco de dados</h3>
   <p>Converter é migrar dados de um sistema ou formato para outro: trocar de tecnologia, integrar bases, sair de relacional para NoSQL ou o caminho inverso. Feito no improviso, destrói informação. Feito em etapas, não.</p>
