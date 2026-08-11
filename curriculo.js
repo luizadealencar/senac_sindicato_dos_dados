@@ -21,7 +21,7 @@ window.CURRICULO = {
        2) ENTREGA: pergunte Nome do time, Nº da missão e deixe um campo de
           texto longo + um campo "enviar arquivo" (para prints/imagens).
      Enquanto estiver com COLE_AQUI, os botões avisam em vez de abrir. */
-  formFiliacao: "COLE_AQUI_o_link_do_formulario_de_filiacao",
+  formFiliacao: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTb17yUu9DmRqvOOuRrPy1ebRvMVRPvkZ71VFJOqZNkoHquUvf_4e3e7a-Z4k5Fa4CWWCST6sDWjI8m/pub?gid=1573232710&single=true&output=csv",
   formEntrega:  "COLE_AQUI_o_link_do_formulario_de_entrega",
 
   /* OPCIONAL, mas recomendado: publique a planilha de respostas da filiação como
