@@ -77,6 +77,7 @@ async function abrirPorta() {
 
   montarFiltros();
   montarCelulas();
+  montarMissoes();
   ligarEventos();
   anexoNovo = ligarAnexo($('[data-anexo="novo"]'), $('#formNovo'));
   anexoResposta = ligarAnexo($('[data-anexo="resposta"]'), $('#formResposta'));
@@ -131,6 +132,20 @@ async function montarCelulas() {
   const lista = [...nomes].filter(Boolean).sort((a, b) => a.localeCompare(b, 'pt'));
   sel.innerHTML = lista.map(c =>
     `<option value="${esc(c)}"${c === eu.celula ? ' selected' : ''}>${esc(c)}</option>`).join('');
+}
+
+function montarMissoes() {
+  const sel = document.querySelector('#selMissao');
+  if (!sel) return;
+  const missoes = (window.CURRICULO && window.CURRICULO.missoes) || [];
+  if (missoes.length) {
+    sel.innerHTML = missoes.map((m, i) =>
+      `<option value="${i + 1}">${i + 1} \u00b7 ${esc(m.titulo)}</option>`).join('');
+  } else {
+    // reserva: 1 a 9 sem nome
+    sel.innerHTML = Array.from({ length: 9 }, (_, i) =>
+      `<option value="${i + 1}">Miss\u00e3o ${i + 1}</option>`).join('');
+  }
 }
 
 function ligarEventos() {
@@ -271,7 +286,6 @@ function cartaoCaso(c) {
       </span>
       <span class="caso-conta">
         <b>${nResp}</b>${nResp === 1 ? 'resposta' : 'respostas'}
-        ${nReac ? `<span>${nReac} ${nReac === 1 ? 'confirma' : 'confirmam'}</span>` : ''}
       </span>
     </a>`;
 }
@@ -423,26 +437,22 @@ async function abrirCaso(id, { rolar = true } = {}) {
       <div class="msg-txt">${textoRico(caso.corpo)}</div>
       ${imagemDe(caso.imagem_url)}
 
-      <div class="msg-pe">
-        <button class="acao${reagi ? ' ativa' : ''}" type="button" data-agir="reagir">
-          ${reagi ? 'Também tenho' : 'Também tenho essa'}${nReac ? ' · ' + nReac : ''}
-        </button>
-        ${mando ? `<button class="acao${caso.resolvido ? ' ativa' : ''}" type="button" data-agir="resolver">
-          ${caso.resolvido ? 'Reabrir caso' : 'Marcar resolvido'}</button>` : ''}
+      ${(mando || eu.papel === 'docente') ? `<div class="msg-pe">
         ${eu.papel === 'docente' ? `<button class="acao${caso.fixado ? ' ativa' : ''}" type="button" data-agir="fixar">
-          ${caso.fixado ? 'Soltar do topo' : 'Fixar no topo'}</button>` : ''}
+          ${caso.fixado ? 'Soltar do topo' : 'Destacar no topo'}</button>` : ''}
         ${mando ? '<button class="acao perigo" type="button" data-agir="apagar">Apagar</button>' : ''}
-      </div>
+      </div>` : ''}
     </article>`;
 
   ligarAvatares(alvo);
-  alvo.querySelector('.msg-pe').addEventListener('click', e => {
+  const barra = alvo.querySelector('.msg-pe');
+  if (barra) barra.addEventListener('click', e => {
     const b = e.target.closest('[data-agir]');
     if (b) agir(b.dataset.agir, caso, b);
   });
 
   const n = (respostas || []).length;
-  $('#contagem').textContent = n ? `${n} ${n === 1 ? 'resposta' : 'respostas'}` : 'Nenhuma resposta ainda';
+  $('#contagem').textContent = n ? `${n} ${n === 1 ? 'resposta' : 'respostas'}` : 'Sem respostas ainda';
 
   const cxRespostas = $('#respostas');
   cxRespostas.innerHTML = n
@@ -509,7 +519,7 @@ async function agir(o_que, caso, botao) {
     }
 
     if (o_que === 'apagar') {
-      if (!confirm('Apagar este caso e todas as respostas dele? Não tem volta.')) return;
+      if (!confirm('Apagar esta entrega e todas as respostas dela? Não tem volta.')) return;
       const { error } = await sb.from('topicos').delete().eq('id', caso.id);
       if (error) throw error;
       apagarAnexo(caso.imagem_url);
