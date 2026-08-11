@@ -100,6 +100,8 @@
 .redacao{border:2px solid var(--tinta);box-shadow:7px 7px 0 var(--tinta);background:var(--papel);padding:20px 22px 22px;margin-bottom:26px}
 .redacao h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:23px;margin-bottom:14px}
 .redacao .linha{display:grid;grid-template-columns:1fr 200px;gap:0 16px}
+.redacao .linha3{display:grid;grid-template-columns:1fr 150px;gap:0 16px}
+@media(max-width:860px){.redacao .linha3{grid-template-columns:1fr}}
 
 .anexo{border:2px dashed var(--borda);padding:13px 15px;margin-bottom:16px;background:var(--papel-barra)}
 .anexo-topo{display:flex;gap:11px;align-items:center;flex-wrap:wrap}
@@ -205,7 +207,7 @@
   </div>
 
   <h1 class="titulo">A Sala<br>dos <em>Fundos</em></h1>
-  <p class="subtitulo">Onde se leva a dúvida antes que ela vire nota baixa. Traga o print do erro, o pedaço da query, o que for. Alguém aqui já apanhou desse mesmo problema.</p>
+  <p class="subtitulo">Aqui cada célula entrega suas missões: diga a missão, escreva o que fez e anexe o print. Seu nome, sua célula e a data entram sozinhos.</p>
 
   <!-- configuração pendente -->
   <div id="avisoConfig" hidden class="aviso-config">
@@ -226,31 +228,26 @@
         <span class="lupa" aria-hidden="true">⌕</span>
         <input type="search" id="busca" placeholder="Procurar por palavra, autor ou erro" aria-label="Procurar nos casos">
       </div>
-      <button class="btn encolhe" type="button" id="btnNovo">Abrir um caso</button>
+      <button class="btn encolhe" type="button" id="btnNovo">Enviar entrega</button>
     </div>
 
     <div class="filtros" id="filtros" style="margin-bottom:20px"></div>
 
     <form class="redacao" id="formNovo" hidden novalidate>
-      <h2>Abrir um caso</h2>
+      <h2>Enviar entrega</h2>
       <p class="recado" id="recadoNovo" hidden></p>
 
-      <label class="campo"><span>Assunto</span>
-        <input type="text" name="titulo" required minlength="3" maxlength="140" placeholder="Ex.: JOIN devolvendo linha repetida">
-      </label>
-
-      <div class="linha">
-        <label class="campo"><span>O que aconteceu</span>
-          <textarea name="corpo" required maxlength="8000" rows="6" placeholder="Conte o que você tentou, o que esperava e o que veio. Trecho de código entre crases vira `destaque`."></textarea>
+      <div class="linha3">
+        <label class="campo"><span>Célula</span>
+          <select name="celula" id="selCelulaEntrega" required></select>
         </label>
-        <label class="campo"><span>Tipo</span>
-          <select name="categoria" id="selCategoria"></select>
+        <label class="campo"><span>Missão</span>
+          <input type="number" name="missao" min="1" max="27" step="1" inputmode="numeric" required placeholder="1 a 27">
         </label>
       </div>
 
-      <label class="campo" id="campoMissao" hidden><span>Número da missão do dia</span>
-        <input type="number" name="missao" min="1" max="27" step="1" inputmode="numeric" placeholder="Ex.: 3">
-        <span class="dica">De 1 a 27. Só para entregas — seu nome, sua célula e a data entram sozinhos.</span>
+      <label class="campo"><span>O que a célula fez</span>
+        <textarea name="corpo" required maxlength="8000" rows="6" placeholder="Descreva a entrega. Pode colar SQL entre crases: `SELECT ...`"></textarea>
       </label>
 
       <div class="anexo" data-anexo="novo">
@@ -263,7 +260,7 @@
       </div>
 
       <div class="redacao-pe">
-        <button class="btn" type="submit">Publicar</button>
+        <button class="btn" type="submit">Enviar entrega</button>
         <button class="btn vazado" type="button" id="btnCancelar">Cancelar</button>
       </div>
     </form>
