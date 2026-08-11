@@ -67,7 +67,7 @@ async function pintarSessao() {
   if (!caixa) return;
 
   if (!configurado) {
-    caixa.innerHTML = '<span class="nav-sessao-aviso">Sem cadastro</span>';
+    caixa.innerHTML = `<a class="nav-sessao-btn" href="entrar.html">Entrar</a>`;
     return;
   }
 
