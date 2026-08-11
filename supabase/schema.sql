@@ -35,7 +35,8 @@ create table if not exists public.topicos (
   titulo      text not null check (char_length(btrim(titulo)) between 3 and 140),
   corpo       text not null check (char_length(btrim(corpo)) between 1 and 8000),
   categoria   text not null default 'duvida'
-              check (categoria in ('duvida','material','vitoria','aviso')),
+              check (categoria in ('duvida','material','vitoria','aviso','entrega')),
+  missao      smallint check (missao is null or missao between 1 and 27),
   imagem_url  text,
   fixado      boolean not null default false,
   resolvido   boolean not null default false,
@@ -348,8 +349,8 @@ grant update (nome, github, celula, avatar_url)
 
 -- tópicos: "fixado" fica de fora de propósito — vai pela função fixar_topico().
 grant select, delete on public.topicos to authenticated;
-grant insert (autor_id, titulo, corpo, categoria, imagem_url) on public.topicos to authenticated;
-grant update (titulo, corpo, categoria, imagem_url, resolvido, editado_em) on public.topicos to authenticated;
+grant insert (autor_id, titulo, corpo, categoria, missao, imagem_url) on public.topicos to authenticated;
+grant update (titulo, corpo, categoria, missao, imagem_url, resolvido, editado_em) on public.topicos to authenticated;
 
 grant select, delete on public.respostas to authenticated;
 grant insert (topico_id, autor_id, corpo, imagem_url) on public.respostas to authenticated;
@@ -477,3 +478,25 @@ end $$;
 --       where id = (select id from auth.users where email = 'aluno@exemplo.com');
 --
 -- ============================================================================
+
+
+-- ============================================================================
+-- 8. ENTREGAS DE MISSÃO — ajuste seguro para bancos que já existem
+--    (rodar o schema de novo aplica isto sem quebrar nada)
+-- ============================================================================
+
+alter table public.topicos drop constraint if exists topicos_categoria_check;
+alter table public.topicos
+  add constraint topicos_categoria_check
+  check (categoria in ('duvida','material','vitoria','aviso','entrega'));
+
+alter table public.topicos add column if not exists missao smallint;
+do $$
+begin
+  alter table public.topicos
+    add constraint topicos_missao_check check (missao is null or missao between 1 and 27);
+exception when duplicate_object then null;   -- já existe
+end $$;
+
+grant insert (autor_id, titulo, corpo, categoria, missao, imagem_url) on public.topicos to authenticated;
+grant update (titulo, corpo, categoria, missao, imagem_url, resolvido, editado_em) on public.topicos to authenticated;
