@@ -22,7 +22,7 @@ window.CURRICULO = {
           texto longo + um campo "enviar arquivo" (para prints/imagens).
      Enquanto estiver com COLE_AQUI, os botões avisam em vez de abrir. */
   formFiliacao: "https://docs.google.com/forms/d/e/1FAIpQLSfYh6CkBBeHmrRCxEovmiT1TUE9WwKXgP24PppQBySpcaTt0w/viewform?usp=publish-editor",
-  formEntrega:  "COLE_AQUI_o_link_do_formulario_de_entrega",
+  formEntrega:  "https://docs.google.com/forms/d/e/1FAIpQLSendmSV_JdaVOMXAqefqojaOlikU8Gcd7v13QWsXfipqQd4eg/viewform?usp=header",
 
   /* OPCIONAL, mas recomendado: publique a planilha de respostas da filiação como
      CSV (na planilha: Arquivo › Compartilhar › Publicar na web › escolha a aba e
@@ -34,7 +34,7 @@ window.CURRICULO = {
 
   /* Caminho alternativo por GitHub (Pull Request), para quem tiver conta.
      Se você não for usar GitHub, pode deixar como está. */
-  repo: "SEU-USUARIO/senac_sindicato_dos_dados",
+  repo: "luizadealencar/senac_sindicato_dos_dados",
 
   /* Calendário: conta segunda a sexta a partir de inicio, pulando os feriados. */
   inicio: "2026-08-17",
