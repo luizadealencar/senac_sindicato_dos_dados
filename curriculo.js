@@ -14,8 +14,27 @@
      missao  a ÚNICA entrega do dia, feita nos últimos 30 min e enviada no site
    ========================================================================== */
 window.CURRICULO = {
-  /* Troque para "seu-usuario/seu-repositorio". Usado no botão de entrega. */
-  repo: "luizadealencar/senac_sindicato_dos_dados",
+  /* =========================================================================
+     ENTREGA SEM GITHUB — via Google Forms (o aluno não precisa de conta GitHub).
+     Crie dois formulários no Google Forms e cole os links "para enviar" aqui:
+       1) FILIAÇÃO: pergunte Nome e Nome do time (célula).
+       2) ENTREGA: pergunte Nome do time, Nº da missão e deixe um campo de
+          texto longo + um campo "enviar arquivo" (para prints/imagens).
+     Enquanto estiver com COLE_AQUI, os botões avisam em vez de abrir. */
+  formFiliacao: "COLE_AQUI_o_link_do_formulario_de_filiacao",
+  formEntrega:  "COLE_AQUI_o_link_do_formulario_de_entrega",
+
+  /* OPCIONAL, mas recomendado: publique a planilha de respostas da filiação como
+     CSV (na planilha: Arquivo › Compartilhar › Publicar na web › escolha a aba e
+     "Valores separados por vírgula (.csv)") e cole o link aqui. Use colunas com
+     cabeçalho: nome, github, celula, xp. Se preencher, o Quadro de Filiados e o
+     Placar se montam sozinhos a partir das respostas — sem editar arquivo nenhum.
+     (O github é opcional; serve só para puxar o avatar.) */
+  planilhaCSV: "",
+
+  /* Caminho alternativo por GitHub (Pull Request), para quem tiver conta.
+     Se você não for usar GitHub, pode deixar como está. */
+  repo: "SEU-USUARIO/senac_sindicato_dos_dados",
 
   /* Calendário: conta segunda a sexta a partir de inicio, pulando os feriados. */
   inicio: "2026-08-17",
@@ -128,6 +147,8 @@ window.CURRICULO = {
       if (cont === 0 && d > new Date(this.inicio + "T00:00:00").setFullYear(2100)) return null;
     }
   },
+
+  configurado: function(v){ return !!v && !/COLE_AQUI/i.test(v); },
 
   missaoDoDia: function(n){
     return (this.missoes || []).find(function(m){ return n >= m.ini && n <= m.fim; }) || null;

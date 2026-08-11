@@ -886,16 +886,7 @@ WHERE id_cliente = 1;</pre>
     // bloco da missão: completo no 1º dia da missão; nos demais, um lembrete curto
     var blocoMissao = '';
     if (m && dia.d === m.ini){
-      var titulo = 'Entrega \u00b7 ' + m.titulo + faixa;
-      var corpo = '### ' + m.titulo + faixa + '\n\n'
-                + '**Miss\u00e3o:** ' + m.texto + '\n\n'
-                + '**C\u00e9lula:** (nome do time)\n'
-                + '**Integrantes:** \n\n'
-                + '**O que fizemos:**\n(descreva, cole o SQL, ou arraste imagens/prints aqui)\n';
-      var url = 'https://github.com/' + C.repo + '/issues/new'
-              + '?labels=' + encodeURIComponent('entrega')
-              + '&title=' + encodeURIComponent(titulo)
-              + '&body='  + encodeURIComponent(corpo);
+      var url = C.configurado(C.formEntrega) ? C.formEntrega : '#';
       blocoMissao = '<div class="dia-missao">'
         + '<span class="dia-missao-rot">Miss\u00e3o \u00b7 ' + esc(m.titulo) + (multi ? esc(faixa) : '') + '</span>'
         + '<p>' + esc(m.texto) + '</p>'
@@ -960,12 +951,12 @@ WHERE id_cliente = 1;</pre>
    avisam em vez de abrir uma página 404 no GitHub. */
 (function(){
   var C = window.CURRICULO;
-  if (!C || !/SEU-USUARIO/i.test(C.repo)) return;
+  if (!C || C.configurado(C.formEntrega)) return;
   document.addEventListener('click', function(e){
-    var a = e.target.closest('#btEntregar, #btFiliar, .dia-entregar');
+    var a = e.target.closest('.dia-entregar');
     if (!a) return;
     e.preventDefault();
-    alert('Falta configurar o repositório.\n\nAbra o arquivo curriculo.js e troque a linha\n  repo: "SEU-USUARIO/senac_sindicato_dos_dados"\npelo seu usuário do GitHub. Depois publique o site pelo GitHub Pages.\n\nAberto direto do computador (file://) o cadastro e o placar não funcionam — precisa estar publicado.');
+    alert('Falta configurar o formulário de entrega.\n\nCrie o Google Form e cole o link no arquivo curriculo.js, na linha formEntrega. Depois publique o site.');
   }, true);
 })();
 

@@ -353,18 +353,9 @@ body{
 
   <div class="filiar">
     <h3>Filie-se ao Sindicato</h3>
-    <p style="margin-bottom:4px">Entre com sua conta do GitHub e preencha a ficha. É o mesmo login que você usa para versionar código &mdash; o avatar e o nome vêm do seu perfil, sem precisar enviar foto.</p>
-    <a id="btFiliar" class="bt-entregar" href="#" target="_blank" rel="noopener" style="margin-top:8px">Filiar-se pelo GitHub</a>
+    <p style="margin-bottom:4px">Preencha a ficha no formulário: seu nome e o nome do time (célula). Leva um minuto e não precisa de conta nenhuma.</p>
+    <a id="btFiliar" class="bt-entregar" href="#" target="_blank" rel="noopener" style="margin-top:8px">Preencher a ficha</a>
     <p class="fraco" style="font-size:16px;margin:14px 0 0">Combinem o <b>nome do time</b> antes e escrevam igual: quem usa o mesmo nome cai na mesma célula do placar. O <span class="mono">XP</span> quem lança sou eu, conforme as missões chegam.</p>
-    <details style="margin-top:14px">
-      <summary class="mono" style="cursor:pointer;font-size:14px">Prefere pelo código? Abra aqui o passo a passo do pull request</summary>
-      <ol style="margin-top:10px">
-        <li>Fa&ccedil;a um <b>fork</b> do reposit&oacute;rio.</li>
-        <li>No <span class="mono">index.html</span>, procure por <span class="mono">alunos:</span> e acrescente o seu bloco:</li>
-      </ol>
-      <pre>{nome:"Seu Nome Completo", github:"seu-usuario", celula:"Nome do seu time"}</pre>
-      <p class="fraco" style="font-size:15px">Commit numa branch nova, abra o <b>pull request</b>, e assim que eu aprovar sua ficha aparece.</p>
-    </details>
   </div>
 </section>
 
@@ -512,25 +503,16 @@ const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':
   const rot = document.querySelector('.missao-rot');
   if (rot && m) rot.textContent = 'Miss\u00e3o \u00b7 ' + m.titulo + faixa;
 
-  // botão: abre uma issue no GitHub já preenchida com a missão do dia
-  const titulo = 'Entrega · ' + (m ? m.titulo : dia.titulo) + (faixa ? ' ' + faixa : '');
-  const corpo = [
-    '### ' + (m ? m.titulo : dia.titulo) + (faixa ? ' ' + faixa : ''), '',
-    '**Missão:** ' + (m ? m.texto : ''), '',
-    '**Célula:** (nome do time)',
-    '**Integrantes:** ', '',
-    '**O que fizemos:**',
-    '(descreva, cole o SQL, ou arraste imagens/prints aqui)', ''
-  ].join('\n');
-  const url = 'https://github.com/' + C.repo + '/issues/new'
-            + '?labels=' + encodeURIComponent('entrega')
-            + '&title=' + encodeURIComponent(titulo)
-            + '&body='  + encodeURIComponent(corpo);
-  $('#btEntregar').href = url;
+  // botão de entrega: abre o Google Form de entrega (o aluno diz a missão e anexa)
+  if (C.configurado(C.formEntrega)) {
+    $('#btEntregar').href = C.formEntrega;
+  } else {
+    $('#btEntregar').href = '#';
+  }
 
-  // botão de filiação
+  // botão de filiação: abre o Google Form de filiação
   const bf = $('#btFiliar');
-  if (bf) bf.href = 'https://github.com/' + C.repo + '/issues/new?template=filiacao.yml';
+  if (bf) bf.href = C.configurado(C.formFiliacao) ? C.formFiliacao : '#';
 })();
 
 /* atos */
@@ -654,12 +636,66 @@ function montarFiliados(){
   }));
 }
 
-/* turma: usa alunos.json quando existir (GitHub Pages), senão a lista embutida.
-   Assim o cadastro automático via GitHub (Action) alimenta o mesmo quadro. */
+/* turma: monta o Quadro de Filiados e o Placar. Fontes, em ordem de prioridade:
+   1) planilhaCSV (respostas do Google Form publicadas como CSV) — automático;
+   2) alunos.json / placar.json (arquivos que você edita à mão);
+   3) listas embutidas no DADOS (reserva). */
 (function(){
   montarPlacar(); montarFiliados();               // desenha já com os dados embutidos
-  const pega = (arq) => fetch(arq, {cache:'no-store'}).then(r => r.ok ? r.json() : null).catch(() => null);
-  Promise.all([pega('alunos.json'), pega('placar.json')]).then(([lista, pontos]) => {
+  const C = window.CURRICULO || {};
+
+  // ---- parser simples de CSV (lida com aspas e vírgulas dentro de campo) ----
+  function parseCSV(texto){
+    const linhas = []; let campo = '', linha = [], dentro = false;
+    for (let i = 0; i < texto.length; i++){
+      const ch = texto[i];
+      if (dentro){
+        if (ch === '"'){ if (texto[i+1] === '"'){ campo += '"'; i++; } else dentro = false; }
+        else campo += ch;
+      } else if (ch === '"') dentro = true;
+      else if (ch === ','){ linha.push(campo); campo = ''; }
+      else if (ch === '\n'){ linha.push(campo); linhas.push(linha); linha = []; campo = ''; }
+      else if (ch !== '\r') campo += ch;
+    }
+    if (campo.length || linha.length){ linha.push(campo); linhas.push(linha); }
+    return linhas.filter(l => l.some(c => c.trim() !== ''));
+  }
+
+  // ---- transforma a planilha (com cabeçalho) em alunos[] e pontos{} ----
+  function daPlanilha(texto){
+    const linhas = parseCSV(texto);
+    if (linhas.length < 2) return null;
+    const cab = linhas[0].map(h => h.trim().toLowerCase());
+    const idx = n => cab.findIndex(h => h === n || h.indexOf(n) !== -1);
+    const iNome = idx('nome'), iGit = idx('github'), iCel = idx('celula') >= 0 ? idx('celula') : idx('célula'), iXp = idx('xp');
+    const alunos = [], pontos = {};
+    for (let k = 1; k < linhas.length; k++){
+      const r = linhas[k];
+      const nome = (iNome >= 0 ? r[iNome] : '').trim();
+      const celula = (iCel >= 0 ? r[iCel] : '').trim();
+      const github = (iGit >= 0 ? r[iGit] : '').trim().replace(/^@/, '');
+      if (nome && celula) alunos.push({ nome, github, celula });
+      if (celula && iXp >= 0){ const xp = Number(r[iXp]); if (!isNaN(xp)) pontos[celula] = xp; }
+    }
+    return { alunos, pontos };
+  }
+
+  const pegaJSON = (arq) => fetch(arq, {cache:'no-store'}).then(r => r.ok ? r.json() : null).catch(() => null);
+  const pegaCSV  = (url) => fetch(url, {cache:'no-store'}).then(r => r.ok ? r.text() : null).catch(() => null);
+
+  if (C.configurado && C.configurado(C.planilhaCSV)){
+    pegaCSV(C.planilhaCSV).then(txt => {
+      const d = txt && daPlanilha(txt);
+      if (d && d.alunos.length){
+        DADOS.alunos = d.alunos;
+        if (Object.keys(d.pontos).length) DADOS.pontos = d.pontos;
+        montarPlacar(); montarFiliados();
+      }
+    });
+    return;   // com planilha, ignora os .json (a planilha é a fonte)
+  }
+
+  Promise.all([pegaJSON('alunos.json'), pegaJSON('placar.json')]).then(([lista, pontos]) => {
     let mudou = false;
     if (Array.isArray(lista) && lista.length){ DADOS.alunos = lista; mudou = true; }
     if (pontos && typeof pontos === 'object'){ DADOS.pontos = pontos; mudou = true; }
@@ -686,12 +722,18 @@ function montarFiliados(){
    avisam em vez de abrir uma página 404 no GitHub. */
 (function(){
   var C = window.CURRICULO;
-  if (!C || !/SEU-USUARIO/i.test(C.repo)) return;
+  if (!C) return;
+  const faltaFil = !C.configurado(C.formFiliacao);
+  const faltaEnt = !C.configurado(C.formEntrega);
+  if (!faltaFil && !faltaEnt) return;
   document.addEventListener('click', function(e){
     var a = e.target.closest('#btEntregar, #btFiliar, .dia-entregar');
     if (!a) return;
-    e.preventDefault();
-    alert('Falta configurar o repositório.\n\nAbra o arquivo curriculo.js e troque a linha\n  repo: "SEU-USUARIO/senac_sindicato_dos_dados"\npelo seu usuário do GitHub. Depois publique o site pelo GitHub Pages.\n\nAberto direto do computador (file://) o cadastro e o placar não funcionam — precisa estar publicado.');
+    var ehFil = a.id === 'btFiliar';
+    if (ehFil ? faltaFil : faltaEnt){
+      e.preventDefault();
+      alert('Falta configurar o formulário' + (ehFil ? ' de filiação' : ' de entrega') + '.\n\nCrie o Google Form e cole o link no arquivo curriculo.js, na linha ' + (ehFil ? 'formFiliacao' : 'formEntrega') + '. Depois publique o site.\n\nAberto direto do computador (file://) o placar e a lista de filiados também não carregam — precisa estar publicado.');
+    }
   }, true);
 })();
 
