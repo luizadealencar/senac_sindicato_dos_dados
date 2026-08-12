@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#191E1B">
+<title>O Desafio — O Sindicato dos Dados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;600;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+.palco{padding:30px 0 60px}
+[hidden]{display:none!important}
+
+.abertura{border:2px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);background:var(--papel);padding:26px 26px 30px;max-width:680px;margin-top:26px}
+.abertura h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:26px;margin-bottom:10px;line-height:1.05}
+.abertura p{color:var(--tinta-fraca);font-size:17px;max-width:60ch;margin-bottom:10px}
+.abertura .acoes{margin-top:20px}
+
+/* barra de progresso */
+.progresso{display:flex;align-items:center;gap:14px;margin:24px 0 18px;flex-wrap:wrap}
+.progresso .passo{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:13px;font-weight:600;color:var(--tinta-fraca)}
+.barra{flex:1;min-width:160px;height:10px;border:2px solid var(--tinta);background:var(--papel)}
+.barra span{display:block;height:100%;background:var(--carimbo);width:0;transition:width .3s}
+.placar-mini{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--tinta)}
+.placar-mini b{color:var(--carimbo);font-size:17px}
+
+/* cartão da pergunta */
+.pergunta{border:2px solid var(--tinta);box-shadow:7px 7px 0 var(--tinta);background:var(--papel);padding:22px 24px 24px}
+.pergunta .rot{display:block;font-size:12px;color:var(--carimbo);margin-bottom:8px}
+.pergunta h3{font-family:'Spectral',Georgia,serif;font-weight:600;font-size:20px;line-height:1.4;margin-bottom:6px}
+.pergunta pre{background:var(--tinta);color:var(--papel);font-family:'JetBrains Mono',monospace;font-size:14.5px;line-height:1.6;padding:14px 16px;margin:14px 0 4px;overflow-x:auto;white-space:pre;border-radius:0}
+.pergunta pre .cm{color:#9DB39A}
+
+.alternativas{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.alt{
+  display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;
+  border:2px solid var(--tinta);background:var(--papel);color:var(--tinta);cursor:pointer;
+  padding:13px 15px;font-family:'Spectral',Georgia,serif;font-size:16.5px;line-height:1.4
+}
+.alt:hover:not(:disabled){background:var(--papel-barra)}
+.alt:focus-visible{outline:2px solid var(--carimbo);outline-offset:2px}
+.alt .letra{font-family:'Saira Condensed',sans-serif;font-weight:800;color:var(--carimbo);flex:none;min-width:18px}
+.alt.mono{font-family:'JetBrains Mono',monospace;font-size:14.5px}
+.alt[disabled]{cursor:default}
+.alt.certa{border-color:#3F6B3A;background:#E4EEDD}
+.alt.certa .letra{color:#3F6B3A}
+.alt.errada{border-color:var(--carimbo);background:#F2E2E2}
+
+.veredito{border-left:5px solid var(--borda);padding:14px 16px;margin-top:18px;background:var(--papel-barra);font-size:16.5px}
+.veredito.bom{border-left-color:#3F6B3A}
+.veredito.ruim{border-left-color:var(--carimbo)}
+.veredito b{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:14px;display:block;margin-bottom:4px}
+.veredito.bom b{color:#3F6B3A}
+.veredito.ruim b{color:var(--carimbo)}
+.pergunta-pe{margin-top:18px;display:flex;justify-content:flex-end}
+
+/* tela final */
+.final{border:2px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);background:var(--papel);padding:30px 28px;text-align:center;max-width:640px}
+.final .nota{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:64px;line-height:1;color:var(--carimbo);margin:6px 0}
+.final .patente-sel{display:inline-block;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:15px;font-weight:600;border:2px solid var(--tinta);padding:6px 16px;margin:8px 0 4px}
+.final h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:28px;margin-bottom:8px}
+.final p{color:var(--tinta-fraca);font-size:17px;max-width:52ch;margin:0 auto 8px}
+.final .acoes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+
+@media(max-width:860px){
+  .palco{padding:20px 0 46px}
+  .abertura,.pergunta,.final{box-shadow:5px 5px 0 var(--tinta)}
+  .abertura{padding:20px 18px 24px}
+  .pergunta{padding:18px 16px 20px}
+  .final{padding:24px 18px}
+  .final .nota{font-size:52px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav" data-pagina="desafio.html"></nav>
+
+<main class="palco env">
+
+  <div class="classif rot">
+    <span>Dossiê A-279 · Boss do Ato III</span>
+    <span id="seloTopo">O interrogatório</span>
+    <span>Só com SQL</span>
+  </div>
+
+  <h1 class="titulo">O <em>Desafio</em></h1>
+  <p class="subtitulo">O cofre está trancado com dez perguntas. Cada uma testa um golpe de SQL que vocês aprenderam no Ato III. Errar não elimina — mas o placar conta. Respondam em célula.</p>
+
+  <!-- abertura -->
+  <section id="abertura" class="abertura">
+    <h2>Antes de começar</h2>
+    <p>São <strong>10 perguntas</strong> sobre o banco da <strong>Loja Aurora</strong> (uma loja online de papelaria). Cada pergunta mostra as alternativas; ao escolher, você vê na hora se acertou e por quê.</p>
+    <p>Tabelas em jogo: <span class="mono">clientes</span>, <span class="mono">produtos</span>, <span class="mono">pedidos</span> e <span class="mono">itens_pedido</span>.</p>
+    <div class="acoes"><button class="btn" type="button" id="btnComecar">Encarar o Boss</button></div>
+  </section>
+
+  <!-- quiz -->
+  <section id="quiz" hidden>
+    <div class="progresso">
+      <span class="passo" id="passo">Pergunta 1 de 10</span>
+      <div class="barra"><span id="barra"></span></div>
+      <span class="placar-mini">Acertos: <b id="acertos">0</b></span>
+    </div>
+    <div id="cartao"></div>
+  </section>
+
+  <!-- final -->
+  <section id="fim" hidden><div class="final" id="finalCartao"></div></section>
+
+</main>
+
+<footer class="rodape env">
+  <p class="rot" style="font-size:13px">UC6 · Criar e Manter Banco de Dados · Técnico em Desenvolvimento de Sistemas</p>
+</footer>
+
+<script src="assets/config.js"></script>
+<script type="module" src="assets/nav.js"></script>
+<script>
+/* ==== O DESAFIO — quiz de SQL, 10 perguntas, tudo em português ==== */
+const PERGUNTAS = [
+  {
+    p: "Você quer ver <b>todas as colunas de todos os clientes</b>. Qual consulta faz isso?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT * FROM clientes;",
+      "SELECT todos FROM clientes;",
+      "GET * FROM clientes;",
+      "SELECT clientes;"
+    ],
+    certa: 0,
+    porque: "O asterisco (*) traz todas as colunas, e o FROM diz de qual tabela. GET não existe em SQL."
+  },
+  {
+    p: "Quer só os produtos com <b>preço maior que 20</b>. Qual filtro está certo?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT nome FROM produtos HAVING preco > 20;",
+      "SELECT nome FROM produtos WHERE preco > 20;",
+      "SELECT nome FROM produtos IF preco > 20;",
+      "SELECT nome FROM produtos FILTER preco > 20;"
+    ],
+    certa: 1,
+    porque: "Para filtrar linhas usamos WHERE. O HAVING só serve depois de um GROUP BY, para filtrar grupos."
+  },
+  {
+    p: "Você quer os clientes cujo <b>nome começa com “Ana”</b>. Qual consulta usa o padrão certo?",
+    codigo: null, mono: true,
+    alts: [
+      "WHERE nome = 'Ana%'",
+      "WHERE nome LIKE 'Ana%'",
+      "WHERE nome LIKE '%Ana'",
+      "WHERE nome IN 'Ana'"
+    ],
+    certa: 1,
+    porque: "LIKE com o coringa % no fim ('Ana%') pega tudo que começa com Ana. Se o % viesse antes ('%Ana'), pegaria o que termina em Ana."
+  },
+  {
+    p: "Quer os pedidos feitos <b>entre 01/09 e 30/09</b>. Qual opção é a mais direta?",
+    codigo: null, mono: true,
+    alts: [
+      "WHERE data_pedido BETWEEN '2026-09-01' AND '2026-09-30'",
+      "WHERE data_pedido = '2026-09-01' AND '2026-09-30'",
+      "WHERE data_pedido IN ('setembro')",
+      "WHERE data_pedido > '2026-09'"
+    ],
+    certa: 0,
+    porque: "BETWEEN … AND … pega um intervalo, incluindo as duas pontas. É o jeito mais limpo de filtrar faixas de data ou número."
+  },
+  {
+    p: "Quer a lista de produtos <b>do mais caro para o mais barato</b>. O que completa a consulta?<br><span class='mono'>SELECT nome, preco FROM produtos ____ ;</span>",
+    codigo: null, mono: true,
+    alts: [
+      "ORDER BY preco ASC",
+      "ORDER BY preco DESC",
+      "GROUP BY preco",
+      "SORT preco DOWN"
+    ],
+    certa: 1,
+    porque: "ORDER BY ordena; DESC é decrescente (do maior para o menor). ASC seria do menor para o maior."
+  },
+  {
+    p: "Você quer saber <b>quantos clientes existem em cada cidade</b>. Qual consulta responde?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT cidade, COUNT(*) FROM clientes GROUP BY cidade;",
+      "SELECT cidade, COUNT(*) FROM clientes;",
+      "SELECT COUNT(cidade) FROM clientes ORDER BY cidade;",
+      "SELECT cidade FROM clientes WHERE COUNT(*);"
+    ],
+    certa: 0,
+    porque: "Para contar por grupo, junte a função de agregação COUNT(*) com GROUP BY na coluna que define o grupo (cidade)."
+  },
+  {
+    p: "Você quer só as <b>cidades com mais de 10 clientes</b>. Onde entra esse filtro?",
+    codigo: null, mono: true,
+    alts: [
+      "… WHERE COUNT(*) > 10",
+      "… GROUP BY cidade WHERE total > 10",
+      "… GROUP BY cidade HAVING COUNT(*) > 10",
+      "… ORDER BY COUNT(*) > 10"
+    ],
+    certa: 2,
+    porque: "Filtro sobre um resultado agregado (COUNT, SUM…) usa HAVING, depois do GROUP BY. O WHERE não enxerga o COUNT porque roda antes de agrupar."
+  },
+  {
+    p: "Você quer o <b>nome do cliente ao lado do valor de cada pedido</b>. Como juntar as duas tabelas?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT c.nome, p.valor FROM clientes c, pedidos p;",
+      "SELECT c.nome, p.valor FROM clientes c JOIN pedidos p ON p.id_cliente = c.id_cliente;",
+      "SELECT c.nome, p.valor FROM clientes JOIN pedidos;",
+      "SELECT c.nome, p.valor MERGE clientes, pedidos;"
+    ],
+    certa: 1,
+    porque: "O JOIN precisa do ON dizendo quais colunas ligam as tabelas (a FK id_cliente). Sem o ON, o banco cruza todas as linhas com todas — o temido produto cartesiano."
+  },
+  {
+    p: "Qual a diferença do <b>LEFT JOIN</b> para o INNER JOIN?",
+    codigo: null, mono: false,
+    alts: [
+      "LEFT JOIN traz só os clientes que têm pedido.",
+      "LEFT JOIN traz TODOS os clientes, mesmo os sem pedido (com NULL onde não houver).",
+      "LEFT JOIN é mais rápido, mas dá o mesmo resultado.",
+      "Não há diferença, são sinônimos."
+    ],
+    certa: 1,
+    porque: "O LEFT JOIN mantém tudo da tabela da esquerda; quem não tem correspondência aparece com NULL. O INNER JOIN traz só quem casa nos dois lados."
+  },
+  {
+    p: "Um colega vai rodar <span class='mono'>DELETE FROM clientes;</span> <b>sem WHERE</b>. O que acontece?",
+    codigo: null, mono: false,
+    alts: [
+      "Nada, o banco pede confirmação antes.",
+      "Apaga só o último cliente.",
+      "Apaga TODOS os clientes da tabela.",
+      "Dá erro de sintaxe."
+    ],
+    certa: 2,
+    porque: "DELETE sem WHERE apaga a tabela inteira, linha por linha, sem perguntar. Regra de ouro: escreva o WHERE antes do DELETE."
+  }
+];
+
+const $ = s => document.querySelector(s);
+let atual = 0, acertos = 0, respondeu = false;
+
+$('#btnComecar').addEventListener('click', () => {
+  $('#abertura').hidden = true;
+  $('#quiz').hidden = false;
+  mostrar();
+});
+
+function esc(t){ return String(t); }
+
+function mostrar(){
+  respondeu = false;
+  const q = PERGUNTAS[atual];
+  $('#passo').textContent = `Pergunta ${atual + 1} de ${PERGUNTAS.length}`;
+  $('#barra').style.width = (atual / PERGUNTAS.length * 100) + '%';
+  $('#acertos').textContent = acertos;
+
+  const letras = ['A', 'B', 'C', 'D'];
+  const alts = q.alts.map((a, i) =>
+    `<button class="alt${q.mono ? ' mono' : ''}" data-i="${i}" type="button">
+       <span class="letra">${letras[i]}</span><span>${a}</span>
+     </button>`).join('');
+
+  $('#cartao').innerHTML = `
+    <div class="pergunta">
+      <span class="rot">Pergunta ${atual + 1}</span>
+      <h3>${q.p}</h3>
+      ${q.codigo ? `<pre>${q.codigo}</pre>` : ''}
+      <div class="alternativas" id="alternativas">${alts}</div>
+      <div id="veredito"></div>
+      <div class="pergunta-pe" id="pe"></div>
+    </div>`;
+
+  $('#alternativas').addEventListener('click', e => {
+    const b = e.target.closest('.alt');
+    if (b) responder(Number(b.dataset.i));
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function responder(escolha){
+  if (respondeu) return;
+  respondeu = true;
+  const q = PERGUNTAS[atual];
+  const certo = escolha === q.certa;
+  if (certo) acertos++;
+
+  const botoes = document.querySelectorAll('.alt');
+  botoes.forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.certa) b.classList.add('certa');
+    else if (i === escolha) b.classList.add('errada');
+  });
+
+  $('#acertos').textContent = acertos;
+  $('#veredito').innerHTML = `
+    <div class="veredito ${certo ? 'bom' : 'ruim'}">
+      <b>${certo ? 'Certeiro' : 'Escorregou'}</b>${q.porque}
+    </div>`;
+
+  const ultima = atual === PERGUNTAS.length - 1;
+  $('#pe').innerHTML = `<button class="btn" type="button" id="btnProx">${ultima ? 'Ver o resultado' : 'Próxima pergunta'}</button>`;
+  $('#btnProx').addEventListener('click', () => {
+    if (ultima) finalizar();
+    else { atual++; mostrar(); }
+  });
+}
+
+function finalizar(){
+  $('#quiz').hidden = true;
+  $('#fim').hidden = false;
+  const total = PERGUNTAS.length;
+  const pct = Math.round(acertos / total * 100);
+
+  let patente, recado;
+  if (acertos === total)      { patente = 'Lenda do Cofre';   recado = 'Gabaritou. O cofre se abriu sem resistência.'; }
+  else if (acertos >= 8)      { patente = 'Veterano';         recado = 'Quase perfeito — o Ato III está dominado.'; }
+  else if (acertos >= 6)      { patente = 'Operador';         recado = 'Passou no Boss. Revise os pontos que escaparam.'; }
+  else if (acertos >= 4)      { patente = 'Agente';           recado = 'Deu para escapar, mas volte ao caderno reforçar SQL.'; }
+  else                        { patente = 'Novato';           recado = 'O cofre resistiu. Reveja a Consulta rápida e tente de novo.'; }
+
+  $('#seloTopo').textContent = 'Caso encerrado';
+  $('#finalCartao').innerHTML = `
+    <span class="rot" style="color:var(--carimbo)">Resultado do interrogatório</span>
+    <div class="nota">${acertos}/${total}</div>
+    <span class="patente-sel">${patente}</span>
+    <h2 style="margin-top:10px">${pct}% de acerto</h2>
+    <p>${recado}</p>
+    <p class="mono" style="font-size:14px">Tirem um print desta tela para a entrega da missão.</p>
+    <div class="acoes">
+      <a class="btn" href="forum.html">Entregar no site</a>
+      <button class="btn vazado" type="button" id="btnDeNovo">Tentar de novo</button>
+    </div>`;
+  $('#btnDeNovo').addEventListener('click', () => {
+    atual = 0; acertos = 0;
+    $('#fim').hidden = true; $('#quiz').hidden = false;
+    $('#seloTopo').textContent = 'O interrogatório';
+    mostrar();
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
