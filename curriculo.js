@@ -68,7 +68,7 @@ window.CURRICULO = {
     { d:18, ato:"III", titulo:"Cofre e cadeado — TCL e DCL", ref:"#ref-sql",
       vemos:"START TRANSACTION, COMMIT, ROLLBACK. CREATE USER, GRANT e REVOKE. Quem pode ver o quê." },
     { d:19, ato:"III", titulo:"Boss: O Desafio", ref:"#ref-sql",
-      vemos:"O Boss do Ato III: o quiz de SQL do Sindicato, em português, respondido em célula. Dez perguntas de SELECT, WHERE, GROUP BY e JOIN." },
+      vemos:"O Boss do Ato III: o quiz de SQL do Sindicato, respondido por cada pessoa da célula, o XP irá acumular ao grupo. Dez perguntas de SELECT, WHERE, GROUP BY e JOIN." },
     { d:20, ato:"IV", titulo:"A ponte", ref:"#ref-crud",
       vemos:"Conectar uma aplicação ao SGBD: driver, string de conexão, o primeiro SELECT vindo do código." },
     { d:21, ato:"IV", titulo:"CRUD completo", ref:"#ref-crud",
