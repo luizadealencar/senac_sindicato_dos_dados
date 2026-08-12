@@ -14,6 +14,7 @@ const ITENS = [
   { t: 'Filiados',  casa: 'index.html', ancora: '#filiados' },
   { t: 'Eventos',   casa: 'index.html', ancora: '#eventos' },
   { t: 'Caderno',   casa: 'caderno.html' },
+  { t: 'Desafio',   casa: 'desafio.html' },
   { t: 'Fórum',     casa: 'forum.html' }
 ];
 
