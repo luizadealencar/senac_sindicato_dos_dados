@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>O Sindicato dos Dados — UC6 Criar e Manter Banco de Dados</title>
+<title>O Sindicato dos Dados — UC5 Desenvolver Banco de Dados</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;600;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -277,12 +277,12 @@ html{scroll-padding-top:64px}
 <header class="capa env" id="hoje">
   <div class="classif rot">
     <span>Dossiê A-279 · Uso interno</span>
-    <span id="cabDia">Operação 01 de 27</span>
-    <span>108 horas · 15h–19h</span>
+    <span id="cabDia">Operação 01 de 13</span>
+    <span>72 horas · 4h por dia</span>
   </div>
 
   <h1 class="titulo">O Sindicato<br>dos <em>Dados</em></h1>
-  <p class="subtitulo">Ninguém nesta cidade guarda informação melhor que a gente. Você entrou como novato. Em 27 operações, ou sai daqui sabendo projetar, construir e defender um banco de dados — ou não sai.</p>
+  <p class="subtitulo">Ninguém nesta cidade guarda informação melhor que a gente. Você entrou como novato. Em 13 operações, ou sai daqui sabendo projetar, construir e defender um banco de dados — ou não sai.</p>
 
   <div class="capa-grade">
     <section class="hoje" aria-labelledby="tHoje">
@@ -304,7 +304,7 @@ html{scroll-padding-top:64px}
 </header>
 
 <section class="secao env" id="atos">
-  <div class="secao-cab"><span class="secao-num">I</span><h2>Os seis atos</h2></div>
+  <div class="secao-cab"><span class="secao-num">I</span><h2>Os quatro atos</h2></div>
   <p class="secao-sub">O caminho do novato até chefe de família. Toque em um ato para abrir o conteúdo.</p>
   <div id="listaAtos"></div>
 </section>
@@ -347,7 +347,7 @@ html{scroll-padding-top:64px}
 </section>
 
 <footer class="rodape env">
-  <p class="rot" style="font-size:13px">UC6 · Criar e Manter Banco de Dados · Técnico em Desenvolvimento de Sistemas</p>
+  <p class="rot" style="font-size:13px">UC5 · Desenvolver Banco de Dados · Técnico em Desenvolvimento de Sistemas</p>
   <p class="credito" style="margin-top:8px">Inspirado no projeto desenvolvido por <a href="https://github.com/rafaelapessin" target="_blank" rel="noopener"><strong>Rafaela Pessin</strong></a>, a quem vão os créditos e o agradecimento.</p>
 </footer>
 
@@ -372,41 +372,29 @@ const DADOS = {
   ],
 
   atos: [
-    { num:"I", nome:"A escolha do cofre", dias:"Dias 1–5",
-      objetivo:"Entender o que é um banco de dados, distinguir os sete tipos e escolher um SGBD com argumento.",
-      conteudos:["O que é banco de dados: tabelas, registros, atributos","Boas práticas de nomenclatura: minúsculas, snake_case, prefixos","Bancos relacionais e não relacionais (NoSQL)","Hierárquico, em rede, orientado a objetos, em memória, distribuído","ACID e consistência eventual","SGBD: funções, concorrência, backup, indexação"],
-      atividades:["Banco de dados humano — a turma vira a tabela e você executa SELECT em voz alta","Speed dating de SGBD — cada célula defende um sistema diante de um cliente-cenário"],
-      entrega:"Relatório de inteligência: resenha crítica recomendando um tipo de banco e um SGBD para a startup do estudo de caso." },
+    { num:"I", nome:"A planta do cofre", dias:"Dias 1\u20134",
+      objetivo:"Entender o que \u00e9 um banco de dados e modelar a empresa antes de escrever uma linha de c\u00f3digo.",
+      conteudos:["O que \u00e9 banco de dados, SGBD e tipos de dados","Levantamento de dados e dicion\u00e1rio de dados","Entidades, atributos e relacionamentos (MER)","Cardinalidade 1:1, 1:N, N:M","Chave candidata, prim\u00e1ria e estrangeira; integridade referencial","Diagrama Entidade-Relacionamento (DER)","Normaliza\u00e7\u00e3o: 1FN, 2FN, 3FN"],
+      atividades:["Banco de dados humano \u2014 a turma vira a tabela e voc\u00ea executa SELECT em voz alta","Post-it storming \u2014 amarelo \u00e9 entidade, rosa \u00e9 atributo, verde \u00e9 relacionamento","A tabela imunda \u2014 recortar uma planilha horr\u00edvel e remontar normalizada"],
+      entrega:"DER completo da empresa da c\u00e9lula, no brModelo ou dbdiagram, com o dicion\u00e1rio de dados e as chaves." },
 
-    { num:"II", nome:"A planta do prédio", dias:"Dias 6–11",
-      objetivo:"Modelar um banco antes de escrever uma linha de código.",
-      conteudos:["Entidades, atributos e relacionamentos (MER)","Cardinalidade 1:1, 1:N, N:M","Diagrama de Entidade-Relacionamento (DER) e seus símbolos","Chave primária e chave estrangeira","Integridade referencial","Normalização: 1FN, 2FN, 3FN"],
-      atividades:["Post-it storming — amarelo é entidade, rosa é atributo, verde é relacionamento","Barbante e cadeiras — cardinalidade fica óbvia quando um aluno segura três barbantes","A tabela imunda — recortar uma planilha horrível e remontar normalizada"],
-      entrega:"DER completo de um sistema real, feito no brModelo ou dbdiagram.io e commitado no repositório da célula." },
+    { num:"II", nome:"Erguer o pr\u00e9dio", dias:"Dias 5\u20136",
+      objetivo:"Tirar o modelo do papel: instalar o SGBD, criar as tabelas e povoar o banco.",
+      conteudos:["Instalar e configurar o SGBD","DDL: CREATE TABLE, ALTER, DROP e tipos de dados","Restri\u00e7\u00f5es: NOT NULL, UNIQUE, CHECK, DEFAULT, PK e FK","\u00cdndices","DML: INSERT, UPDATE, DELETE"],
+      atividades:["Erguer o banco a partir do DER, com as restri\u00e7\u00f5es","Povoar cada tabela com dados reais da empresa"],
+      entrega:"Banco criado com restri\u00e7\u00f5es e ao menos um \u00edndice, populado com no m\u00ednimo cinco linhas por tabela." },
 
-    { num:"III", nome:"As chaves", dias:"Dias 12–19",
-      objetivo:"Escrever SQL com fluência nas cinco categorias da linguagem.",
-      conteudos:["DDL: CREATE, ALTER, DROP e tipos de dados","Restrições: NOT NULL, UNIQUE, CHECK, DEFAULT","Índices: primário, único, não único","DML: INSERT, UPDATE, DELETE","DQL: SELECT, WHERE, ORDER BY, DISTINCT, GROUP BY, funções de agregação","JOIN entre tabelas","TCL: transações, COMMIT, ROLLBACK","DCL: usuários, GRANT, REVOKE"],
-      atividades:["Deck de cartas SQL — montar a query mais elegante em cinco minutos","Caça ao bug — script quebrado no GitHub, quem abre a Issue certa primeiro leva XP","Boss: O Desafio — o quiz de SQL do Sindicato, em português, com SELECT, WHERE, GROUP BY e JOIN"],
-      entrega:"Banco da célula criado, populado e consultado. Script versionado com histórico de commits legível." },
+    { num:"III", nome:"As chaves", dias:"Dias 7\u201310",
+      objetivo:"Escrever SQL com flu\u00eancia para o banco responder perguntas de neg\u00f3cio.",
+      conteudos:["DQL: SELECT, WHERE, ORDER BY, DISTINCT","Filtros: LIKE, BETWEEN, IN","Agrega\u00e7\u00f5es: COUNT, SUM, AVG, MIN, MAX","GROUP BY e HAVING","JOIN (jun\u00e7\u00e3o), uni\u00e3o e interse\u00e7\u00e3o","Subconsultas"],
+      atividades:["Deck de cartas SQL \u2014 montar a query mais elegante em cinco minutos","Boss: O Desafio \u2014 o quiz de SQL do Sindicato, em portugu\u00eas, com SELECT, WHERE, GROUP BY e JOIN"],
+      entrega:"Conjunto de consultas que respondem perguntas da empresa, e o resultado do Desafio pela c\u00e9lula." },
 
-    { num:"IV", nome:"A operação", dias:"Dias 20–22",
-      objetivo:"Ligar o banco à aplicação e fazer o CRUD rodar de verdade.",
-      conteudos:["Conexão da aplicação com o SGBD","Create, Read, Update e Delete a partir do código","Tratamento de erro na operação com o banco","Manutenção e edição de banco em produção"],
-      atividades:["A ponte — primeira conexão da aplicação orientada a objetos com a tabela","Auditoria cruzada — a célula A revisa o banco da célula B por Pull Request, com checklist"],
-      entrega:"Aplicação executando as quatro operações do CRUD sobre o banco da célula." },
-
-    { num:"V", nome:"A batida", dias:"Dias 23–25",
-      objetivo:"Defender o banco juridicamente e sobreviver a uma migração.",
-      conteudos:["LGPD: dado pessoal, dado sensível, titular, tratamento","Princípios legais e direitos do titular","Controlador, operador e o encarregado (DPO)","ANPD: fiscalização e penalidades","Transferência internacional de dados","Conversão de banco: análise, mapeamento, extração, transformação, carga, validação, otimização","Desafios da migração e ferramentas"],
-      atividades:["Tribunal da LGPD — empresa contra ANPD, com júri, citando artigo e princípio","Mudança de cofre — migrar um CSV bagunçado para o banco modelado, e validar"],
-      entrega:"Parecer de conformidade do banco da célula e log da migração executada." },
-
-    { num:"VI", nome:"A última entrega", dias:"Dias 26–27",
-      objetivo:"Apresentar o banco pronto, documentado e defensável.",
-      conteudos:["Documentação técnica no README","Apresentação do produto","Articulação com o Projeto Integrador"],
-      atividades:["Montagem final e revisão da documentação","Apresentação para a turma, com arguição"],
-      entrega:"Banco de dados funcional, aplicação conectada, documentação no GitHub e defesa oral de dez minutos." }
+    { num:"IV", nome:"Trancar e entregar", dias:"Dias 11\u201313",
+      objetivo:"Proteger, salvar e documentar o banco \u2014 e apresentar.",
+      conteudos:["Importa\u00e7\u00e3o e exporta\u00e7\u00e3o de dados (CSV)","Views e \u00edndices","Seguran\u00e7a: controle de acesso (GRANT, REVOKE)","Criptografia, autentica\u00e7\u00e3o, amea\u00e7as e falhas","Backup e restore da base","Documenta\u00e7\u00e3o: README e dicion\u00e1rio de dados"],
+      atividades:["Mudan\u00e7a de cofre \u2014 importar um CSV bagun\u00e7ado para o banco e validar","Trancar o cofre \u2014 criar um usu\u00e1rio s\u00f3 de leitura e fazer o backup","Apresenta\u00e7\u00e3o final da empresa com o banco rodando"],
+      entrega:"Scripts de importa\u00e7\u00e3o, seguran\u00e7a e backup, o README com o dicion\u00e1rio de dados, e a apresenta\u00e7\u00e3o ao vivo." }
   ],
 
   cheats: [

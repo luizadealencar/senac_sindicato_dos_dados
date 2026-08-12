@@ -1,114 +1,69 @@
 /* ==========================================================================
-   CURRÍCULO — fonte única dos 27 dias do curso.
-   As duas páginas (index e caderno) leem daqui. Edite AQUI e vale nos dois.
-
-   Fio condutor: cada célula (grupo) inventa uma empresa e constrói o banco
-   de dados dela ao longo do curso. A missão de cada dia faz esse banco andar.
-
-   Campos de cada dia:
-     d       número da operação (1 a 27)
-     ato     ato a que pertence (I a VI)
-     titulo  nome da operação
-     vemos   o que é apresentado nas 3h30 de aula
-     ref     âncora da Consulta rápida no caderno (onde revisar o conteúdo)
-     missao  a ÚNICA entrega do dia, feita nos últimos 30 min e enviada no site
+   O SINDICATO DOS DADOS — currículo (fonte única para index.html e caderno.html)
+   UC5 · Desenvolver banco de dados · 72h · 4h/dia · seg a sex.
+   A parte da docente são 13 dias (52h), de 24/08 a 10/09/2026 (o curso começou
+   em 17/08 com outro professor; aqui recomeça do zero). Feriado: 07/09.
    ========================================================================== */
 window.CURRICULO = {
-  /* Troque para "seu-usuario/seu-repositorio". Usado no botão de entrega. */
-  repo: "seu-usuario/sindicato-dos-dados",
+  repo: "SEU-USUARIO/senac_sindicato_dos_dados",
 
   /* Calendário: conta segunda a sexta a partir de inicio, pulando os feriados. */
-  inicio: "2026-08-17",
+  inicio: "2026-08-24",
   feriados: ["2026-09-07"],
 
   atos: {
-    I:   "O reconhecimento",
-    II:  "A planta",
-    III: "O cofre",
-    IV:  "A ponte",
-    V:   "A lei",
-    VI:  "O dossiê"
+    I:   "Fundação e modelagem",
+    II:  "Erguer e povoar",
+    III: "Interrogar o banco",
+    IV:  "Proteger e fechar"
   },
 
   dias: [
-    { d:1, ato:"I", titulo:"O recrutamento", ref:"#ref-banco",
-      vemos:"No data show: como o site e as aulas funcionam, e o projeto que atravessa o curso — cada grupo vai inventar uma empresa e construir o banco de dados dela. Formação das células." },
-    { d:2, ato:"I", titulo:"O que a gente guarda", ref:"#ref-banco",
-      vemos:"O que é um banco de dados. Tabelas, registros e atributos. Nomenclatura: minúsculas, snake_case, nomes descritivos, prefixos." },
-    { d:3, ato:"I", titulo:"Sete cofres", ref:"#ref-banco",
-      vemos:"Os sete tipos de banco: relacional, NoSQL, hierárquico, em rede, orientado a objetos, em memória e distribuído. ACID contra consistência eventual." },
-    { d:4, ato:"I", titulo:"O porteiro", ref:"#ref-banco",
-      vemos:"O que faz um SGBD: armazenamento, transações, concorrência, segurança, backup e indexação. Preparação do ambiente (SGBD instalado ou online)." },
-    { d:5, ato:"I", titulo:"Relatório de inteligência", ref:"#ref-banco",
-      vemos:"Fechamento do Ato I. Amarrando tipo de banco, SGBD e as necessidades da empresa num argumento único." },
-    { d:6, ato:"II", titulo:"Entidades e atributos", ref:"#ref-modelagem",
-      vemos:"MER (Modelo Entidade-Relacionamento): o que vira entidade e o que vira atributo." },
-    { d:7, ato:"II", titulo:"Quem se liga a quem", ref:"#ref-modelagem",
-      vemos:"Relacionamentos e cardinalidade: 1:1, 1:N e N:M." },
-    { d:8, ato:"II", titulo:"A planta no papel", ref:"#ref-modelagem",
-      vemos:"DER e seus símbolos. Modelagem no brModelo ou no dbdiagram.io, que já gera o SQL a partir do desenho." },
-    { d:9, ato:"II", titulo:"A tabela imunda", ref:"#ref-modelagem",
-      vemos:"Normalização até a 3ª forma normal: recortar uma planilha caótica em tabelas limpas." },
-    { d:10, ato:"II", titulo:"As chaves da casa", ref:"#ref-modelagem",
-      vemos:"Chave primária, chave estrangeira e integridade referencial. Por que um pedido órfão quebra o sistema." },
-    { d:11, ato:"II", titulo:"Boss: a planta do zero", ref:"#ref-modelagem",
-      vemos:"Dia de entrega do Ato II. Cada célula defende o modelo diante da turma." },
-    { d:12, ato:"III", titulo:"Abrindo o cofre — DDL", ref:"#ref-sql",
-      vemos:"CREATE DATABASE, CREATE TABLE e os tipos de dados (INTEGER, VARCHAR, DATE, DECIMAL). Traduzir o DER em código." },
-    { d:13, ato:"III", titulo:"Regras da casa", ref:"#ref-sql",
-      vemos:"ALTER e DROP. Restrições NOT NULL, UNIQUE, CHECK, DEFAULT, AUTO_INCREMENT. Índices e por que a consulta fica rápida." },
-    { d:14, ato:"III", titulo:"Movimentando — DML", ref:"#ref-sql",
-      vemos:"INSERT, UPDATE e DELETE. O perigo do DELETE sem WHERE, demonstrado ao vivo." },
-    { d:15, ato:"III", titulo:"Perguntando — DQL", ref:"#ref-sql",
-      vemos:"SELECT, WHERE, operadores lógicos, LIKE, BETWEEN, IN." },
-    { d:16, ato:"III", titulo:"Organizando a resposta", ref:"#ref-sql",
-      vemos:"ORDER BY, LIMIT, DISTINCT, COUNT, SUM, AVG, MAX, MIN e GROUP BY com HAVING." },
-    { d:17, ato:"III", titulo:"Costurando tabelas — JOIN", ref:"#ref-sql",
-      vemos:"INNER JOIN e LEFT JOIN. Consultar duas e três tabelas de uma vez. O dia mais difícil do ato." },
-    { d:18, ato:"III", titulo:"Cofre e cadeado — TCL e DCL", ref:"#ref-sql",
-      vemos:"START TRANSACTION, COMMIT, ROLLBACK. CREATE USER, GRANT e REVOKE. Quem pode ver o quê." },
-    { d:19, ato:"III", titulo:"Boss: O Desafio", ref:"#ref-sql",
-      vemos:"O Boss do Ato III: o quiz de SQL do Sindicato, respondido por cada pessoa da célula, o XP irá acumular ao grupo. Dez perguntas de SELECT, WHERE, GROUP BY e JOIN." },
-    { d:20, ato:"IV", titulo:"A ponte", ref:"#ref-crud",
-      vemos:"Conectar uma aplicação ao SGBD: driver, string de conexão, o primeiro SELECT vindo do código." },
-    { d:21, ato:"IV", titulo:"CRUD completo", ref:"#ref-crud",
-      vemos:"Create, Read, Update e Delete funcionando pela interface da aplicação, com tratamento de erro." },
-    { d:22, ato:"IV", titulo:"Auditoria cruzada", ref:"#ref-crud",
-      vemos:"Cada célula revisa o banco de outra por Pull Request, seguindo checklist de nomenclatura, chaves, normalização e restrições." },
-    { d:23, ato:"V", titulo:"A lei chega", ref:"#ref-lgpd",
-      vemos:"LGPD: dado pessoal e sensível, titular, tratamento, princípios, direitos do titular, controlador, operador, DPO, ANPD e penalidades." },
-    { d:24, ato:"V", titulo:"Tribunal", ref:"#ref-lgpd",
-      vemos:"Júri simulado sobre um vazamento, com a turma dividida entre acusação e defesa." },
-    { d:25, ato:"V", titulo:"Mudança de cofre", ref:"#ref-banco",
-      vemos:"Conversão de banco: análise, mapeamento, extração, transformação, carga, validação e otimização." },
-    { d:26, ato:"VI", titulo:"Fechando o dossiê", ref:"#ref-crud",
-      vemos:"Montagem final, README documentando o modelo, script de criação versionado, últimos ajustes de desempenho." },
-    { d:27, ato:"VI", titulo:"A última entrega", ref:"#ref-crud",
-      vemos:"Apresentação do banco com a aplicação rodando ao vivo. Dez minutos por célula, mais arguição da turma e da docente." }
+    { d:1,  ato:"I", titulo:"O recrutamento", ref:"#ref-banco",
+      vemos:"Sem correria: o que é um banco de dados, o que faz um SGBD e os tipos de dados. Formem a célula e inventem a empresa que vão modelar o curso inteiro." },
+    { d:2,  ato:"I", titulo:"Levantar o que a empresa guarda", ref:"#ref-modelagem",
+      vemos:"Modelagem conceitual: levantamento de dados, dicionário de dados, e as primeiras entidades e atributos da empresa." },
+    { d:3,  ato:"I", titulo:"Quem se liga a quem", ref:"#ref-modelagem",
+      vemos:"Relacionamentos e cardinalidade (1:1, 1:N, N:M). Chaves candidata, primária e estrangeira. Integridade referencial." },
+    { d:4,  ato:"I", titulo:"A planta e a faxina", ref:"#ref-modelagem",
+      vemos:"Fecha o DER no brModelo ou dbdiagram e normaliza até a 3ª forma normal — recortar a planilha caótica em tabelas limpas." },
+    { d:5,  ato:"II", titulo:"Erguer o banco", ref:"#ref-sql",
+      vemos:"Instalar e configurar o SGBD. DDL: CREATE TABLE, tipos de dados e restrições (NOT NULL, UNIQUE, CHECK, DEFAULT, PK, FK)." },
+    { d:6,  ato:"II", titulo:"Dar vida ao banco", ref:"#ref-crud",
+      vemos:"DML: INSERT para povoar, UPDATE para corrigir, DELETE para remover — sempre com WHERE. O banco sai do papel." },
+    { d:7,  ato:"III", titulo:"As primeiras consultas", ref:"#ref-sql",
+      vemos:"DQL: SELECT, WHERE, ORDER BY, e os filtros LIKE, BETWEEN e IN. Fazer o banco responder perguntas." },
+    { d:8,  ato:"III", titulo:"Contar e agrupar", ref:"#ref-sql",
+      vemos:"Agregações: COUNT, SUM, AVG, MIN, MAX. GROUP BY para agrupar e HAVING para filtrar grupos." },
+    { d:9,  ato:"III", titulo:"Cruzar as tabelas", ref:"#ref-join",
+      vemos:"JOIN (junção) entre tabelas, união e interseção de resultados, e subconsultas. O poder de verdade do SQL." },
+    { d:10, ato:"III", titulo:"Boss: O Desafio", ref:"#ref-sql",
+      vemos:"O Boss do Ato III: o quiz de SQL do Sindicato (aba O Desafio), em célula. Depois, revisão geral de consultas." },
+    { d:11, ato:"IV", titulo:"Entra e sai de dados", ref:"#ref-crud",
+      vemos:"Importação e exportação de dados (CSV) conforme o SGBD. Views para atalhos de consulta e índices para acelerar." },
+    { d:12, ato:"IV", titulo:"Trancar o cofre", ref:"#ref-seguranca",
+      vemos:"Segurança: controle de acesso com GRANT e REVOKE, ideia de criptografia e autenticação, ameaças e falhas — e backup e restore da base." },
+    { d:13, ato:"IV", titulo:"Fechar o dossiê", ref:"#ref-banco",
+      vemos:"Reta final: documentação do projeto (README e dicionário de dados), organização dos arquivos e apresentação da empresa com o banco rodando." }
   ],
 
   /* Missões do projeto. Cada uma pode durar vários dias; a entrega vale para o
-     intervalo [ini, fim]. O XP NÃO sai daqui — quem lança o XP é a docente, no
-     placar.json. A missão é só o que a célula produz e entrega no site. */
+     intervalo [ini, fim]. O XP NÃO sai daqui — quem lança é a docente. */
   missoes: [
     { ini:1,  fim:1,  titulo:"Fundar a célula",
       texto:"Sem dispositivos hoje. Formem o grupo, escolham o nome da célula e inventem a empresa que vão modelar o curso inteiro: nome, ramo e o que ela faz. O nome da célula entra no site." },
-    { ini:2,  fim:5,  titulo:"Documento de visão",
-      texto:"Escrevam o documento de visão da empresa: o que ela faz, tudo que precisa guardar (candidatos a tabelas e campos), o tipo de banco escolhido e o SGBD — cada escolha justificada pelo negócio. Entreguem em texto; podem anexar imagens." },
-    { ini:6,  fim:11, titulo:"O modelo completo",
-      texto:"Construam o modelo do banco: entidades e atributos, relacionamentos com cardinalidade, DER desenhado no brModelo ou no dbdiagram, normalizado até a 3FN, com chaves primárias e estrangeiras definidas. Entreguem o DER (imagem) e a lista de tabelas com suas chaves." },
-    { ini:12, fim:14, titulo:"Erguer o banco",
-      texto:"Tirem o modelo do papel: script CREATE TABLE de todas as tabelas, com restrições (NOT NULL, UNIQUE, CHECK, DEFAULT) e ao menos um índice, e populem cada tabela com dados reais da empresa (mínimo cinco linhas). Entreguem o SQL completo." },
-    { ini:15, fim:18, titulo:"Interrogar o banco",
-      texto:"Escrevam consultas que respondam perguntas de negócio da empresa: filtros (WHERE, LIKE, BETWEEN), ordenação e agregações (GROUP BY, HAVING, COUNT/SUM/AVG), pelo menos três JOINs entre tabelas, uma transação com COMMIT/ROLLBACK e um usuário só de leitura com GRANT. Entreguem as queries e os resultados." },
-    { ini:19, fim:19, titulo:"Boss: O Desafio",
-      texto:"Enfrentem o Boss do Ato III: o quiz de SQL do Sindicato (na aba O Desafio). São 10 perguntas de SELECT, WHERE, GROUP BY e JOIN, respondidas em célula. Entreguem o print da pontuação final." },
-    { ini:20, fim:22, titulo:"A ponte e a auditoria",
-      texto:"Conectem uma aplicação ao banco e deixem o CRUD (criar, ler, atualizar, excluir) funcionando pela interface, com tratamento de erro. Depois revisem o banco de outra célula por checklist. Entreguem prints do CRUD e o parecer da auditoria." },
-    { ini:23, fim:24, titulo:"A empresa sob a LGPD",
-      texto:"Apliquem a LGPD ao banco da empresa: apontem os dados pessoais e sensíveis, o que a lei exige para cada um, e preparem a peça do júri (acusação ou defesa) sobre um vazamento. Entreguem o mapeamento e o texto do júri." },
-    { ini:25, fim:27, titulo:"Fechar o dossiê",
-      texto:"Reta final: migrem um arquivo sujo (CSV/planilha) para o banco, escrevam o README documentando o modelo e como rodar, versionem tudo no GitHub e apresentem a empresa com a aplicação rodando ao vivo. Entreguem o link do repositório." }
+    { ini:2,  fim:4,  titulo:"O modelo completo",
+      texto:"Construam o modelo do banco da empresa: dicionário de dados, entidades e atributos, relacionamentos com cardinalidade, chaves primárias e estrangeiras, DER desenhado e tudo normalizado até a 3FN. Entreguem o DER (imagem) e a lista de tabelas com suas chaves." },
+    { ini:5,  fim:6,  titulo:"Erguer e povoar o banco",
+      texto:"Tirem o modelo do papel: script CREATE TABLE de todas as tabelas, com restrições e ao menos um índice, e populem cada tabela com dados reais (mínimo cinco linhas por tabela). Entreguem o SQL completo, rodando sem erro." },
+    { ini:7,  fim:9,  titulo:"Interrogar o banco",
+      texto:"Escrevam consultas que respondam perguntas de negócio: filtros (WHERE, LIKE, BETWEEN, IN), ordenação e agregações (GROUP BY, HAVING, COUNT/SUM/AVG), pelo menos três JOINs e uma subconsulta. Entreguem as queries e os resultados." },
+    { ini:10, fim:10, titulo:"Boss: O Desafio",
+      texto:"Enfrentem o Boss do Ato III: o quiz de SQL do Sindicato (na aba O Desafio), respondido em célula. São 10 perguntas de SELECT, WHERE, GROUP BY e JOIN. O resultado conta XP para a célula." },
+    { ini:11, fim:12, titulo:"Importar, proteger e salvar",
+      texto:"Importem um arquivo CSV para o banco, criem uma view e um índice úteis, e apliquem segurança: um usuário só de leitura com GRANT, e um backup da base com o plano de restore. Entreguem os scripts e o print do backup." },
+    { ini:13, fim:13, titulo:"Fechar o dossiê",
+      texto:"Reta final: escrevam o README documentando o modelo e como rodar, o dicionário de dados, versionem tudo e apresentem a empresa com o banco rodando ao vivo. Entreguem o link do repositório ou o pacote final." }
   ],
 
   /* ----- utilidades de calendário (usadas pelas duas páginas) ----- */
@@ -151,7 +106,6 @@ window.CURRICULO = {
     return Math.max(1, Math.min(n, total));
   },
 
-  /* dd/mm formatado, ou "" se não der */
   dataBR: function(n){
     var d = this.dataDoDia(n);
     if (!d || isNaN(d)) return "";

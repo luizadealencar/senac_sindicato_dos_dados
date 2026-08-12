@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>O Caderno — UC6 Criar e Manter Banco de Dados</title>
+<title>O Caderno — UC5 Desenvolver Banco de Dados</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;600;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -105,7 +105,7 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 .caixa.alerta{border-color:var(--carimbo)}
 .caixa.alerta .caixa-rot{background:var(--carimbo)}
 .caixa.missao{box-shadow:6px 6px 0 var(--tinta)}
-/* cards dos 27 dias */
+/* cards dos 13 dias */
 .dia{border:2px solid var(--tinta);margin-bottom:22px;scroll-margin-top:60px;background:var(--papel)}
 .dia.hoje{box-shadow:7px 7px 0 var(--carimbo);border-color:var(--carimbo)}
 .dia-cab{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:var(--tinta);color:var(--papel);padding:11px 16px}
@@ -211,7 +211,7 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 <header class="capa env">
   <div class="classif rot">
     <span>Dossiê A-279 · Material de estudo</span>
-    <span id="capaDias">27 dias · 108 horas</span>
+    <span id="capaDias">13 dias · 72 horas</span>
     <span>Consulta liberada durante as operações</span>
   </div>
   <h1 class="titulo">O <em>Caderno</em></h1>
@@ -223,7 +223,7 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 <aside class="indice" aria-label="Índice do caderno">
   <h2>Índice</h2>
   <a class="indice-hoje" id="irHoje" href="#dia-1">Ir para o dia de hoje →</a>
-  <p class="indice-grupo">Os 27 dias</p>
+  <p class="indice-grupo">Os 13 dias</p>
   <ol id="indiceAtos"></ol>
   <p class="indice-grupo">Consulta rápida</p>
   <ol>
@@ -231,7 +231,8 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
     <li><a href="#ref-modelagem"><span>B</span>Modelagem</a></li>
     <li><a href="#ref-sql"><span>C</span>SQL</a></li>
     <li><a href="#ref-crud"><span>D</span>CRUD</a></li>
-    <li><a href="#ref-lgpd"><span>E</span>LGPD</a></li>
+    <li><a href="#ref-seguranca"><span>E</span>Segurança</a></li>
+    <li><a href="#ref-lgpd"><span>F</span>LGPD <span class="fraco" style="font-size:12px">(bônus)</span></a></li>
   </ol>
 </aside>
 
@@ -240,7 +241,7 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 <!-- ==================== COMO FUNCIONA ==================== -->
 <section class="parte" id="p1">
   <div class="parte-cab"><span class="parte-num">00</span><h2>Como funciona</h2></div>
-  <p class="abre">São 108 horas para sair daqui capaz de projetar, criar, alimentar e defender um banco de dados — e você faz isso construindo um de verdade.</p>
+  <p class="abre">São 72 horas para sair daqui capaz de projetar, criar, alimentar e defender um banco de dados — e você faz isso construindo um de verdade.</p>
 
   <p>O curso todo gira em torno de um projeto: <strong>cada célula inventa uma empresa e constrói o banco de dados dela</strong>, do primeiro rascunho à aplicação rodando. Cada dia mostra o que a gente vê em sala. Espalhadas pelos dias estão as <strong>missões</strong> — algumas de um dia, outras de dois ou três — que a célula faz no ritmo dela e entrega no site quando termina. Cada missão empurra o banco da empresa de vocês mais um passo.</p>
 
@@ -250,9 +251,9 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
   </div>
 </section>
 
-<!-- ==================== OS 27 DIAS ==================== -->
+<!-- ==================== OS 13 DIAS ==================== -->
 <section class="parte" id="dias">
-  <div class="parte-cab"><span class="parte-num">27</span><h2>Os 27 dias</h2></div>
+  <div class="parte-cab"><span class="parte-num">13</span><h2>Os 13 dias</h2></div>
   <div id="osDias"></div>
 </section>
 
@@ -901,6 +902,41 @@ WHERE id_cliente = 1;</pre>
   </section>
 
 <!-- ==================== PARTE 5 ==================== -->
+<section class="parte" id="ref-seguranca">
+  <div class="parte-cab"><span class="parte-num">E</span><h2>Segurança do banco</h2></div>
+  <p>Guardar dado é assumir responsabilidade. A UC5 cobra que o banco seja <strong>disponível, íntegro e consistente</strong>, protegido contra falhas e acessos indevidos. Aqui ficam as peças práticas: quem pode fazer o quê, e como não perder tudo.</p>
+
+  <h3 id="p5s-1">5.1 Controle de acesso (DCL)</h3>
+  <p>Nem todo mundo precisa poder tudo. Um sistema que só lê relatórios não deveria poder apagar tabela. O SQL controla isso com <span class="mono">GRANT</span> (concede) e <span class="mono">REVOKE</span> (retira).</p>
+<pre><span class="cm">-- cria um usuário só de leitura</span>
+CREATE USER 'consulta'@'localhost' IDENTIFIED BY 'senha_forte';
+GRANT SELECT ON loja_aurora.* TO 'consulta'@'localhost';
+
+<span class="cm">-- e, se precisar tirar depois</span>
+REVOKE SELECT ON loja_aurora.* FROM 'consulta'@'localhost';</pre>
+  <p>Regra de ouro: dê o <strong>menor acesso possível</strong> para cada usuário fazer o trabalho dele. É o princípio do menor privilégio.</p>
+
+  <h3 id="p5s-2">5.2 As ameaças e as defesas</h3>
+  <ul>
+    <li><strong>Acesso indevido:</strong> senhas fortes, <strong>autenticação</strong> e controle de acesso por usuário.</li>
+    <li><strong>Interceptação:</strong> <strong>criptografia</strong> — dados sensíveis guardados e trafegados embaralhados, ilegíveis para quem não tem a chave.</li>
+    <li><strong>Perda de dados:</strong> <strong>backup</strong> regular (veja abaixo) e redundância.</li>
+    <li><strong>Dado corrompido:</strong> restrições (PK, FK, CHECK) e transações garantem <strong>integridade</strong> e <strong>consistência</strong>.</li>
+  </ul>
+
+  <h3 id="p5s-3">5.3 Backup e restore</h3>
+  <p><strong>Backup</strong> é a cópia de segurança da base; <strong>restore</strong> é trazê-la de volta depois de um desastre. Sem backup testado, um comando errado (um <span class="mono">DELETE</span> sem <span class="mono">WHERE</span>) apaga o trabalho de meses.</p>
+<pre><span class="cm">-- fazer o backup (no terminal, não no SQL)</span>
+mysqldump -u root -p loja_aurora &gt; backup_loja_aurora.sql
+
+<span class="cm">-- restaurar a partir do arquivo</span>
+mysql -u root -p loja_aurora &lt; backup_loja_aurora.sql</pre>
+  <div class="caixa">
+    <span class="caixa-rot">O backup que ninguém testou não existe</span>
+    <p>De nada adianta gerar o arquivo e nunca tentar restaurar. Faça o restore num banco de teste de vez em quando: é a única prova de que o backup funciona.</p>
+  </div>
+</section>
+
 <section class="parte" id="ref-lgpd">
   <div class="parte-cab"><span class="parte-num">E</span><h2>LGPD</h2></div>
   <p class="abre">A parte que separa quem sabe montar um banco de quem pode responder por ele.</p>
@@ -979,7 +1015,7 @@ WHERE id_cliente = 1;</pre>
 </div>
 
 <footer class="rodape env">
-  <p class="rot" style="font-size:13px">UC6 · Criar e Manter Banco de Dados · Técnico em Desenvolvimento de Sistemas</p>
+  <p class="rot" style="font-size:13px">UC5 · Desenvolver Banco de Dados · Técnico em Desenvolvimento de Sistemas</p>
   <p style="margin-top:5px">Conteúdo adaptado do caderno A-279 do Senac/ES para uso em sala.</p>
   <p class="credito" style="margin-top:8px">Inspirado no projeto desenvolvido por <a href="https://github.com/rafaelapessin" target="_blank" rel="noopener"><strong>Rafaela Pessin</strong></a>, a quem vão os créditos e o agradecimento.</p>
 </footer>
@@ -987,7 +1023,7 @@ WHERE id_cliente = 1;</pre>
 <a href="#" class="topo">↑ topo</a>
 
 <script>
-/* ====== os 27 dias (fonte: curriculo.js) ====== */
+/* ====== os 13 dias (fonte: curriculo.js) ====== */
 (function(){
   var C = window.CURRICULO;
   if (!C) return;
@@ -996,7 +1032,7 @@ WHERE id_cliente = 1;</pre>
 
   // capa: total de dias
   var cap = document.getElementById('capaDias');
-  if (cap) cap.textContent = C.dias.length + ' dias · 108 horas';
+  if (cap) cap.textContent = C.dias.length + ' dias · 72 horas';
 
   // ir para hoje
   var ir = document.getElementById('irHoje');
@@ -1004,7 +1040,7 @@ WHERE id_cliente = 1;</pre>
 
   // cards
   var alvo = document.getElementById('osDias');
-  var refNome = {'#ref-banco':'Banco de dados','#ref-modelagem':'Modelagem','#ref-sql':'SQL','#ref-crud':'CRUD','#ref-lgpd':'LGPD'};
+  var refNome = {'#ref-banco':'Banco de dados','#ref-modelagem':'Modelagem','#ref-sql':'SQL','#ref-join':'JOIN','#ref-crud':'CRUD','#ref-seguranca':'Segurança','#ref-lgpd':'LGPD'};
   alvo.innerHTML = C.dias.map(function(dia){
     var eHoje = dia.d === hoje;
     var data = C.dataBR(dia.d);
