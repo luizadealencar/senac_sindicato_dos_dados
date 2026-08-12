@@ -105,7 +105,7 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 .caixa.alerta{border-color:var(--carimbo)}
 .caixa.alerta .caixa-rot{background:var(--carimbo)}
 .caixa.missao{box-shadow:6px 6px 0 var(--tinta)}
-/* cards dos 13 dias */
+/* cards dos 18 dias */
 .dia{border:2px solid var(--tinta);margin-bottom:22px;scroll-margin-top:60px;background:var(--papel)}
 .dia.hoje{box-shadow:7px 7px 0 var(--carimbo);border-color:var(--carimbo)}
 .dia-cab{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:var(--tinta);color:var(--papel);padding:11px 16px}
@@ -211,7 +211,7 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 <header class="capa env">
   <div class="classif rot">
     <span>Dossiê A-279 · Material de estudo</span>
-    <span id="capaDias">13 dias · 72 horas</span>
+    <span id="capaDias">18 dias · 72 horas</span>
     <span>Consulta liberada durante as operações</span>
   </div>
   <h1 class="titulo">O <em>Caderno</em></h1>
@@ -223,7 +223,7 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
 <aside class="indice" aria-label="Índice do caderno">
   <h2>Índice</h2>
   <a class="indice-hoje" id="irHoje" href="#dia-1">Ir para o dia de hoje →</a>
-  <p class="indice-grupo">Os 13 dias</p>
+  <p class="indice-grupo">Os 18 dias</p>
   <ol id="indiceAtos"></ol>
   <p class="indice-grupo">Consulta rápida</p>
   <ol>
@@ -232,7 +232,6 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
     <li><a href="#ref-sql"><span>C</span>SQL</a></li>
     <li><a href="#ref-crud"><span>D</span>CRUD</a></li>
     <li><a href="#ref-seguranca"><span>E</span>Segurança</a></li>
-    <li><a href="#ref-lgpd"><span>F</span>LGPD <span class="fraco" style="font-size:12px">(bônus)</span></a></li>
   </ol>
 </aside>
 
@@ -251,9 +250,9 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
   </div>
 </section>
 
-<!-- ==================== OS 13 DIAS ==================== -->
+<!-- ==================== OS 18 DIAS ==================== -->
 <section class="parte" id="dias">
-  <div class="parte-cab"><span class="parte-num">13</span><h2>Os 13 dias</h2></div>
+  <div class="parte-cab"><span class="parte-num">18</span><h2>Os 18 dias</h2></div>
   <div id="osDias"></div>
 </section>
 
@@ -592,7 +591,7 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
   </table>
   </div>
 
-  <p>SQL também é peça de segurança e conformidade: controle de acesso, auditoria e proteção contra vazamento passam por ela — o que a coloca no centro de qualquer conversa sobre LGPD, assunto da Parte 05.</p>
+  <p>SQL também é peça de segurança: controle de acesso, auditoria e proteção contra vazamento passam por ela — assunto da Parte 05, Segurança.</p>
 
   <div class="caixa ferramenta">
     <span class="caixa-rot">Ferramentas · rodar SQL online</span>
@@ -600,7 +599,7 @@ td.mono,th.mono{font-family:'JetBrains Mono',monospace;font-size:14px}
     <ul>
       <li><strong>Programiz SQL</strong> — <a href="https://www.programiz.com/sql/online-compiler/" target="_blank" rel="noopener">programiz.com/sql</a>. Editor com banco de exemplo já carregado; ótimo para o primeiro contato.</li>
       <li><strong>OneCompiler</strong> — <a href="https://onecompiler.com/mysql" target="_blank" rel="noopener">onecompiler.com/mysql</a>. Roda MySQL de verdade e deixa você criar suas próprias tabelas.</li>
-      <li><strong>O Desafio</strong> — <a href="desafio.html">o quiz de SQL do Sindicato</a>. Dez perguntas em português, com correção na hora. É o Boss do Ato III.</li>
+      <li><strong>O Desafio</strong> — <a href="desafio.html">o quiz de SQL do Sindicato</a>. Dez perguntas em português, com correção na hora. É o Boss do Ato IV.</li>
     </ul>
   </div>
 
@@ -937,79 +936,7 @@ mysql -u root -p loja_aurora &lt; backup_loja_aurora.sql</pre>
   </div>
 </section>
 
-<section class="parte" id="ref-lgpd">
-  <div class="parte-cab"><span class="parte-num">E</span><h2>LGPD</h2></div>
-  <p class="abre">A parte que separa quem sabe montar um banco de quem pode responder por ele.</p>
 
-  <p>A <strong>Lei nº 13.709, de 14 de agosto de 2018</strong>, a Lei Geral de Proteção de Dados Pessoais, estabelece as regras de tratamento de dados pessoais no Brasil. Em 2019, a <strong>Lei nº 13.853</strong> a alterou e criou a <strong>ANPD</strong>, a Autoridade Nacional de Proteção de Dados. A base da LGPD são os direitos fundamentais de liberdade e privacidade previstos na Constituição.</p>
-
-  <h3 id="p5-1">5.1 Conceitos que caem em prova</h3>
-  <ul>
-    <li><strong>Dado pessoal</strong> — qualquer informação que identifique ou torne identificável uma pessoa natural: nome, CPF, endereço.</li>
-    <li><strong>Dado sensível</strong> — categoria mais íntima: origem racial, convicção religiosa, opinião política, dado biométrico, saúde. Exige cautela maior e consentimento explícito.</li>
-    <li><strong>Titular</strong> — a pessoa a quem os dados se referem. O cliente, o usuário, você.</li>
-    <li><strong>Tratamento</strong> — qualquer operação com dado pessoal: coletar, armazenar, consultar, usar, comunicar, eliminar.</li>
-  </ul>
-  <p><strong>Aplicabilidade.</strong> Vale para toda empresa, organização ou pessoa que trate dados no Brasil, não importa onde o controlador esteja. Empresa estrangeira também responde, se o tratamento ocorrer em território nacional ou se os dados forem de pessoas aqui.</p>
-
-  <h3 id="p5-2">5.2 Os princípios legais</h3>
-  <ul>
-    <li><strong>Finalidade</strong> — coletar para propósito legítimo, explícito e específico.</li>
-    <li><strong>Adequação</strong> — o tratamento tem que combinar com a finalidade informada.</li>
-    <li><strong>Necessidade</strong> — só o mínimo de dados que a finalidade exige.</li>
-    <li><strong>Livre acesso</strong> — o titular consulta seus dados quando quiser.</li>
-    <li><strong>Qualidade dos dados</strong> — exatos, claros, relevantes e atualizados.</li>
-    <li><strong>Transparência</strong> — o titular sabe o que é feito com o que é dele.</li>
-    <li><strong>Segurança</strong> — medidas técnicas de proteção.</li>
-    <li><strong>Prevenção</strong> — agir antes do dano acontecer.</li>
-    <li><strong>Não discriminação</strong> — o dado não pode virar instrumento de discriminação.</li>
-  </ul>
-
-  <h3 id="p5-3">5.3 Direitos do titular</h3>
-  <ul>
-    <li><strong>Acesso</strong> — saber quais dados seus a organização trata.</li>
-    <li><strong>Retificação</strong> — corrigir dado incompleto ou impreciso.</li>
-    <li><strong>Exclusão</strong> — pedir a eliminação, em determinadas circunstâncias.</li>
-    <li><strong>Portabilidade</strong> — levar os dados para outro fornecedor.</li>
-    <li><strong>Informação</strong> — ser informado sobre o tratamento.</li>
-    <li><strong>Revogação do consentimento</strong> — voltar atrás a qualquer momento.</li>
-  </ul>
-
-  <h3 id="p5-4">5.4 Transferência internacional</h3>
-  <p>Só é permitida para países ou organismos que ofereçam nível adequado de proteção, conforme a ANPD determinar. Se o destino não tiver essa proteção, o controlador precisa garantir salvaguardas — cláusulas contratuais específicas, por exemplo.</p>
-
-  <h3 id="p5-5">5.5 Quem é quem no tratamento</h3>
-  <ul>
-    <li><strong>Controlador</strong> — decide sobre o tratamento. A empresa que coleta e usa dados de clientes.</li>
-    <li><strong>Operador</strong> — trata os dados em nome do controlador. A terceirizada que hospeda o banco.</li>
-    <li><strong>Encarregado (DPO)</strong> — o profissional que garante o cumprimento da lei: orienta sobre conformidade, recebe reclamações dos titulares e faz a ponte entre organização, titulares e ANPD. Pode ser funcionário ou contratado de fora.</li>
-  </ul>
-  <p>Controlador e operador respondem, os dois, pela conformidade.</p>
-
-  <h3 id="p5-6">5.6 Segurança e boas práticas</h3>
-  <p>A lei exige medidas técnicas e administrativas contra acesso não autorizado, vazamento e dano. Na prática:</p>
-  <ul>
-    <li>criptografia e controle de acesso por perfil;</li>
-    <li>auditorias periódicas;</li>
-    <li>treinamento constante da equipe em segurança da informação.</li>
-  </ul>
-
-  <h3 id="p5-7">5.7 Fiscalização e penalidades</h3>
-  <p>A ANPD fiscaliza por investigação, relatório de auditoria e denúncia de titular. Também orienta os agentes de tratamento, aplica sanções, elabora regulamentação e coopera com autoridades internacionais.</p>
-  <div class="tab-rolo">
-  <table>
-    <thead><tr><th>Sanção</th><th>Quando</th></tr></thead>
-    <tbody>
-      <tr><td>Advertência</td><td>Infração de menor gravidade</td></tr>
-      <tr><td>Multa</td><td>Até 2% do faturamento, limitada a R$ 50 milhões por infração</td></tr>
-      <tr><td>Suspensão do tratamento</td><td>Impede o tratamento por período determinado</td></tr>
-      <tr><td>Eliminação dos dados</td><td>Casos de infração grave</td></tr>
-    </tbody>
-  </table>
-  </div>
-
-  
-  </section>
 
 </main>
 </div>
@@ -1023,7 +950,7 @@ mysql -u root -p loja_aurora &lt; backup_loja_aurora.sql</pre>
 <a href="#" class="topo">↑ topo</a>
 
 <script>
-/* ====== os 13 dias (fonte: curriculo.js) ====== */
+/* ====== os 18 dias (fonte: curriculo.js) ====== */
 (function(){
   var C = window.CURRICULO;
   if (!C) return;
@@ -1040,7 +967,7 @@ mysql -u root -p loja_aurora &lt; backup_loja_aurora.sql</pre>
 
   // cards
   var alvo = document.getElementById('osDias');
-  var refNome = {'#ref-banco':'Banco de dados','#ref-modelagem':'Modelagem','#ref-sql':'SQL','#ref-join':'JOIN','#ref-crud':'CRUD','#ref-seguranca':'Segurança','#ref-lgpd':'LGPD'};
+  var refNome = {'#ref-banco':'Banco de dados','#ref-modelagem':'Modelagem','#ref-sql':'SQL','#ref-join':'JOIN','#ref-crud':'CRUD','#ref-seguranca':'Segurança'};
   alvo.innerHTML = C.dias.map(function(dia){
     var eHoje = dia.d === hoje;
     var data = C.dataBR(dia.d);

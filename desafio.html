@@ -81,13 +81,13 @@
 <main class="palco env">
 
   <div class="classif rot">
-    <span>Dossiê A-279 · Boss do Ato III</span>
+    <span>Dossiê A-279 · Boss do Ato IV</span>
     <span id="seloTopo">O interrogatório</span>
     <span>Só com SQL</span>
   </div>
 
   <h1 class="titulo">O <em>Desafio</em></h1>
-  <p class="subtitulo">O cofre está trancado com dez perguntas. Cada uma testa um golpe de SQL que vocês aprenderam no Ato III. Errar não elimina — mas o placar conta. Respondam em célula.</p>
+  <p class="subtitulo">O cofre está trancado com dez perguntas. Cada uma testa um golpe de SQL que vocês aprenderam no Ato IV. Errar não elimina — mas o placar conta. Respondam em célula.</p>
 
   <!-- trava: só para filiados -->
   <section id="trava" class="abertura" hidden>
@@ -358,7 +358,7 @@ function finalizar(){
 
   let patente, recado;
   if (acertos === total)      { patente = 'Lenda do Cofre';   recado = 'Gabaritou. O cofre se abriu sem resistência.'; }
-  else if (acertos >= 8)      { patente = 'Veterano';         recado = 'Quase perfeito — o Ato III está dominado.'; }
+  else if (acertos >= 8)      { patente = 'Veterano';         recado = 'Quase perfeito — o Ato IV está dominado.'; }
   else if (acertos >= 6)      { patente = 'Operador';         recado = 'Passou no Boss. Revise os pontos que escaparam.'; }
   else if (acertos >= 4)      { patente = 'Agente';           recado = 'Deu para escapar, mas volte ao caderno reforçar SQL.'; }
   else                        { patente = 'Novato';           recado = 'O cofre resistiu. Reveja a Consulta rápida e tente de novo.'; }
@@ -393,7 +393,7 @@ async function registrar(acertos, total){
   try {
     const { error } = await sb.from('topicos').insert({
       autor_id: eu.id,
-      titulo: 'Desafio (Boss do Ato III)' + (eu.celula ? ' · ' + eu.celula : ''),
+      titulo: 'Desafio (Boss do Ato IV)' + (eu.celula ? ' · ' + eu.celula : ''),
       corpo: 'Resultado do Desafio: ' + acertos + '/' + total + ' acertos.',
       categoria: 'entrega',
       missao: 6
