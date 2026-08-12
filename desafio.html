@@ -89,8 +89,21 @@
   <h1 class="titulo">O <em>Desafio</em></h1>
   <p class="subtitulo">O cofre está trancado com dez perguntas. Cada uma testa um golpe de SQL que vocês aprenderam no Ato III. Errar não elimina — mas o placar conta. Respondam em célula.</p>
 
+  <!-- trava: só para filiados -->
+  <section id="trava" class="abertura" hidden>
+    <h2>Só para filiados</h2>
+    <p>O Desafio conta <strong>XP para a sua célula</strong> — por isso ele é só para quem está filiado. Entre com sua conta (ou filie-se) para encarar o Boss.</p>
+    <div class="acoes"><a class="btn" href="entrar.html">Entrar / Filiar-se</a></div>
+  </section>
+
+  <!-- carregando -->
+  <section id="carregando" class="abertura">
+    <h2>Abrindo o cofre…</h2>
+    <p class="mono" style="font-size:14px">Verificando a sua ficha.</p>
+  </section>
+
   <!-- abertura -->
-  <section id="abertura" class="abertura">
+  <section id="abertura" class="abertura" hidden>
     <h2>Antes de começar</h2>
     <p>São <strong>10 perguntas</strong> sobre o banco da <strong>Loja Aurora</strong> (uma loja online de papelaria). Cada pergunta mostra as alternativas; ao escolher, você vê na hora se acertou e por quê.</p>
     <p>Tabelas em jogo: <span class="mono">clientes</span>, <span class="mono">produtos</span>, <span class="mono">pedidos</span> e <span class="mono">itens_pedido</span>.</p>
@@ -118,7 +131,9 @@
 
 <script src="assets/config.js"></script>
 <script type="module" src="assets/nav.js"></script>
-<script>
+<script type="module">
+import { sessao, sb, configurado } from './assets/sindicato.js';
+
 /* ==== O DESAFIO — quiz de SQL, 10 perguntas, tudo em português ==== */
 const PERGUNTAS = [
   {
@@ -245,6 +260,29 @@ const PERGUNTAS = [
 
 const $ = s => document.querySelector(s);
 let atual = 0, acertos = 0, respondeu = false;
+let eu = null;             // perfil do filiado logado
+
+// ---- porta de entrada: só filiado passa ----
+(async function porta(){
+  if (!configurado) { travar('O cadastro ainda não foi ligado. Avise a docente.'); return; }
+  let dados = { user: null, perfil: null };
+  try { dados = await sessao(); } catch (e) { /* sem sessão */ }
+  const { user, perfil } = dados;
+  if (!user) { travar(); return; }
+  if (perfil && perfil.filiado === false) { travar('Sua conta existe, mas a ficha ainda não foi carimbada. Volte ao Entrar e digite o código da turma.'); return; }
+  eu = perfil || { id: user.id, celula: '', nome: user.email };
+  $('#carregando').hidden = true;
+  $('#trava').hidden = true;
+  $('#abertura').hidden = false;
+})();
+
+function travar(msg){
+  $('#carregando').hidden = true;
+  $('#abertura').hidden = true;
+  const t = $('#trava');
+  if (msg) t.querySelector('p').textContent = msg;
+  t.hidden = false;
+}
 
 $('#btnComecar').addEventListener('click', () => {
   $('#abertura').hidden = true;
@@ -332,9 +370,9 @@ function finalizar(){
     <span class="patente-sel">${patente}</span>
     <h2 style="margin-top:10px">${pct}% de acerto</h2>
     <p>${recado}</p>
-    <p class="mono" style="font-size:14px">Tirem um print desta tela para a entrega da missão.</p>
+    <p id="registroStatus" class="mono" style="font-size:14px">Registrando o resultado da célula…</p>
     <div class="acoes">
-      <a class="btn" href="forum.html">Entregar no site</a>
+      <a class="btn" href="index.html#placar">Ver o placar</a>
       <button class="btn vazado" type="button" id="btnDeNovo">Tentar de novo</button>
     </div>`;
   $('#btnDeNovo').addEventListener('click', () => {
@@ -344,6 +382,28 @@ function finalizar(){
     mostrar();
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  registrar(acertos, total);
+}
+
+/* grava o resultado como uma entrega da célula (missão 6 = Boss). A docente
+   vê no fórum, filtrando por Entregas, e lança o XP da célula. */
+async function registrar(acertos, total){
+  const el = document.getElementById('registroStatus');
+  if (!sb || !eu || !eu.id) { if (el) el.textContent = 'Sem conexão para registrar — tire um print para a entrega.'; return; }
+  try {
+    const { error } = await sb.from('topicos').insert({
+      autor_id: eu.id,
+      titulo: 'Desafio (Boss do Ato III)' + (eu.celula ? ' · ' + eu.celula : ''),
+      corpo: 'Resultado do Desafio: ' + acertos + '/' + total + ' acertos.',
+      categoria: 'entrega',
+      missao: 6
+    });
+    if (error) throw error;
+    if (el) el.innerHTML = 'Resultado registrado para a célula <b>' + (eu.celula || '—') + '</b>. A docente lança o XP.';
+  } catch (e) {
+    if (el) el.textContent = 'Não consegui registrar automaticamente. Tire um print e entregue no fórum.';
+    console.warn('registro do desafio:', e.message || e);
+  }
 }
 </script>
 </body>
