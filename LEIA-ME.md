@@ -1,6 +1,6 @@
 # O Sindicato dos Dados — guia de instalação
 
-Site da UC6 (Criar e Manter Banco de Dados) com cadastro de alunos, fórum com
+Site da UC5 (Desenvolver Banco de Dados) com cadastro de alunos, fórum com
 imagens e quadro de filiados automático.
 
 Tudo roda **de graça**: Supabase no plano gratuito para banco, login e imagens;
