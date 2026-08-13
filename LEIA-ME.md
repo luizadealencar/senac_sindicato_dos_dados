@@ -187,32 +187,54 @@ Crie um repositório no GitHub e siga as duas linhas que ele mostra para enviar.
    saída — é um site estático.
 4. **Deploy**. Em menos de um minuto o site está no ar.
 
-### 4.3 Escolher o endereço
+### 4.3 O endereço do site
 
-Na Vercel: **Settings** → **Domains**. O endereço `.vercel.app` é gratuito e a
-parte antes do ponto é sua:
+O site mora em:
 
 ```
-sindicato-dos-dados.vercel.app
+uc5-banco-de-dados.vercel.app
 ```
 
-Se quiser um domínio próprio (`sindicatodosdados.com.br`), a Vercel liga de
+Na Vercel, o endereço `.vercel.app` é gratuito e a parte antes do ponto é
+sua, em **Settings** → **Domains**.
+
+Se quiser um domínio próprio (`uc5bancodedados.com.br`), a Vercel liga de
 graça, mas o registro do domínio é pago — uns R$ 40 por ano no registro.br.
 Nesse caso é só adicionar em **Domains** e seguir as instruções de DNS que
 aparecem.
 
-### 4.4 Avisar o Supabase do novo endereço
+### 4.4 Avisar o Supabase do endereço
 
-**Sem este passo o login para de funcionar em produção.**
+**Sem este passo o login para de funcionar em produção.** O Supabase só deixa
+o aluno voltar para endereços que ele conhece; se o site mudar de endereço sem
+ele saber, todo mundo é rejeitado no login.
 
 1. Supabase → **Authentication** → **URL Configuration**.
-2. **Site URL**: `https://sindicato-dos-dados.vercel.app`
+2. **Site URL**: `https://uc5-banco-de-dados.vercel.app`
 3. **Redirect URLs**: acrescente as duas linhas:
    ```
-   https://sindicato-dos-dados.vercel.app/**
+   https://uc5-banco-de-dados.vercel.app/**
    http://localhost:8000/**
    ```
-4. No GitHub, edite o OAuth App e ponha a *Homepage URL* nova.
+4. No GitHub, edite o OAuth App e ponha a *Homepage URL* nova. A
+   *Authorization callback URL* **não** muda: ela aponta para o Supabase,
+   não para o site.
+
+### 4.5 Se um dia trocar o endereço de novo
+
+A ordem evita deixar a turma sem login no meio do caminho:
+
+1. **Supabase primeiro:** acrescente o endereço novo nas *Redirect URLs*, sem
+   apagar o antigo. Nada quebra, e o terreno fica pronto.
+2. **Vercel:** em **Settings** → **Domains**, use **Add** para acrescentar o
+   endereço novo. Prefira acrescentar a renomear o projeto — renomear derruba
+   o endereço antigo na hora, e quem tiver o link salvo fica sem site.
+3. **Supabase de novo:** troque o *Site URL* para o endereço novo.
+4. **Teste numa aba anônima** antes de anunciar: entre com e-mail e senha, e
+   também pelo botão do GitHub.
+5. **GitHub:** atualize a *Homepage URL* do OAuth App.
+6. Só então aposente o endereço antigo — de preferência no fim do semestre,
+   porque os alunos podem tê-lo salvo.
 
 ---
 
