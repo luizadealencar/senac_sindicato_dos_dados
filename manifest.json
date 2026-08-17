@@ -1,0 +1,23 @@
+{
+  "name": "O Sindicato dos Dados",
+  "short_name": "Sindicato",
+  "description": "UC5 · Desenvolver Banco de Dados — o curso inteiro, dia a dia, com missões, caderno e placar.",
+  "lang": "pt-BR",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#E9EDE3",
+  "theme_color": "#191E1B",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Hoje", "url": "index.html#hoje" },
+    { "name": "Caderno", "url": "caderno.html" },
+    { "name": "O Desafio", "url": "desafio.html" }
+  ]
+}
