@@ -157,6 +157,7 @@ async function cadastrar(e) {
       options: {
         data: {
           nome: f.nome.value.trim().slice(0, 80),
+          user_name: f.github.value.trim() || null,
           celula
         }
       }
@@ -179,6 +180,7 @@ async function cadastrar(e) {
     /* Guarda o que o aluno escolheu, caso o gatilho não tenha aproveitado. */
     if (perfil) {
       const remendo = {};
+      if (!perfil.github && f.github.value.trim()) remendo.github = f.github.value.trim();
       if (perfil.nome === 'Agente sem nome') remendo.nome = f.nome.value.trim().slice(0, 80);
       if (Object.keys(remendo).length) await sb.from('perfis').update(remendo).eq('id', perfil.id);
     }
