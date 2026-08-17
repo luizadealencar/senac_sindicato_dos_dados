@@ -109,7 +109,6 @@ function ligarFormularios() {
   $('#formEntrar').addEventListener('submit', entrar);
   $('#formCadastro').addEventListener('submit', cadastrar);
   $('#formCodigo').addEventListener('submit', carimbar);
-  $('#btnGithub').addEventListener('click', githubEntrar);
   $('#btnSair2').addEventListener('click', sair);
 }
 
@@ -158,7 +157,6 @@ async function cadastrar(e) {
       options: {
         data: {
           nome: f.nome.value.trim().slice(0, 80),
-          user_name: f.github.value.trim() || null,
           celula
         }
       }
@@ -181,7 +179,6 @@ async function cadastrar(e) {
     /* Guarda o que o aluno escolheu, caso o gatilho não tenha aproveitado. */
     if (perfil) {
       const remendo = {};
-      if (!perfil.github && f.github.value.trim()) remendo.github = f.github.value.trim();
       if (perfil.nome === 'Agente sem nome') remendo.nome = f.nome.value.trim().slice(0, 80);
       if (Object.keys(remendo).length) await sb.from('perfis').update(remendo).eq('id', perfil.id);
     }
@@ -223,16 +220,6 @@ async function filiar(codigo, celula) {
   return data || { ok: false, erro: 'O servidor não respondeu direito. Tente de novo.' };
 }
 
-async function githubEntrar() {
-  const volta = new URL('entrar.html', location.href);
-  volta.searchParams.set('vai', destino);
-
-  const { error } = await sb.auth.signInWithOAuth({
-    provider: 'github',
-    options: { redirectTo: volta.toString() }
-  });
-  if (error) recado($('#recadoPorta'), traduzirErro(error));
-}
 
 async function seguir() {
   const { perfil } = await sessao({ recarregar: true });
