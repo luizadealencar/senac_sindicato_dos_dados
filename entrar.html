@@ -39,12 +39,6 @@ form[hidden],section[hidden],div[hidden]{display:none}
 .ou::before,.ou::after{content:'';flex:1;height:1px;background:var(--borda)}
 .ou span{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:12px}
 
-.btn-github{
-  width:100%;background:var(--tinta);border-color:var(--tinta);color:var(--papel);
-  font-size:14px;min-height:50px
-}
-.btn-github:hover{background:var(--papel);color:var(--tinta)}
-.btn-github svg{width:19px;height:19px;fill:currentColor;flex:none}
 
 .rodape-form{margin-top:18px;font-size:15.5px;color:var(--tinta-fraca)}
 .rodape-form button{background:none;border:none;padding:0;font:inherit;color:var(--carimbo);cursor:pointer;text-decoration:underline}
@@ -98,7 +92,7 @@ form[hidden],section[hidden],div[hidden]{display:none}
   </div>
 
   <h1 class="titulo">A <em>Filiação</em></h1>
-  <p class="subtitulo">Sem ficha assinada ninguém entra na sala dos fundos. Leva dois minutos e você não precisa de conta em lugar nenhum — a não ser que queira entrar pelo GitHub.</p>
+  <p class="subtitulo">Sem ficha assinada ninguém entra na sala dos fundos. Leva dois minutos: crie sua conta com e-mail e senha, escolha a célula e use o código da turma.</p>
 
   <div id="avisoConfig" hidden class="aviso-config">
     <b>O cadastro ainda não foi ligado</b>
@@ -155,17 +149,11 @@ form[hidden],section[hidden],div[hidden]{display:none}
             </label>
           </div>
 
-          <div class="dupla">
-            <label class="campo"><span>Célula (nome do time)</span>
-              <input type="text" name="celula" id="inCelula" list="celulasSugeridas" required
-                     minlength="2" maxlength="30" autocomplete="off" placeholder="Ex.: Guardiões do SELECT">
-              <span class="dica">Combinem um nome e escrevam <b>igual</b>. Se o time já criou, ele aparece na lista.</span>
-            </label>
-            <label class="campo"><span>GitHub <span style="text-transform:none;letter-spacing:0">(opcional)</span></span>
-              <input type="text" name="github" autocomplete="off" maxlength="39" placeholder="seu-usuario" pattern="[A-Za-z0-9\-]{1,39}">
-              <span class="dica">Só o usuário. Vira sua foto no quadro.</span>
-            </label>
-          </div>
+          <label class="campo"><span>Célula (nome do time)</span>
+            <input type="text" name="celula" id="inCelula" list="celulasSugeridas" required
+                   minlength="2" maxlength="30" autocomplete="off" placeholder="Ex.: Guardiões do SELECT">
+            <span class="dica">Combinem um nome e escrevam <b>igual</b>. Se o time já criou, ele aparece na lista.</span>
+          </label>
 
           <label class="campo mono"><span>Código da turma</span>
             <input type="text" name="codigo" autocomplete="off" required maxlength="40" placeholder="XXXXXXXX">
@@ -178,12 +166,6 @@ form[hidden],section[hidden],div[hidden]{display:none}
           </p>
         </form>
 
-        <div class="ou"><span>ou</span></div>
-
-        <button class="btn btn-github" type="button" id="btnGithub">
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-          Entrar com o GitHub
-        </button>
       </div>
 
       <!-- ---------- CÓDIGO DA TURMA (já entrou, falta filiar) ---------- -->
