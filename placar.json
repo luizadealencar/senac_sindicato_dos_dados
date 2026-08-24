@@ -1,8 +1,8 @@
 {
   "_comodousar": "Uma linha por celula: o nome do time e o XP total. Voce lanca o numero que quiser (some os pontos conforme as celulas entregam). O bloco _logos guarda a imagem de cada time.",
   "_logos": {
-    "CBI": "logos/cbi.png",
-    "HYDRA": "logos/hydra.png",
+    "CBI": "logos/cbi.jpg",
+    "HYDRA": "logos/hydra.jpg",
     "UNIONE 404": "logos/unione-404.png",
     "AURA E ENZO": "logos/aura-e-enzo.png"
   },
