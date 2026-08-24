@@ -80,6 +80,7 @@ body{
 .hoje-linha{display:flex;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--borda);font-size:16.5px}
 .hoje-linha dt{min-width:76px;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:13px;font-weight:600;color:var(--tinta-fraca);padding-top:3px}
 .hoje-linha dd{flex:1}
+.xp-tag{display:inline-block;background:var(--latao);color:var(--papel);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:1px 7px;border-radius:2px;margin-left:6px;letter-spacing:0;vertical-align:middle}
 .missao-hoje{margin-top:18px;padding-top:16px;border-top:2px solid var(--tinta)}
 .missao-rot{background:var(--latao);color:var(--papel);display:inline-block;padding:4px 12px;font-size:12.5px}
 #hjMissao{margin:11px 0 14px;font-size:16.5px}
@@ -191,6 +192,8 @@ html{scroll-padding-top:64px}
 .celula p{font-size:15px;color:var(--tinta-fraca)}
 .celula-pos{position:absolute;top:13px;right:15px;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--tinta-fraca)}
 .celula .celula-roster{font-size:14px;color:var(--tinta);margin-top:5px;line-height:1.45}
+.celula-logo{position:absolute;right:14px;bottom:14px;width:46px;height:46px;object-fit:cover;border:2px solid var(--tinta);background:var(--papel)}
+.celula{padding-right:70px}
 .patente{display:inline-block;margin-top:9px;border:1.5px solid var(--latao);color:var(--latao);font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:600;padding:3px 9px}
 
 /* ---------- ficha ---------- */
@@ -478,7 +481,7 @@ const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':
   const faixa = m && m.fim > m.ini ? ' (dias ' + m.ini + '\u2013' + m.fim + ')' : '';
   $('#hjMissao').textContent = m ? m.texto : '\u2014';
   const rot = document.querySelector('.missao-rot');
-  if (rot && m) rot.textContent = 'Miss\u00e3o \u00b7 ' + m.titulo + faixa;
+  if (rot && m) rot.innerHTML = 'Miss\u00e3o \u00b7 ' + esc(m.titulo) + esc(faixa) + (m.xp ? ' <span class="xp-tag">vale ' + m.xp + ' XP</span>' : '');
 
   // entrega da missão: vai para a Sala dos Fundos (fórum), onde a célula
   // abre o caso com texto e imagens.
