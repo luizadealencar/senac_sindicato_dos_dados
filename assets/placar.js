@@ -9,19 +9,41 @@ import { sb, configurado, esc } from './sindicato.js';
 const alvo = document.getElementById('celulas');
 if (alvo) pintar();
 
+// Patentes por faixa de XP (soma das notas). Ajustadas para ~8 missões de nota
+// até 10 (total possível 80). Se você usar outra escala, troque os números.
 const patenteDe = xp =>
-  xp >= 300 ? 'Lenda' : xp >= 180 ? 'Veterano' : xp >= 90 ? 'Operador' : xp >= 30 ? 'Agente' : 'Novato';
+  xp >= 72 ? 'Lenda' : xp >= 55 ? 'Veterano' : xp >= 35 ? 'Operador' : xp >= 15 ? 'Agente' : 'Novato';
 
-async function xpPorCelula() {
-  // placar.json vence; DADOS.pontos é a reserva
-  const mapa = {};
-  const guarda = obj => { for (const k in (obj || {})) mapa[k.trim().toLowerCase()] = Number(obj[k]) || 0; };
+async function lerPlacar() {
+  // placar.json manda; DADOS.pontos é reserva. Cada célula pode ter um número
+  // (total) ou um objeto com a nota por missão (o placar SOMA). O bloco _logos
+  // guarda a imagem de cada célula.
+  const xp = {}, logos = {};
+  const soma = v => {
+    if (v && typeof v === 'object') {
+      let s = 0;
+      for (const k in v) { const n = Number(v[k]); if (!isNaN(n)) s += n; }
+      return s;
+    }
+    return Number(v) || 0;
+  };
+  const guarda = obj => {
+    for (const k in (obj || {})) {
+      if (k.charAt(0) === '_') continue;         // ignora _comodousar, _missoes, _logos
+      xp[k.trim().toLowerCase()] = soma(obj[k]);
+    }
+  };
   guarda(window.DADOS?.pontos);
   try {
     const r = await fetch('placar.json', { cache: 'no-store' });
-    if (r.ok) guarda(await r.json());
+    if (r.ok) {
+      const j = await r.json();
+      guarda(j);
+      const L = j._logos || {};
+      for (const k in L) if (L[k]) logos[k.trim().toLowerCase()] = String(L[k]);
+    }
   } catch { /* sem arquivo: fica a reserva */ }
-  return mapa;
+  return { xp, logos };
 }
 
 async function membros() {
@@ -60,10 +82,11 @@ async function membros() {
 }
 
 async function pintar() {
-  const [times, xp] = await Promise.all([membros(), xpPorCelula()]);
+  const [times, dados] = await Promise.all([membros(), lerPlacar()]);
+  const { xp, logos } = dados;
 
   const celulas = times
-    .map(c => ({ ...c, xp: xp[c.chave] || 0 }))
+    .map(c => ({ ...c, xp: xp[c.chave] || 0, logo: logos[c.chave] || '' }))
     .sort((a, b) => b.xp - a.xp || b.n - a.n || a.nome.localeCompare(b.nome, 'pt'));
 
   if (!celulas.length) {
@@ -78,5 +101,6 @@ async function pintar() {
       <h3>${esc(c.nome)}</h3>
       <p>${c.n} ${c.n === 1 ? 'agente' : 'agentes'}</p>
       <span class="patente">${esc(patenteDe(c.xp))}</span>
+      ${c.logo ? `<img class="celula-logo" src="${esc(c.logo)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
     </div>`).join('');
 }
