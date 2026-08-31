@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#191E1B">
+<title>O Laboratório — O Sindicato dos Dados</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;600;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+.palco{padding:26px 0 70px}
+.lab-intro{max-width:70ch}
+.lab-intro p{font-size:17.5px;color:var(--tinta-fraca);margin-bottom:12px}
+
+/* estado de carregamento do motor */
+.carregando-motor{border:2px dashed var(--borda);padding:16px 18px;margin:18px 0;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--tinta-fraca)}
+
+/* painel do banco */
+.banco{border:2px solid var(--tinta);background:var(--papel);margin:22px 0}
+.banco-cab{background:var(--tinta);color:var(--papel);padding:10px 16px;font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:15px}
+.tabelas{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0}
+.tabela{border-top:1px solid var(--papel-linha);padding:12px 16px}
+.tabela:nth-child(n+3){border-top:1px solid var(--tinta)}
+.tabela h4{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--carimbo);margin-bottom:6px}
+.tabela ul{list-style:none;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--tinta-fraca);line-height:1.7}
+.tabela .pk{color:var(--carimbo);font-weight:700}
+.tabela .fk{color:var(--latao);font-weight:700}
+
+/* console */
+.console{border:2px solid var(--tinta);box-shadow:6px 6px 0 var(--tinta);background:var(--papel);margin:22px 0}
+.console-cab{display:flex;justify-content:space-between;align-items:center;background:var(--papel-barra);border-bottom:2px solid var(--tinta);padding:8px 14px}
+.console-cab span{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-weight:600;font-size:13px}
+textarea.sql{width:100%;border:none;background:var(--tinta);color:#EDEFE7;font-family:'JetBrains Mono',monospace;font-size:14.5px;line-height:1.6;padding:14px 16px;resize:vertical;min-height:90px;display:block}
+textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
+.console-pe{display:flex;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid var(--papel-linha);flex-wrap:wrap}
+.btn-mini{font-family:'Saira Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:13px;border:2px solid var(--tinta);background:var(--tinta);color:var(--papel);padding:7px 15px;cursor:pointer}
+.btn-mini.vazado{background:transparent;color:var(--tinta)}
+.btn-mini:hover{background:var(--carimbo);border-color:var(--carimbo);color:var(--papel)}
+
+/* resultados */
+.saida{padding:0 14px 14px;overflow-x:auto}
+.saida table{border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:13px;min-width:100%}
+.saida th{background:var(--tinta);color:var(--papel);text-align:left;padding:6px 12px;white-space:nowrap;position:sticky;top:0}
+.saida td{border-bottom:1px solid var(--papel-linha);padding:5px 12px;white-space:nowrap}
+.saida tr:nth-child(even) td{background:var(--papel-barra)}
+.saida .nlinhas{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:12px;color:var(--tinta-fraca);padding:8px 0 4px}
+.saida .erro{color:var(--carimbo);font-family:'JetBrains Mono',monospace;font-size:13.5px;padding:10px 0;border-left:4px solid var(--carimbo);padding-left:12px}
+
+/* módulos e lições */
+.modulo{margin-top:46px}
+.modulo-cab{border-bottom:2px solid var(--tinta);padding-bottom:6px;margin-bottom:6px;display:flex;align-items:baseline;gap:12px}
+.modulo-cab .m-num{font-family:'JetBrains Mono',monospace;color:var(--carimbo);font-weight:700;font-size:16px}
+.modulo-cab h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:26px}
+.modulo-cab .dur{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tinta-fraca)}
+
+.licao{border-left:3px solid var(--borda);padding:14px 0 14px 18px;margin:24px 0}
+.licao h3{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:20px;margin-bottom:8px}
+.licao p{font-size:16.5px;color:var(--tinta);margin-bottom:10px;max-width:68ch}
+.licao code{font-family:'JetBrains Mono',monospace;background:var(--papel-barra);padding:1px 5px;font-size:.92em;border:1px solid var(--papel-linha)}
+.exemplo{background:var(--tinta);color:#EDEFE7;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.6;padding:12px 14px;margin:10px 0;white-space:pre-wrap;overflow-x:auto}
+.exemplo .cm{color:#9DB39A}
+
+/* desafios */
+.desafio{border:2px solid var(--tinta);background:var(--papel);margin:14px 0;padding:0}
+.desafio-cab{background:var(--carimbo);color:var(--papel);padding:8px 14px;font-family:'Saira Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:13px;display:flex;justify-content:space-between}
+.desafio-corpo{padding:12px 14px}
+.desafio-corpo p{font-size:16px;margin-bottom:10px}
+.desafio textarea{width:100%;border:2px solid var(--borda);background:var(--tinta);color:#EDEFE7;font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.6;padding:10px 12px;resize:vertical;min-height:60px}
+.desafio textarea:focus{outline:none;border-color:var(--carimbo)}
+.desafio-acoes{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.veredicto{font-size:14.5px;padding:8px 12px;margin-top:10px;display:none}
+.veredicto.bom{display:block;border-left:4px solid #3F6B3A;background:#E4EEDD;color:#294D26}
+.veredicto.ruim{display:block;border-left:4px solid var(--carimbo);background:#F2E2E2;color:#7a1f1f}
+.desafio.resolvido .desafio-cab{background:#3F6B3A}
+.dica-txt{font-size:14px;color:var(--tinta-fraca);margin-top:8px;display:none;border-left:3px solid var(--latao);padding-left:10px}
+
+/* placar de progresso */
+.progresso-lab{position:sticky;top:0;z-index:20;background:var(--papel-barra);border:2px solid var(--tinta);padding:10px 16px;margin:18px 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.progresso-lab b{font-family:'JetBrains Mono',monospace;color:var(--carimbo);font-size:17px}
+.barra-lab{flex:1;min-width:140px;height:10px;border:2px solid var(--tinta);background:var(--papel)}
+.barra-lab span{display:block;height:100%;background:var(--carimbo);width:0;transition:width .3s}
+
+@media(max-width:860px){
+  .palco{padding:18px 0 50px}
+  .console{box-shadow:4px 4px 0 var(--tinta)}
+  .modulo-cab h2{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav" data-pagina="laboratorio.html"></nav>
+
+<main class="palco env">
+
+  <div class="classif rot">
+    <span>Dossiê A-279 · Laboratório de campo</span>
+    <span>Loja Aurora</span>
+    <span>SQL ao vivo</span>
+  </div>
+
+  <h1 class="titulo">O <em>Laboratório</em></h1>
+  <div class="lab-intro">
+    <p>O banco da <strong>Loja Aurora</strong> — uma papelaria online — está aqui, vivo, dentro desta página. Você escreve a consulta, aperta <strong>Rodar</strong> e vê o resultado na hora. Nada para instalar.</p>
+    <p>Trabalhe de cima para baixo: cada lição explica um comando, mostra um exemplo que você pode rodar, e traz desafios para você resolver escrevendo a sua própria consulta. Some pontos resolvendo os casos.</p>
+  </div>
+
+  <div id="motor" class="carregando-motor">Ligando o banco de dados… (primeira vez pode levar alguns segundos)</div>
+
+  <!-- progresso -->
+  <div class="progresso-lab" id="progresso" hidden>
+    <span style="font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:13px;font-weight:600">Casos resolvidos</span>
+    <b><span id="feitos">0</span>/<span id="total">0</span></b>
+    <div class="barra-lab"><span id="barraLab"></span></div>
+  </div>
+
+  <!-- o banco -->
+  <div class="banco">
+    <div class="banco-cab">O banco: 4 tabelas</div>
+    <div class="tabelas">
+      <div class="tabela"><h4>clientes</h4><ul>
+        <li class="pk">id_cliente</li><li>nome</li><li>email</li><li>cidade</li><li>status_cliente <span style="color:var(--tinta-fraca)">(ativo/inativo)</span></li><li>data_cadastro</li></ul></div>
+      <div class="tabela"><h4>produtos</h4><ul>
+        <li class="pk">id_produto</li><li>nome</li><li>categoria</li><li>preco</li><li>estoque</li></ul></div>
+      <div class="tabela"><h4>pedidos</h4><ul>
+        <li class="pk">id_pedido</li><li class="fk">id_cliente</li><li>data_pedido</li><li>status <span style="color:var(--tinta-fraca)">(pago/aberto/…)</span></li></ul></div>
+      <div class="tabela"><h4>itens_pedido</h4><ul>
+        <li class="fk">id_pedido</li><li class="fk">id_produto</li><li>quantidade</li><li>preco_unit</li></ul></div>
+    </div>
+  </div>
+
+  <!-- console livre -->
+  <div class="console">
+    <div class="console-cab"><span>Console livre — escreva qualquer consulta</span></div>
+    <textarea class="sql" id="sqlLivre" spellcheck="false">SELECT * FROM produtos;</textarea>
+    <div class="console-pe">
+      <button class="btn-mini" id="btnRodar">Rodar ▶</button>
+      <button class="btn-mini vazado" id="btnLimpar">Limpar</button>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tinta-fraca)">Dica: termine com <b>;</b></span>
+    </div>
+    <div class="saida" id="saidaLivre"></div>
+  </div>
+
+  <div id="conteudo"></div>
+
+</main>
+
+<footer class="rodape env">
+  <p class="rot" style="font-size:13px">UC5 · Desenvolver Banco de Dados · O banco roda no seu navegador com SQLite (sql.js). Nada é enviado para fora.</p>
+</footer>
+
+<script src="assets/config.js"></script>
+<script type="module" src="assets/nav.js"></script>
+<script src="assets/sqljs/sql-wasm.js"></script>
+<script src="assets/aurora-db.sql.js"></script>
+<script src="assets/laboratorio.js"></script>
+</body>
+</html>
