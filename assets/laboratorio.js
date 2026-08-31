@@ -80,7 +80,7 @@ function conferir(sqlAluno, sqlRef, ordenado) {
    ========================================================================== */
 const MODULOS = [
   {
-    num: 'I', nome: 'Ver e filtrar', dur: 'Dia 1 · ~50 min · 10 casos',
+    num: 'I', nome: 'Ver e filtrar', dur: 'Dia 1',
     licoes: [
       {
         titulo: 'SELECT — escolher o que ver',
@@ -90,6 +90,10 @@ const MODULOS = [
           { p: 'Mostre <b>apenas o nome e o email</b> de todos os clientes.', r: 'SELECT nome, email FROM clientes;', dica: 'SELECT coluna1, coluna2 FROM tabela;' },
           { p: 'Mostre <b>todas as colunas</b> da tabela de pedidos.', r: 'SELECT * FROM pedidos;', dica: 'Use o * para trazer tudo.' },
           { p: 'Mostre o <b>nome do produto e o preço</b>, mas com a coluna de preço aparecendo com o título <b>valor</b>.', r: 'SELECT nome, preco AS valor FROM produtos;', dica: 'Use AS para renomear: preco AS valor' }
+        ,
+          { p: 'Mostre o <b>id, a data e o status</b> de cada pedido — nessa ordem.', r: 'SELECT id_pedido, data_pedido, status FROM pedidos;', dica: 'Três colunas separadas por vírgula.' }
+        ,
+          { p: 'Mostre <b>todas as colunas</b> da tabela de itens de pedido.', r: 'SELECT * FROM itens_pedido;', dica: 'SELECT * FROM itens_pedido;' }
         ]
       },
       {
@@ -101,6 +105,10 @@ const MODULOS = [
           { p: 'Mostre o nome dos clientes que estão com <b>status inativo</b>.', r: "SELECT nome FROM clientes WHERE status_cliente = 'inativo';", dica: "status_cliente = 'inativo'" },
           { p: 'Mostre nome e cidade dos clientes que <b>não</b> são de Vitoria.', r: "SELECT nome, cidade FROM clientes WHERE cidade <> 'Vitoria';", dica: "<> quer dizer 'diferente de'" },
           { p: "Mostre o id e a data dos pedidos feitos <b>a partir de 01/07/2026</b> (data &gt;= '2026-07-01').", r: "SELECT id_pedido, data_pedido FROM pedidos WHERE data_pedido >= '2026-07-01';", dica: 'Data é texto no formato AAAA-MM-DD, entre aspas.' }
+        ,
+          { p: 'Mostre nome e preço dos produtos que custam <b>30 ou mais</b>.', r: 'SELECT nome, preco FROM produtos WHERE preco >= 30;', dica: 'O >= inclui o próprio 30.' }
+        ,
+          { p: "Mostre o id e a data dos pedidos feitos <b>antes de março terminar</b> (data menor que '2026-04-01').", r: "SELECT id_pedido, data_pedido FROM pedidos WHERE data_pedido < '2026-04-01';", dica: "data_pedido < '2026-04-01'" }
         ]
       },
       {
@@ -111,12 +119,28 @@ const MODULOS = [
           { p: 'Mostre nome e preço dos produtos da categoria <b>Papelaria</b> com <b>preço acima de 15</b>.', r: "SELECT nome, preco FROM produtos WHERE categoria = 'Papelaria' AND preco > 15;", dica: 'Duas condições ligadas por AND.' },
           { p: 'Mostre o nome dos clientes de <b>Serra ou Cariacica</b>.', r: "SELECT nome FROM clientes WHERE cidade = 'Serra' OR cidade = 'Cariacica';", dica: "cidade = 'Serra' OR cidade = 'Cariacica'" },
           { p: 'Mostre nome e estoque dos produtos de <b>Papelaria</b> que estão com <b>estoque abaixo de 60</b>.', r: "SELECT nome, estoque FROM produtos WHERE categoria = 'Papelaria' AND estoque < 60;", dica: 'Duas condições com AND.' }
+        ,
+          { p: 'Mostre nome, cidade e status dos clientes <b>ativos de Vila Velha</b>.', r: "SELECT nome, cidade, status_cliente FROM clientes WHERE cidade = 'Vila Velha' AND status_cliente = 'ativo';", dica: 'Duas condições com AND.' }
+        ,
+          { p: 'Mostre nome e preço dos produtos que <b>não custam entre 10 e 30</b> (use NOT com BETWEEN).', r: 'SELECT nome, preco FROM produtos WHERE NOT preco BETWEEN 10 AND 30;', dica: 'NOT preco BETWEEN 10 AND 30' }
+        ]
+      }
+    ,
+      {
+        titulo: 'IS NULL — quando não há informação',
+        html: `Campo vazio não é zero nem texto em branco: é <code>NULL</code>, a ausência de informação. E <code>NULL</code> não se compara com <code>=</code>. Para testar, use <code>IS NULL</code> e <code>IS NOT NULL</code>. Para trocar o vazio por um texto na hora de mostrar, use <code>COALESCE</code> (no MySQL também existe o <code>IFNULL</code>).`,
+        exemplo: `-- clientes que ainda não deixaram telefone\nSELECT nome FROM clientes WHERE telefone IS NULL;\n\n-- trocando o vazio por um aviso na saída\nSELECT nome, COALESCE(telefone, 'sem telefone') AS contato\nFROM clientes;`,
+        desafios: [
+          { p: 'Liste o nome dos clientes que <b>não têm telefone cadastrado</b>.', r: 'SELECT nome FROM clientes WHERE telefone IS NULL;', dica: 'WHERE telefone IS NULL — nunca use = NULL' },
+          { p: 'Liste nome e telefone dos clientes que <b>têm</b> telefone.', r: 'SELECT nome, telefone FROM clientes WHERE telefone IS NOT NULL;', dica: 'IS NOT NULL' },
+          { p: 'Mostre o nome de todos os clientes e o telefone; onde não houver telefone, mostre o texto <b>sem telefone</b>.', r: "SELECT nome, COALESCE(telefone, 'sem telefone') FROM clientes;", dica: "COALESCE(telefone, 'sem telefone')" },
+          { p: 'Conte <b>quantos clientes estão sem telefone</b>.', r: 'SELECT COUNT(*) FROM clientes WHERE telefone IS NULL;', dica: 'COUNT(*) com WHERE ... IS NULL' }
         ]
       }
     ]
   },
   {
-    num: 'II', nome: 'Refinar a busca', dur: 'Dia 2 · ~50 min · 11 casos',
+    num: 'II', nome: 'Refinar a busca', dur: 'Dia 2',
     licoes: [
       {
         titulo: 'ORDER BY e LIMIT — ordenar e cortar',
@@ -127,6 +151,10 @@ const MODULOS = [
           { p: 'Mostre o nome e o estoque dos <b>3 produtos com maior estoque</b>.', r: 'SELECT nome, estoque FROM produtos ORDER BY estoque DESC LIMIT 3;', ordenado: true, dica: 'ORDER BY estoque DESC LIMIT 3' },
           { p: 'Liste os clientes em <b>ordem alfabética</b> (só o nome).', r: 'SELECT nome FROM clientes ORDER BY nome ASC;', ordenado: true, dica: 'ORDER BY nome' },
           { p: 'Liste nome, categoria e preço dos produtos ordenados <b>por categoria (A-Z) e, dentro de cada categoria, do mais caro para o mais barato</b>.', r: 'SELECT nome, categoria, preco FROM produtos ORDER BY categoria ASC, preco DESC;', ordenado: true, dica: 'Dá para ordenar por duas colunas: ORDER BY a ASC, b DESC' }
+        ,
+          { p: 'Mostre o <b>produto mais barato</b> do catálogo (nome e preço, só uma linha).', r: 'SELECT nome, preco FROM produtos ORDER BY preco ASC LIMIT 1;', ordenado: true, dica: 'ORDER BY preco ASC LIMIT 1' }
+        ,
+          { p: 'Liste os clientes ordenados <b>por cidade (A-Z) e, dentro da cidade, por nome (A-Z)</b>.', r: 'SELECT nome, cidade FROM clientes ORDER BY cidade ASC, nome ASC;', ordenado: true, dica: 'ORDER BY cidade, nome' }
         ]
       },
       {
@@ -136,6 +164,10 @@ const MODULOS = [
         desafios: [
           { p: 'Liste as <b>categorias diferentes</b> de produto que existem.', r: 'SELECT DISTINCT categoria FROM produtos;', dica: 'SELECT DISTINCT categoria …' },
           { p: 'Liste as <b>cidades diferentes</b> onde a loja tem clientes.', r: 'SELECT DISTINCT cidade FROM clientes;', dica: 'SELECT DISTINCT cidade FROM clientes;' }
+        ,
+          { p: 'Liste os <b>status diferentes</b> que um pedido pode ter neste banco.', r: 'SELECT DISTINCT status FROM pedidos;', dica: 'SELECT DISTINCT status FROM pedidos;' }
+        ,
+          { p: 'Liste as <b>combinações diferentes de cidade e status</b> que aparecem nos clientes.', r: 'SELECT DISTINCT cidade, status_cliente FROM clientes;', dica: 'DISTINCT vale para o conjunto das colunas listadas.' }
         ]
       },
       {
@@ -148,12 +180,39 @@ const MODULOS = [
           { p: 'Mostre os pedidos cujo <b>status é pago ou enviado</b> (id e status).', r: "SELECT id_pedido, status FROM pedidos WHERE status IN ('pago','enviado');", dica: "status IN ('pago','enviado')" },
           { p: 'Mostre o nome dos clientes cujo nome <b>termina com a letra a</b>.', r: "SELECT nome FROM clientes WHERE nome LIKE '%a';", dica: "O % fica no começo: LIKE '%a'" },
           { p: 'Mostre nome e categoria dos produtos que <b>não</b> são de Papelaria nem de Decoracao.', r: "SELECT nome, categoria FROM produtos WHERE categoria NOT IN ('Papelaria','Decoracao');", dica: "NOT IN ('Papelaria','Decoracao')" }
+        ,
+          { p: 'Mostre os produtos cujo nome <b>contém a palavra Neon</b>.', r: "SELECT nome FROM produtos WHERE nome LIKE '%Neon%';", dica: "LIKE '%Neon%'" }
+        ,
+          { p: 'Mostre nome e estoque dos produtos com <b>estoque entre 50 e 100</b>.', r: 'SELECT nome, estoque FROM produtos WHERE estoque BETWEEN 50 AND 100;', dica: 'BETWEEN 50 AND 100' }
+        ]
+      }
+    ,
+      {
+        titulo: 'Funções de texto — arrumar o que aparece',
+        html: `Dá para transformar o texto na própria consulta: <code>UPPER</code> e <code>LOWER</code> mudam a caixa, <code>LENGTH</code> conta os caracteres, <code>SUBSTR(texto, início, quantos)</code> recorta um pedaço. Para juntar dois textos, o SQLite usa <code>||</code> e o <b>MySQL usa <code>CONCAT(a, b)</code></b> — é uma das poucas diferenças que você vai encontrar entre os dois.`,
+        exemplo: `-- nome em maiúsculas e o tamanho dele\nSELECT UPPER(nome) AS nome, LENGTH(nome) AS letras FROM clientes;\n\n-- juntando duas colunas num texto só\nSELECT nome || ' — ' || cidade AS ficha FROM clientes;\n\n-- os 4 primeiros caracteres da data são o ano\nSELECT SUBSTR(data_pedido, 1, 4) AS ano FROM pedidos;`,
+        desafios: [
+          { p: 'Mostre o <b>nome de todos os produtos em letras maiúsculas</b>.', r: 'SELECT UPPER(nome) FROM produtos;', dica: 'UPPER(nome)' },
+          { p: 'Mostre o nome dos clientes e <b>quantas letras</b> cada nome tem.', r: 'SELECT nome, LENGTH(nome) FROM clientes;', dica: 'LENGTH(nome)' },
+          { p: 'Monte uma coluna única no formato <b>nome - cidade</b> para cada cliente (com espaço, hífen, espaço).', r: "SELECT nome || ' - ' || cidade FROM clientes;", dica: "No SQLite: a || ' - ' || b. No MySQL seria CONCAT(a,' - ',b)." },
+          { p: 'Mostre o <b>ano de cada pedido</b> junto com o id (use os 4 primeiros caracteres da data).', r: 'SELECT id_pedido, SUBSTR(data_pedido, 1, 4) FROM pedidos;', dica: 'SUBSTR(data_pedido, 1, 4)' },
+          { p: 'Conte <b>quantos pedidos houve em cada mês</b> (use os 7 primeiros caracteres da data, tipo 2026-04), do mês mais movimentado para o menos.', r: 'SELECT SUBSTR(data_pedido,1,7) AS mes, COUNT(*) AS qtd FROM pedidos GROUP BY mes ORDER BY qtd DESC, mes ASC;', dica: 'Agrupe por SUBSTR(data_pedido,1,7)' }
+        ]
+      }
+    ,
+      {
+        titulo: 'LIMIT com OFFSET — de dez em dez',
+        html: `<code>LIMIT</code> corta o resultado, e o <code>OFFSET</code> diz quantas linhas <b>pular</b> antes de começar. É assim que um site monta a página 2 de uma lista. Sem <code>ORDER BY</code> a divisão não tem sentido, porque a ordem pode mudar.`,
+        exemplo: `-- as 5 primeiras linhas (página 1)\nSELECT nome, preco FROM produtos ORDER BY nome LIMIT 5;\n\n-- as 5 seguintes (página 2): pula 5 e traz 5\nSELECT nome, preco FROM produtos ORDER BY nome LIMIT 5 OFFSET 5;`,
+        desafios: [
+          { p: 'Mostre a <b>segunda página</b> da lista de clientes em ordem alfabética, com 5 por página (ou seja: pule 5 e traga 5).', r: 'SELECT nome FROM clientes ORDER BY nome LIMIT 5 OFFSET 5;', ordenado: true, dica: 'ORDER BY nome LIMIT 5 OFFSET 5' },
+          { p: 'Mostre o <b>segundo produto mais caro</b> (só ele: pule o primeiro e traga um).', r: 'SELECT nome, preco FROM produtos ORDER BY preco DESC LIMIT 1 OFFSET 1;', ordenado: true, dica: 'ORDER BY preco DESC LIMIT 1 OFFSET 1' }
         ]
       }
     ]
   },
   {
-    num: 'III', nome: 'Contar e agrupar', dur: 'Dia 3 · ~55 min · 14 casos',
+    num: 'III', nome: 'Contar e agrupar', dur: 'Dia 3',
     licoes: [
       {
         titulo: 'As funções de agregação',
@@ -166,6 +225,12 @@ const MODULOS = [
           { p: 'Descubra o <b>preço do produto mais caro</b> do catálogo.', r: 'SELECT MAX(preco) FROM produtos;', dica: 'MAX(preco)' },
           { p: 'Descubra <b>quantas cidades diferentes</b> aparecem no cadastro de clientes.', r: 'SELECT COUNT(DISTINCT cidade) FROM clientes;', dica: 'COUNT(DISTINCT cidade)' },
           { p: 'Descubra <b>quanto a loja faturou ao todo</b>: some quantidade × preço unitário de todos os itens vendidos.', r: 'SELECT SUM(quantidade * preco_unit) FROM itens_pedido;', dica: 'SUM(quantidade * preco_unit)' }
+        ,
+          { p: 'Descubra o <b>menor estoque</b> encontrado no catálogo.', r: 'SELECT MIN(estoque) FROM produtos;', dica: 'MIN(estoque)' }
+        ,
+          { p: 'Descubra <b>quantas unidades foram vendidas ao todo</b> (soma das quantidades de todos os itens).', r: 'SELECT SUM(quantidade) FROM itens_pedido;', dica: 'SUM(quantidade) na tabela de itens' }
+        ,
+          { p: 'Descubra a <b>média de itens por pedido</b>: conte as linhas de itens e divida pelo número de pedidos diferentes que aparecem lá.', r: 'SELECT COUNT(*) * 1.0 / COUNT(DISTINCT id_pedido) FROM itens_pedido;', dica: 'COUNT(*) * 1.0 / COUNT(DISTINCT id_pedido) — o 1.0 evita divisão inteira.' }
         ]
       },
       {
@@ -181,12 +246,42 @@ const MODULOS = [
           { p: 'Contando <b>só os clientes ativos</b>, mostre quantos há em cada cidade.', r: "SELECT cidade, COUNT(*) FROM clientes WHERE status_cliente = 'ativo' GROUP BY cidade;", dica: 'O WHERE vem antes do GROUP BY.' },
           { p: 'Mostre <b>quantos pedidos cada cliente fez</b> (id do cliente e a contagem), do que mais pediu para o que menos pediu.', r: 'SELECT id_cliente, COUNT(*) AS pedidos FROM pedidos GROUP BY id_cliente ORDER BY pedidos DESC, id_cliente ASC;', dica: 'GROUP BY id_cliente' },
           { p: 'Mostre, <b>para cada cidade e cada status</b>, quantos clientes existem (cidade, status e a contagem).', r: 'SELECT cidade, status_cliente, COUNT(*) FROM clientes GROUP BY cidade, status_cliente;', dica: 'Dá para agrupar por duas colunas: GROUP BY cidade, status_cliente' }
+        ,
+          { p: 'Mostre <b>quantos itens diferentes cada pedido tem</b> (id do pedido e a contagem de linhas).', r: 'SELECT id_pedido, COUNT(*) AS itens FROM itens_pedido GROUP BY id_pedido;', dica: 'GROUP BY id_pedido' }
+        ,
+          { p: 'Mostre o <b>preço mais caro de cada categoria</b> (categoria e o maior preço).', r: 'SELECT categoria, MAX(preco) FROM produtos GROUP BY categoria;', dica: 'MAX(preco) com GROUP BY categoria' }
+        ,
+          { p: "Mostre <b>quantos pedidos houve em cada status, apenas a partir de julho</b> (data &gt;= '2026-07-01').", r: "SELECT status, COUNT(*) FROM pedidos WHERE data_pedido >= '2026-07-01' GROUP BY status;", dica: 'WHERE filtra antes; GROUP BY agrupa depois.' }
+        ]
+      }
+    ,
+      {
+        titulo: 'Contas na consulta e o ROUND',
+        html: `A consulta também faz conta: <code>+</code>, <code>-</code>, <code>*</code> e <code>/</code> funcionam entre colunas e números. Como média e multiplicação costumam gerar um monte de casas decimais, o <code>ROUND(valor, casas)</code> arredonda. Dê sempre um apelido com <code>AS</code> à coluna calculada.`,
+        exemplo: `-- quanto vale o estoque de cada produto\nSELECT nome, preco * estoque AS valor_parado FROM produtos;\n\n-- média com duas casas\nSELECT categoria, ROUND(AVG(preco), 2) AS media\nFROM produtos GROUP BY categoria;`,
+        desafios: [
+          { p: 'Mostre o nome e <b>quanto vale o estoque</b> de cada produto (preço × estoque), do mais valioso para o menos.', r: 'SELECT nome, preco * estoque AS valor FROM produtos ORDER BY valor DESC;', ordenado: true, dica: 'preco * estoque, com AS e ORDER BY' },
+          { p: 'Mostre o <b>preço médio por categoria arredondado com 2 casas</b>.', r: 'SELECT categoria, ROUND(AVG(preco), 2) FROM produtos GROUP BY categoria;', dica: 'ROUND(AVG(preco), 2)' },
+          { p: 'Simule uma <b>promoção de 10% de desconto</b>: mostre o nome, o preço atual e o preço com desconto arredondado em 2 casas.', r: 'SELECT nome, preco, ROUND(preco * 0.9, 2) AS promocional FROM produtos;', dica: 'preco * 0.9 dentro do ROUND' },
+          { p: 'Mostre o <b>total de cada linha de item</b> vendida: id do pedido, id do produto e quantidade × preço unitário.', r: 'SELECT id_pedido, id_produto, quantidade * preco_unit AS total FROM itens_pedido;', dica: 'quantidade * preco_unit' }
+        ]
+      }
+    ,
+      {
+        titulo: 'CASE WHEN — criar faixas e rótulos',
+        html: `O <code>CASE</code> cria uma coluna nova a partir de uma regra, como um se/senão dentro da consulta. A forma é <code>CASE WHEN condição THEN valor ... ELSE outro END</code>. Serve para transformar número em faixa ('barato', 'caro') e para contar só o que interessa dentro de um <code>SUM</code>.`,
+        exemplo: `-- classificando o preço em faixas\nSELECT nome, preco,\n  CASE WHEN preco < 10 THEN 'barato'\n       WHEN preco < 30 THEN 'medio'\n       ELSE 'caro' END AS faixa\nFROM produtos;`,
+        desafios: [
+          { p: "Classifique cada produto pelo estoque: <b>abaixo de 50</b> é 'pouco', <b>de 50 a 199</b> é 'medio', o resto é 'muito'. Mostre nome, estoque e a classificação.", r: "SELECT nome, estoque, CASE WHEN estoque < 50 THEN 'pouco' WHEN estoque < 200 THEN 'medio' ELSE 'muito' END AS classificacao FROM produtos;", dica: "CASE WHEN estoque < 50 THEN 'pouco' WHEN estoque < 200 THEN 'medio' ELSE 'muito' END" },
+          { p: "Mostre o nome do cliente e uma coluna dizendo <b>'tem telefone'</b> ou <b>'sem telefone'</b>.", r: "SELECT nome, CASE WHEN telefone IS NULL THEN 'sem telefone' ELSE 'tem telefone' END AS contato FROM clientes;", dica: 'CASE WHEN telefone IS NULL THEN ... ELSE ... END' },
+          { p: 'Conte, numa <b>linha só</b>, quantos pedidos estão pagos e quantos estão cancelados (duas colunas).', r: "SELECT SUM(CASE WHEN status = 'pago' THEN 1 ELSE 0 END) AS pagos, SUM(CASE WHEN status = 'cancelado' THEN 1 ELSE 0 END) AS cancelados FROM pedidos;", dica: 'SUM(CASE WHEN ... THEN 1 ELSE 0 END) — conta só o que bate' },
+          { p: 'Para cada cidade, mostre <b>quantos clientes têm telefone</b> e quantos não têm (cidade e as duas contagens).', r: 'SELECT cidade, SUM(CASE WHEN telefone IS NOT NULL THEN 1 ELSE 0 END) AS com, SUM(CASE WHEN telefone IS NULL THEN 1 ELSE 0 END) AS sem FROM clientes GROUP BY cidade;', dica: 'Dois SUM(CASE ...) e um GROUP BY cidade' }
         ]
       }
     ]
   },
   {
-    num: 'IV', nome: 'Filtrar grupos e cruzar tabelas', dur: 'Dia 4 · ~55 min · 11 casos',
+    num: 'IV', nome: 'Filtrar grupos e cruzar tabelas', dur: 'Dia 4',
     licoes: [
       {
         titulo: 'HAVING — filtrar depois de agrupar',
@@ -200,6 +295,12 @@ const MODULOS = [
           { p: 'Mostre os <b>clientes que fizeram 3 pedidos ou mais</b> (id do cliente e a contagem).', r: 'SELECT id_cliente, COUNT(*) FROM pedidos GROUP BY id_cliente HAVING COUNT(*) >= 3;', dica: 'HAVING COUNT(*) >= 3' },
           { p: 'Entre os <b>pedidos já pagos</b>, mostre os clientes com <b>2 ou mais</b> pedidos pagos (id do cliente e a contagem). Repare: um filtro é WHERE, o outro é HAVING.', r: "SELECT id_cliente, COUNT(*) FROM pedidos WHERE status = 'pago' GROUP BY id_cliente HAVING COUNT(*) >= 2;", dica: "WHERE status='pago' filtra linhas; HAVING COUNT(*)>=2 filtra grupos." },
           { p: 'Mostre as <b>cidades com 3 clientes ou mais</b>, da que tem mais para a que tem menos.', r: 'SELECT cidade, COUNT(*) AS n FROM clientes GROUP BY cidade HAVING COUNT(*) >= 3 ORDER BY n DESC;', ordenado: true, dica: 'HAVING COUNT(*) >= 3 e depois ORDER BY' }
+        ,
+          { p: 'Mostre os <b>pedidos que têm 3 itens ou mais</b> (id do pedido e a contagem).', r: 'SELECT id_pedido, COUNT(*) AS itens FROM itens_pedido GROUP BY id_pedido HAVING COUNT(*) >= 3;', dica: 'GROUP BY id_pedido HAVING COUNT(*) >= 3' }
+        ,
+          { p: 'Mostre as <b>categorias que têm mais de 2 produtos</b> (categoria e a contagem).', r: 'SELECT categoria, COUNT(*) FROM produtos GROUP BY categoria HAVING COUNT(*) > 2;', dica: 'HAVING COUNT(*) > 2' }
+        ,
+          { p: 'Mostre os <b>produtos que venderam mais de 20 unidades no total</b> (id do produto e a soma).', r: 'SELECT id_produto, SUM(quantidade) AS un FROM itens_pedido GROUP BY id_produto HAVING SUM(quantidade) > 20;', dica: 'GROUP BY id_produto HAVING SUM(quantidade) > 20' }
         ]
       },
       {
@@ -211,6 +312,47 @@ const MODULOS = [
           { p: 'Some <b>quantas unidades cada produto vendeu</b> ao todo: nome do produto e a soma da quantidade (junte produtos com itens_pedido, agrupe pelo produto).', r: 'SELECT pr.nome, SUM(i.quantidade) AS vendidas FROM itens_pedido i JOIN produtos pr ON pr.id_produto = i.id_produto GROUP BY pr.id_produto, pr.nome;', dica: 'JOIN + GROUP BY pelo produto, SUM(quantidade).' },
           { p: 'Mostre o <b>nome do cliente e a cidade</b> de cada pedido <b>cancelado</b>.', r: "SELECT c.nome, c.cidade FROM pedidos p JOIN clientes c ON c.id_cliente = p.id_cliente WHERE p.status = 'cancelado';", dica: "JOIN e depois WHERE p.status='cancelado'" },
           { p: '<b>Caso final.</b> Mostre o <b>nome do produto e o total faturado</b> (soma de quantidade × preço unitário), apenas para os produtos que faturaram <b>mais de 300</b>, do maior para o menor.', r: 'SELECT pr.nome, SUM(i.quantidade * i.preco_unit) AS receita FROM itens_pedido i JOIN produtos pr ON pr.id_produto = i.id_produto GROUP BY pr.id_produto, pr.nome HAVING SUM(i.quantidade * i.preco_unit) > 300 ORDER BY receita DESC;', ordenado: true, dica: 'JOIN + GROUP BY + HAVING + ORDER BY, tudo junto.' }
+        ,
+          { p: 'Mostre o <b>nome do produto e a quantidade</b> de cada linha de item vendida.', r: 'SELECT pr.nome, i.quantidade FROM itens_pedido i JOIN produtos pr ON pr.id_produto = i.id_produto;', dica: 'JOIN produtos pr ON pr.id_produto = i.id_produto' }
+        ,
+          { p: '<b>Três tabelas de uma vez:</b> mostre o nome do cliente, o nome do produto e a quantidade, ligando pedidos, clientes, itens e produtos.', r: 'SELECT c.nome, pr.nome, i.quantidade FROM pedidos p JOIN clientes c ON c.id_cliente = p.id_cliente JOIN itens_pedido i ON i.id_pedido = p.id_pedido JOIN produtos pr ON pr.id_produto = i.id_produto;', dica: 'Dá para encadear vários JOIN, um depois do outro.' }
+        ,
+          { p: 'Mostre <b>quanto cada cliente já gastou</b> ao todo: nome e a soma de quantidade × preço unitário, do que mais gastou para o que menos gastou.', r: 'SELECT c.nome, SUM(i.quantidade * i.preco_unit) AS gasto FROM clientes c JOIN pedidos p ON p.id_cliente = c.id_cliente JOIN itens_pedido i ON i.id_pedido = p.id_pedido GROUP BY c.id_cliente, c.nome ORDER BY gasto DESC;', ordenado: true, dica: 'JOIN das três tabelas, GROUP BY pelo cliente e ORDER BY a soma.' }
+        ]
+      }
+    ,
+      {
+        titulo: 'LEFT JOIN — trazer também quem não tem par',
+        html: `O <code>JOIN</code> comum só devolve as linhas que têm par nas duas tabelas. Quem não tem par <b>some</b> do resultado. O <code>LEFT JOIN</code> mantém tudo da tabela da esquerda e preenche com <code>NULL</code> o que faltar da direita. É assim que se acha <b>quem nunca comprou</b> ou <b>o que nunca vendeu</b>.`,
+        exemplo: `-- todo cliente, tenha ele pedido ou não\nSELECT c.nome, p.id_pedido\nFROM clientes c\nLEFT JOIN pedidos p ON p.id_cliente = c.id_cliente;\n\n-- só os que nunca compraram: o par não existe, então é NULL\nSELECT c.nome\nFROM clientes c\nLEFT JOIN pedidos p ON p.id_cliente = c.id_cliente\nWHERE p.id_pedido IS NULL;`,
+        desafios: [
+          { p: 'Liste o nome dos <b>clientes que nunca fizeram pedido</b>.', r: 'SELECT c.nome FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente WHERE p.id_pedido IS NULL;', dica: 'LEFT JOIN e depois WHERE p.id_pedido IS NULL' },
+          { p: 'Liste o nome dos <b>produtos que nunca foram vendidos</b>.', r: 'SELECT pr.nome FROM produtos pr LEFT JOIN itens_pedido i ON i.id_produto = pr.id_produto WHERE i.id_produto IS NULL;', dica: 'LEFT JOIN com itens_pedido e IS NULL' },
+          { p: 'Mostre <b>todos os clientes</b> e quantos pedidos cada um fez — inclusive os que fizeram zero (nome e a contagem).', r: 'SELECT c.nome, COUNT(p.id_pedido) AS pedidos FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente GROUP BY c.id_cliente, c.nome;', dica: 'COUNT(p.id_pedido) conta só o que existe; COUNT(*) contaria a linha vazia também.' },
+          { p: 'Mostre <b>todos os produtos</b> e o total de unidades vendidas de cada um, colocando <b>0</b> onde nunca vendeu.', r: 'SELECT pr.nome, COALESCE(SUM(i.quantidade), 0) AS vendidas FROM produtos pr LEFT JOIN itens_pedido i ON i.id_produto = pr.id_produto GROUP BY pr.id_produto, pr.nome;', dica: 'COALESCE(SUM(i.quantidade), 0)' }
+        ]
+      }
+    ,
+      {
+        titulo: 'Subconsulta — uma pergunta dentro da outra',
+        html: `Quando a resposta depende de outra consulta, dá para colocar uma dentro da outra, entre parênteses. Ela pode devolver <b>um valor</b> (para comparar com <code>=</code>, <code>&gt;</code>), <b>uma lista</b> (para usar com <code>IN</code>) ou servir de teste com <code>EXISTS</code>. É o jeito de responder coisas como 'acima da média'.`,
+        exemplo: `-- produtos mais caros que a média\nSELECT nome, preco FROM produtos\nWHERE preco > (SELECT AVG(preco) FROM produtos);\n\n-- clientes que têm ao menos um pedido cancelado\nSELECT nome FROM clientes\nWHERE id_cliente IN (SELECT id_cliente FROM pedidos WHERE status = 'cancelado');`,
+        desafios: [
+          { p: 'Mostre os produtos com <b>preço acima da média</b> do catálogo (nome e preço).', r: 'SELECT nome, preco FROM produtos WHERE preco > (SELECT AVG(preco) FROM produtos);', dica: 'WHERE preco > (SELECT AVG(preco) FROM produtos)' },
+          { p: 'Mostre o nome dos <b>clientes que têm pelo menos um pedido pago</b>, usando uma subconsulta com IN.', r: "SELECT nome FROM clientes WHERE id_cliente IN (SELECT id_cliente FROM pedidos WHERE status = 'pago');", dica: "id_cliente IN (SELECT id_cliente FROM pedidos WHERE status='pago')" },
+          { p: 'Mostre o nome dos <b>clientes que nunca fizeram pedido</b>, agora com <b>NOT IN</b> em vez de LEFT JOIN.', r: 'SELECT nome FROM clientes WHERE id_cliente NOT IN (SELECT id_cliente FROM pedidos);', dica: 'NOT IN (SELECT id_cliente FROM pedidos)' },
+          { p: 'Mostre o produto <b>mais caro do catálogo</b> comparando com o preço máximo (nome e preço).', r: 'SELECT nome, preco FROM produtos WHERE preco = (SELECT MAX(preco) FROM produtos);', dica: 'WHERE preco = (SELECT MAX(preco) FROM produtos)' },
+          { p: 'Mostre o nome dos clientes com <b>estoque de pedidos acima da média de pedidos por cliente</b>: primeiro conte os pedidos por cliente, depois compare com a média dessas contagens.', r: 'SELECT c.nome FROM clientes c WHERE (SELECT COUNT(*) FROM pedidos p WHERE p.id_cliente = c.id_cliente) > (SELECT COUNT(*) * 1.0 / COUNT(DISTINCT id_cliente) FROM pedidos);', dica: 'Uma subconsulta conta os pedidos do cliente; a outra calcula a média geral.' }
+        ]
+      }
+    ,
+      {
+        titulo: 'UNION — empilhar dois resultados',
+        html: `O <code>UNION</code> junta o resultado de duas consultas <b>uma embaixo da outra</b>. As duas precisam ter a mesma quantidade de colunas e tipos compatíveis. O <code>UNION</code> remove as linhas repetidas; o <code>UNION ALL</code> mantém todas.`,
+        exemplo: `-- uma lista só com produtos muito baratos e muito caros\nSELECT nome, 'barato' AS faixa FROM produtos WHERE preco < 5\nUNION\nSELECT nome, 'caro' FROM produtos WHERE preco > 35;`,
+        desafios: [
+          { p: "Monte <b>uma lista só</b> com o nome dos produtos abaixo de 5 (marcados como 'barato') e acima de 35 (marcados como 'caro').", r: "SELECT nome, 'barato' AS faixa FROM produtos WHERE preco < 5 UNION SELECT nome, 'caro' FROM produtos WHERE preco > 35;", dica: 'Duas consultas com o mesmo número de colunas, ligadas por UNION' },
+          { p: 'Monte uma <b>agenda única</b> com o nome e a cidade de todos os clientes de Serra e de Guarapari, usando UNION.', r: "SELECT nome, cidade FROM clientes WHERE cidade = 'Serra' UNION SELECT nome, cidade FROM clientes WHERE cidade = 'Guarapari';", dica: 'Duas consultas ligadas por UNION' }
         ]
       }
     ]
@@ -281,9 +423,10 @@ function montarConteudo() {
           ${desafios}
         </div>`;
     }).join('');
+    const nCasos = mod.licoes.reduce((t, li) => t + li.desafios.length, 0);
     return `
       <section class="modulo">
-        <div class="modulo-cab"><span class="m-num">${mod.num}</span><h2>${esc(mod.nome)}</h2><span class="dur">${esc(mod.dur)}</span></div>
+        <div class="modulo-cab"><span class="m-num">${mod.num}</span><h2>${esc(mod.nome)}</h2><span class="dur">${esc(mod.dur)} · ${nCasos} casos</span></div>
         ${licoes}
       </section>`;
   }).join('');
