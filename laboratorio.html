@@ -85,6 +85,11 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
 .progresso-lab b{font-family:'JetBrains Mono',monospace;color:var(--carimbo);font-size:17px}
 .barra-lab{flex:1;min-width:140px;height:10px;border:2px solid var(--tinta);background:var(--papel)}
 .barra-lab span{display:block;height:100%;background:var(--carimbo);width:0;transition:width .3s}
+#btnRecomecar{margin-left:auto;flex:none}
+.salvo-aviso{
+  font-size:14.5px;color:var(--tinta-fraca);margin:-8px 0 22px;
+  border-left:3px solid var(--borda);padding:2px 0 2px 12px;max-width:76ch
+}
 
 @media(max-width:860px){
   .palco{padding:18px 0 50px}
@@ -118,7 +123,9 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
     <span style="font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:13px;font-weight:600">Casos resolvidos</span>
     <b><span id="feitos">0</span>/<span id="total">0</span></b>
     <div class="barra-lab"><span id="barraLab"></span></div>
+    <button type="button" id="btnRecomecar" class="btn-mini vazado" title="Apaga o progresso guardado neste navegador">Recomeçar</button>
   </div>
+  <p class="salvo-aviso">O seu progresso e as consultas que você escreve ficam guardados <b>neste navegador</b>. Pode fechar a aba e voltar depois — inclusive amanhã. Em computador da escola, use sempre a mesma máquina.</p>
 
   <!-- o banco -->
   <div class="banco">
