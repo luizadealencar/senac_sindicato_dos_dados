@@ -61,7 +61,10 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
 
 .licao{border-left:3px solid var(--borda);padding:14px 0 14px 18px;margin:24px 0}
 .licao h3{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:20px;margin-bottom:8px}
-.licao p{font-size:16.5px;color:var(--tinta);margin-bottom:10px;max-width:68ch}
+.licao>p{font-size:16.5px;color:var(--tinta);margin-bottom:10px;max-width:68ch}
+/* o enunciado do caso mora dentro da lição, mas não é leitura corrida:
+   é uma linha curta numa caixa, e fica melhor ocupando a largura toda */
+.desafio-corpo p{max-width:none}
 .licao code{font-family:'JetBrains Mono',monospace;background:var(--papel-barra);padding:1px 5px;font-size:.92em;border:1px solid var(--papel-linha)}
 .exemplo{background:var(--tinta);color:#EDEFE7;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.6;padding:12px 14px;margin:10px 0;white-space:pre-wrap;overflow-x:auto}
 .exemplo .cm{color:#9DB39A}
@@ -70,7 +73,7 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
 .desafio{border:2px solid var(--tinta);background:var(--papel);margin:14px 0;padding:0}
 .desafio-cab{background:var(--carimbo);color:var(--papel);padding:8px 14px;font-family:'Saira Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:13px;display:flex;justify-content:space-between}
 .desafio-corpo{padding:12px 14px}
-.desafio-corpo p{font-size:16px;margin-bottom:10px}
+.desafio-corpo p{font-size:16px;margin-bottom:10px;max-width:none}
 .desafio textarea{width:100%;border:2px solid var(--borda);background:var(--tinta);color:#EDEFE7;font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.6;padding:10px 12px;resize:vertical;min-height:60px}
 .desafio textarea:focus{outline:none;border-color:var(--carimbo)}
 .desafio-acoes{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
