@@ -3,24 +3,70 @@
    Banco: Loja Aurora. Lições + desafios com correção automática.
    ========================================================================== */
 
-let db = null;
-const $ = s => document.querySelector(s);
-const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+import { sb, configurado, sessao, esc } from './sindicato.js';
 
-/* ---------- liga o motor ---------- */
-initSqlJs({ locateFile: f => 'assets/sqljs/' + f })
-  .then(SQL => {
-    db = new SQL.Database();
-    db.run(window.AURORA_SQL);
-    $('#motor').remove();
-    $('#progresso').hidden = false;
-    ligarConsole();
-    montarConteudo();
-    rodarNaSaida($('#sqlLivre').value, $('#saidaLivre'));
-  })
-  .catch(e => {
-    $('#motor').innerHTML = 'Não consegui ligar o banco. Recarregue a página (F5). Detalhe: ' + esc(e.message || e);
-  });
+let db = null;
+let eu = null;                    // ficha do aluno que entrou
+const $ = s => document.querySelector(s);
+
+/* ---------- porta: o laboratório é só para quem entrou ---------- */
+function barrar(titulo, texto, rotulo = 'Entrar') {
+  const m = $('#motor'); if (m) m.remove();
+  const porta = $('#portaLab');
+  porta.hidden = false;
+  porta.innerHTML = `
+    <h2>${esc(titulo)}</h2>
+    <p>${esc(texto)}</p>
+    <div class="acoes">
+      <a class="btn" href="entrar.html?vai=laboratorio.html">${esc(rotulo)}</a>
+      <a class="btn vazado" href="index.html">Voltar ao início</a>
+    </div>`;
+}
+
+async function abrir() {
+  if (!configurado) {
+    return barrar('O cadastro ainda não foi ligado',
+      'Quem cuida do site precisa preencher as chaves do Supabase em assets/config.js.');
+  }
+
+  let dados;
+  try { dados = await sessao(); }
+  catch { return barrar('Não deu para falar com o servidor', 'Confira a internet e recarregue a página.'); }
+
+  if (!dados.user) {
+    return barrar('Entre para começar',
+      'O laboratório guarda o seu progresso na sua ficha, então precisa saber quem é você. ' +
+      'Assim você fecha o navegador, troca de computador e continua de onde parou.');
+  }
+  if (!dados.perfil?.filiado) {
+    return barrar('Sua ficha não foi carimbada',
+      'A conta existe, mas falta digitar o código da turma.', 'Informar o código');
+  }
+
+  eu = dados.perfil;
+  await ligarMotor();
+}
+
+function ligarMotor() {
+  return initSqlJs({ locateFile: f => 'assets/sqljs/' + f })
+    .then(async SQL => {
+      db = new SQL.Database();
+      db.run(window.AURORA_SQL);
+      await carregarProgresso();
+      $('#motor').remove();
+      $('#areaLab').hidden = false;
+      $('#progresso').hidden = false;
+      ligarConsole();
+      montarEsquema();
+      montarConteudo();
+      rodarNaSaida($('#sqlLivre').value, $('#saidaLivre'));
+    })
+    .catch(e => {
+      $('#motor').innerHTML = 'Não consegui ligar o banco. Recarregue a página (F5). Detalhe: ' + esc(e.message || e);
+    });
+}
+
+abrir();
 
 /* ---------- executar SQL ---------- */
 function exec(sql) {
@@ -54,6 +100,46 @@ function ligarConsole() {
   $('#sqlLivre').addEventListener('keydown', e => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); rodarNaSaida($('#sqlLivre').value, $('#saidaLivre')); }
   });
+}
+
+
+/* ==========================================================================
+   O BANCO NA TELA — lê a estrutura do próprio banco, em vez de repetir a
+   lista à mão. Assim nenhuma coluna fica de fora quando o banco mudar.
+   ========================================================================== */
+function montarEsquema() {
+  const alvo = $('#tabelas');
+  if (!alvo) return;
+
+  const tabelas = exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY rowid;")
+    .values.map(l => l[0]);
+
+  const html = tabelas.map(t => {
+    const colunas = exec(`PRAGMA table_info(${t});`);
+    const iNome = colunas.columns.indexOf('name');
+    const iPk   = colunas.columns.indexOf('pk');
+
+    /* quais colunas apontam para outra tabela */
+    const fks = new Set();
+    try {
+      const r = exec(`PRAGMA foreign_key_list(${t});`);
+      const iFrom = r.columns.indexOf('from');
+      r.values.forEach(l => fks.add(l[iFrom]));
+    } catch { /* tabela sem chave estrangeira */ }
+
+    const itens = colunas.values.map(l => {
+      const nome = l[iNome];
+      const classe = l[iPk] ? 'pk' : (fks.has(nome) ? 'fk' : '');
+      return `<li${classe ? ` class="${classe}"` : ''}>${esc(nome)}</li>`;
+    }).join('');
+
+    const n = exec(`SELECT COUNT(*) FROM ${t};`).values[0][0];
+    return `<div class="tabela"><h4>${esc(t)} <small>${n}</small></h4><ul>${itens}</ul></div>`;
+  }).join('');
+
+  alvo.innerHTML = html;
+  const cab = $('#bancoCab');
+  if (cab) cab.textContent = `O banco: ${tabelas.length} tabelas`;
 }
 
 /* ---------- conferir desafio ---------- */
@@ -135,6 +221,8 @@ const MODULOS = [
           { p: 'Liste nome e telefone dos clientes que <b>têm</b> telefone.', r: 'SELECT nome, telefone FROM clientes WHERE telefone IS NOT NULL;', dica: 'IS NOT NULL' },
           { p: 'Mostre o nome de todos os clientes e o telefone; onde não houver telefone, mostre o texto <b>sem telefone</b>.', r: "SELECT nome, COALESCE(telefone, 'sem telefone') FROM clientes;", dica: "COALESCE(telefone, 'sem telefone')" },
           { p: 'Conte <b>quantos clientes estão sem telefone</b>.', r: 'SELECT COUNT(*) FROM clientes WHERE telefone IS NULL;', dica: 'COUNT(*) com WHERE ... IS NULL' }
+        ,
+          { p: 'Mostre nome e cidade dos <b>clientes sem telefone que moram em Vila Velha</b>.', r: "SELECT nome, cidade FROM clientes WHERE telefone IS NULL AND cidade = 'Vila Velha';", dica: 'IS NULL combinado com AND' }
         ]
       }
     ]
@@ -155,6 +243,12 @@ const MODULOS = [
           { p: 'Mostre o <b>produto mais barato</b> do catálogo (nome e preço, só uma linha).', r: 'SELECT nome, preco FROM produtos ORDER BY preco ASC LIMIT 1;', ordenado: true, dica: 'ORDER BY preco ASC LIMIT 1' }
         ,
           { p: 'Liste os clientes ordenados <b>por cidade (A-Z) e, dentro da cidade, por nome (A-Z)</b>.', r: 'SELECT nome, cidade FROM clientes ORDER BY cidade ASC, nome ASC;', ordenado: true, dica: 'ORDER BY cidade, nome' }
+        ,
+          { p: 'Mostre os <b>5 clientes cadastrados mais recentemente</b> (nome e data de cadastro).', r: 'SELECT nome, data_cadastro FROM clientes ORDER BY data_cadastro DESC LIMIT 5;', ordenado: true, dica: 'ORDER BY data_cadastro DESC LIMIT 5' }
+        ,
+          { p: 'Liste os produtos do <b>menor para o maior estoque</b>, mostrando nome, categoria e estoque.', r: 'SELECT nome, categoria, estoque FROM produtos ORDER BY estoque ASC;', ordenado: true, dica: 'ORDER BY estoque ASC' }
+        ,
+          { p: 'Mostre os <b>3 pedidos mais antigos</b> (id e data).', r: 'SELECT id_pedido, data_pedido FROM pedidos ORDER BY data_pedido ASC LIMIT 3;', ordenado: true, dica: 'ORDER BY data_pedido ASC LIMIT 3' }
         ]
       },
       {
@@ -168,6 +262,10 @@ const MODULOS = [
           { p: 'Liste os <b>status diferentes</b> que um pedido pode ter neste banco.', r: 'SELECT DISTINCT status FROM pedidos;', dica: 'SELECT DISTINCT status FROM pedidos;' }
         ,
           { p: 'Liste as <b>combinações diferentes de cidade e status</b> que aparecem nos clientes.', r: 'SELECT DISTINCT cidade, status_cliente FROM clientes;', dica: 'DISTINCT vale para o conjunto das colunas listadas.' }
+        ,
+          { p: 'Liste os <b>status diferentes</b> que um cliente pode ter.', r: 'SELECT DISTINCT status_cliente FROM clientes;', dica: 'DISTINCT status_cliente' }
+        ,
+          { p: 'Descubra <b>quantos clientes diferentes já fizeram pedido</b>.', r: 'SELECT COUNT(DISTINCT id_cliente) FROM pedidos;', dica: 'COUNT(DISTINCT id_cliente)' }
         ]
       },
       {
@@ -184,6 +282,14 @@ const MODULOS = [
           { p: 'Mostre os produtos cujo nome <b>contém a palavra Neon</b>.', r: "SELECT nome FROM produtos WHERE nome LIKE '%Neon%';", dica: "LIKE '%Neon%'" }
         ,
           { p: 'Mostre nome e estoque dos produtos com <b>estoque entre 50 e 100</b>.', r: 'SELECT nome, estoque FROM produtos WHERE estoque BETWEEN 50 AND 100;', dica: 'BETWEEN 50 AND 100' }
+        ,
+          { p: 'Mostre o nome dos clientes cujo nome <b>começa com a letra M</b>.', r: "SELECT nome FROM clientes WHERE nome LIKE 'M%';", dica: "LIKE 'M%'" }
+        ,
+          { p: 'Mostre nome e preço dos produtos que <b>não</b> são de Papelaria, usando NOT IN.', r: "SELECT nome, preco FROM produtos WHERE categoria NOT IN ('Papelaria');", dica: "categoria NOT IN ('Papelaria')" }
+        ,
+          { p: 'Mostre os pedidos feitos <b>no segundo trimestre</b> (data entre 2026-04-01 e 2026-06-30), com id e data.', r: "SELECT id_pedido, data_pedido FROM pedidos WHERE data_pedido BETWEEN '2026-04-01' AND '2026-06-30';", dica: 'BETWEEN funciona com datas em texto AAAA-MM-DD' }
+        ,
+          { p: 'Mostre nome e cidade dos clientes que <b>não</b> moram em Vitoria nem em Serra.', r: "SELECT nome, cidade FROM clientes WHERE cidade NOT IN ('Vitoria','Serra');", dica: "NOT IN ('Vitoria','Serra')" }
         ]
       }
     ,
@@ -197,6 +303,14 @@ const MODULOS = [
           { p: 'Monte uma coluna única no formato <b>nome - cidade</b> para cada cliente (com espaço, hífen, espaço).', r: "SELECT nome || ' - ' || cidade FROM clientes;", dica: "No SQLite: a || ' - ' || b. No MySQL seria CONCAT(a,' - ',b)." },
           { p: 'Mostre o <b>ano de cada pedido</b> junto com o id (use os 4 primeiros caracteres da data).', r: 'SELECT id_pedido, SUBSTR(data_pedido, 1, 4) FROM pedidos;', dica: 'SUBSTR(data_pedido, 1, 4)' },
           { p: 'Conte <b>quantos pedidos houve em cada mês</b> (use os 7 primeiros caracteres da data, tipo 2026-04), do mês mais movimentado para o menos.', r: 'SELECT SUBSTR(data_pedido,1,7) AS mes, COUNT(*) AS qtd FROM pedidos GROUP BY mes ORDER BY qtd DESC, mes ASC;', dica: 'Agrupe por SUBSTR(data_pedido,1,7)' }
+        ,
+          { p: 'Mostre a <b>categoria em minúsculas</b> de cada produto, junto com o nome.', r: 'SELECT nome, LOWER(categoria) FROM produtos;', dica: 'LOWER(categoria)' }
+        ,
+          { p: 'Mostre o nome dos clientes cujo <b>nome tem mais de 12 letras</b>.', r: 'SELECT nome FROM clientes WHERE LENGTH(nome) > 12;', dica: 'WHERE LENGTH(nome) > 12' }
+        ,
+          { p: 'Monte uma etiqueta no formato <b>produto (categoria)</b> para cada produto.', r: "SELECT nome || ' (' || categoria || ')' FROM produtos;", dica: 'Junte com || e não esqueça os parênteses dentro das aspas.' }
+        ,
+          { p: 'Mostre <b>quantos pedidos houve em cada ano</b> (use os 4 primeiros caracteres da data).', r: 'SELECT SUBSTR(data_pedido,1,4) AS ano, COUNT(*) FROM pedidos GROUP BY ano;', dica: 'GROUP BY SUBSTR(data_pedido,1,4)' }
         ]
       }
     ,
@@ -207,6 +321,10 @@ const MODULOS = [
         desafios: [
           { p: 'Mostre a <b>segunda página</b> da lista de clientes em ordem alfabética, com 5 por página (ou seja: pule 5 e traga 5).', r: 'SELECT nome FROM clientes ORDER BY nome LIMIT 5 OFFSET 5;', ordenado: true, dica: 'ORDER BY nome LIMIT 5 OFFSET 5' },
           { p: 'Mostre o <b>segundo produto mais caro</b> (só ele: pule o primeiro e traga um).', r: 'SELECT nome, preco FROM produtos ORDER BY preco DESC LIMIT 1 OFFSET 1;', ordenado: true, dica: 'ORDER BY preco DESC LIMIT 1 OFFSET 1' }
+        ,
+          { p: 'Mostre a <b>terceira página</b> dos produtos em ordem alfabética, com 4 por página.', r: 'SELECT nome FROM produtos ORDER BY nome LIMIT 4 OFFSET 8;', ordenado: true, dica: 'Página 3 com 4 por página: pula 8.' }
+        ,
+          { p: 'Mostre do <b>terceiro ao quinto cliente</b> em ordem alfabética.', r: 'SELECT nome FROM clientes ORDER BY nome LIMIT 3 OFFSET 2;', ordenado: true, dica: 'Pula 2 e traz 3.' }
         ]
       }
     ]
@@ -231,6 +349,12 @@ const MODULOS = [
           { p: 'Descubra <b>quantas unidades foram vendidas ao todo</b> (soma das quantidades de todos os itens).', r: 'SELECT SUM(quantidade) FROM itens_pedido;', dica: 'SUM(quantidade) na tabela de itens' }
         ,
           { p: 'Descubra a <b>média de itens por pedido</b>: conte as linhas de itens e divida pelo número de pedidos diferentes que aparecem lá.', r: 'SELECT COUNT(*) * 1.0 / COUNT(DISTINCT id_pedido) FROM itens_pedido;', dica: 'COUNT(*) * 1.0 / COUNT(DISTINCT id_pedido) — o 1.0 evita divisão inteira.' }
+        ,
+          { p: 'Descubra a <b>quantidade média por item vendido</b>, arredondada em 2 casas.', r: 'SELECT ROUND(AVG(quantidade), 2) FROM itens_pedido;', dica: 'ROUND(AVG(quantidade), 2)' }
+        ,
+          { p: 'Descubra <b>quantos produtos custam mais de 20</b>.', r: 'SELECT COUNT(*) FROM produtos WHERE preco > 20;', dica: 'COUNT(*) com WHERE' }
+        ,
+          { p: 'Descubra o <b>maior e o menor preço unitário</b> já praticado numa venda (duas colunas).', r: 'SELECT MAX(preco_unit), MIN(preco_unit) FROM itens_pedido;', dica: 'Dá para pedir MAX e MIN na mesma consulta.' }
         ]
       },
       {
@@ -252,6 +376,14 @@ const MODULOS = [
           { p: 'Mostre o <b>preço mais caro de cada categoria</b> (categoria e o maior preço).', r: 'SELECT categoria, MAX(preco) FROM produtos GROUP BY categoria;', dica: 'MAX(preco) com GROUP BY categoria' }
         ,
           { p: "Mostre <b>quantos pedidos houve em cada status, apenas a partir de julho</b> (data &gt;= '2026-07-01').", r: "SELECT status, COUNT(*) FROM pedidos WHERE data_pedido >= '2026-07-01' GROUP BY status;", dica: 'WHERE filtra antes; GROUP BY agrupa depois.' }
+        ,
+          { p: 'Mostre <b>quantos clientes há em cada status</b> (ativo e inativo).', r: 'SELECT status_cliente, COUNT(*) FROM clientes GROUP BY status_cliente;', dica: 'GROUP BY status_cliente' }
+        ,
+          { p: 'Mostre a <b>média de preço unitário por produto</b> vendido (id do produto e a média arredondada em 2 casas).', r: 'SELECT id_produto, ROUND(AVG(preco_unit), 2) FROM itens_pedido GROUP BY id_produto;', dica: 'AVG(preco_unit) com GROUP BY id_produto' }
+        ,
+          { p: 'Mostre <b>quanto cada pedido somou</b> em dinheiro (id do pedido e a soma de quantidade × preço unitário), do maior para o menor.', r: 'SELECT id_pedido, SUM(quantidade * preco_unit) AS total FROM itens_pedido GROUP BY id_pedido ORDER BY total DESC;', ordenado: true, dica: 'SUM(quantidade * preco_unit) agrupado por pedido' }
+        ,
+          { p: 'Mostre <b>quantos produtos diferentes cada categoria tem e o estoque médio</b> de cada uma (três colunas).', r: 'SELECT categoria, COUNT(*) AS itens, ROUND(AVG(estoque), 1) AS estoque_medio FROM produtos GROUP BY categoria;', dica: 'Dá para pedir várias agregações de uma vez.' }
         ]
       }
     ,
@@ -264,6 +396,10 @@ const MODULOS = [
           { p: 'Mostre o <b>preço médio por categoria arredondado com 2 casas</b>.', r: 'SELECT categoria, ROUND(AVG(preco), 2) FROM produtos GROUP BY categoria;', dica: 'ROUND(AVG(preco), 2)' },
           { p: 'Simule uma <b>promoção de 10% de desconto</b>: mostre o nome, o preço atual e o preço com desconto arredondado em 2 casas.', r: 'SELECT nome, preco, ROUND(preco * 0.9, 2) AS promocional FROM produtos;', dica: 'preco * 0.9 dentro do ROUND' },
           { p: 'Mostre o <b>total de cada linha de item</b> vendida: id do pedido, id do produto e quantidade × preço unitário.', r: 'SELECT id_pedido, id_produto, quantidade * preco_unit AS total FROM itens_pedido;', dica: 'quantidade * preco_unit' }
+        ,
+          { p: 'Mostre o nome do produto e <b>quanto sobraria no caixa</b> se vendesse metade do estoque pelo preço atual (arredonde em 2 casas).', r: 'SELECT nome, ROUND(preco * estoque / 2.0, 2) AS metade FROM produtos;', dica: 'Use 2.0 para não fazer divisão inteira.' }
+        ,
+          { p: 'Mostre nome, preço e o <b>preço com 15% de aumento</b>, arredondado em 2 casas.', r: 'SELECT nome, preco, ROUND(preco * 1.15, 2) AS reajustado FROM produtos;', dica: 'preco * 1.15' }
         ]
       }
     ,
@@ -276,6 +412,12 @@ const MODULOS = [
           { p: "Mostre o nome do cliente e uma coluna dizendo <b>'tem telefone'</b> ou <b>'sem telefone'</b>.", r: "SELECT nome, CASE WHEN telefone IS NULL THEN 'sem telefone' ELSE 'tem telefone' END AS contato FROM clientes;", dica: 'CASE WHEN telefone IS NULL THEN ... ELSE ... END' },
           { p: 'Conte, numa <b>linha só</b>, quantos pedidos estão pagos e quantos estão cancelados (duas colunas).', r: "SELECT SUM(CASE WHEN status = 'pago' THEN 1 ELSE 0 END) AS pagos, SUM(CASE WHEN status = 'cancelado' THEN 1 ELSE 0 END) AS cancelados FROM pedidos;", dica: 'SUM(CASE WHEN ... THEN 1 ELSE 0 END) — conta só o que bate' },
           { p: 'Para cada cidade, mostre <b>quantos clientes têm telefone</b> e quantos não têm (cidade e as duas contagens).', r: 'SELECT cidade, SUM(CASE WHEN telefone IS NOT NULL THEN 1 ELSE 0 END) AS com, SUM(CASE WHEN telefone IS NULL THEN 1 ELSE 0 END) AS sem FROM clientes GROUP BY cidade;', dica: 'Dois SUM(CASE ...) e um GROUP BY cidade' }
+        ,
+          { p: "Classifique cada pedido: 'fechado' quando o status for pago ou enviado, senão 'em aberto'. Mostre o id e a classificação.", r: "SELECT id_pedido, CASE WHEN status IN ('pago','enviado') THEN 'fechado' ELSE 'em aberto' END AS situacao FROM pedidos;", dica: "CASE WHEN status IN ('pago','enviado') THEN ... ELSE ... END" }
+        ,
+          { p: "Mostre cada produto com o rótulo <b>'em falta'</b> quando o estoque for menor que 20, e <b>'ok'</b> nos demais.", r: "SELECT nome, estoque, CASE WHEN estoque < 20 THEN 'em falta' ELSE 'ok' END AS aviso FROM produtos;", dica: "CASE WHEN estoque < 20 THEN 'em falta' ELSE 'ok' END" }
+        ,
+          { p: 'Conte <b>quantos produtos há em cada faixa de preço</b>: até 10, de 10 a 30, e acima de 30 (faixa e contagem).', r: "SELECT CASE WHEN preco <= 10 THEN 'ate 10' WHEN preco <= 30 THEN '10 a 30' ELSE 'acima de 30' END AS faixa, COUNT(*) FROM produtos GROUP BY faixa;", dica: 'Dá para agrupar pelo apelido da coluna criada com CASE.' }
         ]
       }
     ]
@@ -301,6 +443,12 @@ const MODULOS = [
           { p: 'Mostre as <b>categorias que têm mais de 2 produtos</b> (categoria e a contagem).', r: 'SELECT categoria, COUNT(*) FROM produtos GROUP BY categoria HAVING COUNT(*) > 2;', dica: 'HAVING COUNT(*) > 2' }
         ,
           { p: 'Mostre os <b>produtos que venderam mais de 20 unidades no total</b> (id do produto e a soma).', r: 'SELECT id_produto, SUM(quantidade) AS un FROM itens_pedido GROUP BY id_produto HAVING SUM(quantidade) > 20;', dica: 'GROUP BY id_produto HAVING SUM(quantidade) > 20' }
+        ,
+          { p: 'Mostre as <b>cidades onde o total de clientes sem telefone é 2 ou mais</b> (cidade e a contagem).', r: 'SELECT cidade, COUNT(*) FROM clientes WHERE telefone IS NULL GROUP BY cidade HAVING COUNT(*) >= 2;', dica: 'WHERE filtra as linhas sem telefone; HAVING filtra os grupos.' }
+        ,
+          { p: 'Mostre os <b>pedidos que somaram mais de 200 reais</b> (id do pedido e o total).', r: 'SELECT id_pedido, SUM(quantidade * preco_unit) AS total FROM itens_pedido GROUP BY id_pedido HAVING SUM(quantidade * preco_unit) > 200;', dica: 'HAVING SUM(quantidade * preco_unit) > 200' }
+        ,
+          { p: 'Mostre os <b>meses com mais de 5 pedidos</b> (mês no formato 2026-04 e a contagem).', r: 'SELECT SUBSTR(data_pedido,1,7) AS mes, COUNT(*) AS qtd FROM pedidos GROUP BY mes HAVING COUNT(*) > 5;', dica: 'Agrupe pelo mês e use HAVING COUNT(*) > 5' }
         ]
       },
       {
@@ -318,6 +466,12 @@ const MODULOS = [
           { p: '<b>Três tabelas de uma vez:</b> mostre o nome do cliente, o nome do produto e a quantidade, ligando pedidos, clientes, itens e produtos.', r: 'SELECT c.nome, pr.nome, i.quantidade FROM pedidos p JOIN clientes c ON c.id_cliente = p.id_cliente JOIN itens_pedido i ON i.id_pedido = p.id_pedido JOIN produtos pr ON pr.id_produto = i.id_produto;', dica: 'Dá para encadear vários JOIN, um depois do outro.' }
         ,
           { p: 'Mostre <b>quanto cada cliente já gastou</b> ao todo: nome e a soma de quantidade × preço unitário, do que mais gastou para o que menos gastou.', r: 'SELECT c.nome, SUM(i.quantidade * i.preco_unit) AS gasto FROM clientes c JOIN pedidos p ON p.id_cliente = c.id_cliente JOIN itens_pedido i ON i.id_pedido = p.id_pedido GROUP BY c.id_cliente, c.nome ORDER BY gasto DESC;', ordenado: true, dica: 'JOIN das três tabelas, GROUP BY pelo cliente e ORDER BY a soma.' }
+        ,
+          { p: 'Mostre o <b>nome do cliente e a data</b> dos pedidos ainda em aberto.', r: "SELECT c.nome, p.data_pedido FROM pedidos p JOIN clientes c ON c.id_cliente = p.id_cliente WHERE p.status = 'aberto';", dica: "JOIN e depois WHERE p.status = 'aberto'" }
+        ,
+          { p: 'Mostre <b>quantos pedidos cada cidade fez</b> (cidade e a contagem), da que mais pediu para a que menos pediu.', r: 'SELECT c.cidade, COUNT(*) AS pedidos FROM pedidos p JOIN clientes c ON c.id_cliente = p.id_cliente GROUP BY c.cidade ORDER BY pedidos DESC;', ordenado: true, dica: 'JOIN e GROUP BY pela cidade do cliente' }
+        ,
+          { p: 'Mostre <b>quanto cada categoria faturou</b> (categoria e a soma de quantidade × preço unitário), do maior para o menor.', r: 'SELECT pr.categoria, SUM(i.quantidade * i.preco_unit) AS receita FROM itens_pedido i JOIN produtos pr ON pr.id_produto = i.id_produto GROUP BY pr.categoria ORDER BY receita DESC;', ordenado: true, dica: 'JOIN com produtos e GROUP BY pr.categoria' }
         ]
       }
     ,
@@ -330,6 +484,10 @@ const MODULOS = [
           { p: 'Liste o nome dos <b>produtos que nunca foram vendidos</b>.', r: 'SELECT pr.nome FROM produtos pr LEFT JOIN itens_pedido i ON i.id_produto = pr.id_produto WHERE i.id_produto IS NULL;', dica: 'LEFT JOIN com itens_pedido e IS NULL' },
           { p: 'Mostre <b>todos os clientes</b> e quantos pedidos cada um fez — inclusive os que fizeram zero (nome e a contagem).', r: 'SELECT c.nome, COUNT(p.id_pedido) AS pedidos FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente GROUP BY c.id_cliente, c.nome;', dica: 'COUNT(p.id_pedido) conta só o que existe; COUNT(*) contaria a linha vazia também.' },
           { p: 'Mostre <b>todos os produtos</b> e o total de unidades vendidas de cada um, colocando <b>0</b> onde nunca vendeu.', r: 'SELECT pr.nome, COALESCE(SUM(i.quantidade), 0) AS vendidas FROM produtos pr LEFT JOIN itens_pedido i ON i.id_produto = pr.id_produto GROUP BY pr.id_produto, pr.nome;', dica: 'COALESCE(SUM(i.quantidade), 0)' }
+        ,
+          { p: 'Mostre <b>todos os clientes com o total que já gastaram</b>, colocando 0 em quem nunca comprou.', r: 'SELECT c.nome, COALESCE(SUM(i.quantidade * i.preco_unit), 0) AS gasto FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente LEFT JOIN itens_pedido i ON i.id_pedido = p.id_pedido GROUP BY c.id_cliente, c.nome;', dica: 'Dois LEFT JOIN encadeados e COALESCE na soma.' }
+        ,
+          { p: 'Conte <b>quantos clientes nunca fizeram pedido</b>.', r: 'SELECT COUNT(*) FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente WHERE p.id_pedido IS NULL;', dica: 'COUNT(*) sobre o LEFT JOIN com IS NULL' }
         ]
       }
     ,
@@ -343,6 +501,12 @@ const MODULOS = [
           { p: 'Mostre o nome dos <b>clientes que nunca fizeram pedido</b>, agora com <b>NOT IN</b> em vez de LEFT JOIN.', r: 'SELECT nome FROM clientes WHERE id_cliente NOT IN (SELECT id_cliente FROM pedidos);', dica: 'NOT IN (SELECT id_cliente FROM pedidos)' },
           { p: 'Mostre o produto <b>mais caro do catálogo</b> comparando com o preço máximo (nome e preço).', r: 'SELECT nome, preco FROM produtos WHERE preco = (SELECT MAX(preco) FROM produtos);', dica: 'WHERE preco = (SELECT MAX(preco) FROM produtos)' },
           { p: 'Mostre o nome dos clientes com <b>estoque de pedidos acima da média de pedidos por cliente</b>: primeiro conte os pedidos por cliente, depois compare com a média dessas contagens.', r: 'SELECT c.nome FROM clientes c WHERE (SELECT COUNT(*) FROM pedidos p WHERE p.id_cliente = c.id_cliente) > (SELECT COUNT(*) * 1.0 / COUNT(DISTINCT id_cliente) FROM pedidos);', dica: 'Uma subconsulta conta os pedidos do cliente; a outra calcula a média geral.' }
+        ,
+          { p: 'Mostre os produtos com <b>estoque abaixo da média</b> do catálogo (nome e estoque).', r: 'SELECT nome, estoque FROM produtos WHERE estoque < (SELECT AVG(estoque) FROM produtos);', dica: 'WHERE estoque < (SELECT AVG(estoque) FROM produtos)' }
+        ,
+          { p: 'Mostre o nome dos <b>clientes que nunca tiveram pedido cancelado</b>, usando NOT IN.', r: "SELECT nome FROM clientes WHERE id_cliente NOT IN (SELECT id_cliente FROM pedidos WHERE status = 'cancelado');", dica: 'NOT IN com a lista de quem teve cancelamento' }
+        ,
+          { p: 'Mostre nome e preço dos produtos que custam <b>mais que o produto mais caro da Papelaria</b>.', r: "SELECT nome, preco FROM produtos WHERE preco > (SELECT MAX(preco) FROM produtos WHERE categoria = 'Papelaria');", dica: 'A subconsulta acha o teto da Papelaria.' }
         ]
       }
     ,
@@ -353,6 +517,8 @@ const MODULOS = [
         desafios: [
           { p: "Monte <b>uma lista só</b> com o nome dos produtos abaixo de 5 (marcados como 'barato') e acima de 35 (marcados como 'caro').", r: "SELECT nome, 'barato' AS faixa FROM produtos WHERE preco < 5 UNION SELECT nome, 'caro' FROM produtos WHERE preco > 35;", dica: 'Duas consultas com o mesmo número de colunas, ligadas por UNION' },
           { p: 'Monte uma <b>agenda única</b> com o nome e a cidade de todos os clientes de Serra e de Guarapari, usando UNION.', r: "SELECT nome, cidade FROM clientes WHERE cidade = 'Serra' UNION SELECT nome, cidade FROM clientes WHERE cidade = 'Guarapari';", dica: 'Duas consultas ligadas por UNION' }
+        ,
+          { p: "Monte uma lista única com o nome dos <b>clientes de Vitoria</b> marcados como 'capital' e os <b>de Vila Velha</b> marcados como 'vizinha'.", r: "SELECT nome, 'capital' AS origem FROM clientes WHERE cidade = 'Vitoria' UNION SELECT nome, 'vizinha' FROM clientes WHERE cidade = 'Vila Velha';", dica: 'Duas consultas com duas colunas cada, ligadas por UNION' }
         ]
       }
     ]
@@ -360,35 +526,90 @@ const MODULOS = [
 ];
 
 /* ==========================================================================
-   PROGRESSO SALVO — o aluno pode fechar a aba e voltar no dia seguinte.
-   Fica no navegador dele (localStorage), não no servidor.
+   PROGRESSO — fica na ficha do aluno, no banco, e também no navegador.
+
+   O navegador serve de rascunho rápido e de rede de segurança quando a
+   internet cai; o banco é o que garante continuar em outra máquina.
    ========================================================================== */
 const CHAVE = 'lab-aurora-v1';
+let resolvidos = new Set();
+let rascunhos = {};
 
-function lerEstado() {
+function lerLocal() {
   try {
     const bruto = localStorage.getItem(CHAVE);
     if (!bruto) return { feitos: [], rascunhos: {} };
     const e = JSON.parse(bruto);
     return { feitos: e.feitos || [], rascunhos: e.rascunhos || {} };
-  } catch { return { feitos: [], rascunhos: {} }; }   // aba anônima, cota cheia
+  } catch { return { feitos: [], rascunhos: {} }; }
 }
 
-function salvarEstado() {
+function salvarLocal() {
   try {
-    localStorage.setItem(CHAVE, JSON.stringify({
-      feitos: [...resolvidos],
-      rascunhos,
-      em: new Date().toISOString()
-    }));
-  } catch { /* sem espaço ou sem permissão: segue sem salvar */ }
+    localStorage.setItem(CHAVE, JSON.stringify({ feitos: [...resolvidos], rascunhos }));
+  } catch { /* aba anônima ou cota cheia: segue só com o banco */ }
+}
+
+/** Junta o que veio do banco com o que estava neste navegador. */
+async function carregarProgresso() {
+  const local = lerLocal();
+  resolvidos = new Set(local.feitos);
+  rascunhos = { ...local.rascunhos };
+
+  try {
+    const { data } = await sb.from('lab_progresso')
+      .select('feitos, rascunhos').eq('perfil_id', eu.id).maybeSingle();
+    if (data) {
+      (data.feitos || []).forEach(id => resolvidos.add(id));
+      /* o rascunho do banco só entra onde este navegador não tem nada */
+      for (const [id, txt] of Object.entries(data.rascunhos || {})) {
+        if (!rascunhos[id]) rascunhos[id] = txt;
+      }
+    }
+  } catch (e) {
+    console.warn('Não consegui buscar o progresso guardado:', e.message || e);
+  }
+}
+
+let esperaBanco;
+function salvarEstado() {
+  salvarLocal();
+  clearTimeout(esperaBanco);
+  esperaBanco = setTimeout(gravarNoBanco, 1200);   // não grava a cada tecla
+}
+
+/** Grava já, sem esperar o intervalo. */
+function gravarAgora() {
+  clearTimeout(esperaBanco);
+  salvarLocal();
+  return gravarNoBanco();
+}
+
+/* Fechar a aba, trocar de janela ou apagar a tela do celular grava na hora.
+   Sem isto, o que foi respondido nos últimos segundos ficaria só no navegador
+   — e é justamente aí que o aluno costuma perder trabalho. */
+addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') gravarAgora();
+});
+addEventListener('pagehide', gravarAgora);
+
+async function gravarNoBanco() {
+  if (!sb || !eu) return;
+  const marca = $('#marcaSalvo');
+  try {
+    const { error } = await sb.from('lab_progresso').upsert({
+      perfil_id: eu.id, feitos: [...resolvidos], rascunhos
+    }, { onConflict: 'perfil_id' });
+    if (error) throw error;
+    if (marca) { marca.textContent = 'progresso guardado'; marca.className = 'marca-salvo bom'; }
+  } catch (e) {
+    if (marca) { marca.textContent = 'sem guardar — confira a internet'; marca.className = 'marca-salvo ruim'; }
+    console.warn('Falhou ao guardar no banco:', e.message || e);
+  }
 }
 
 /* ---------- render ---------- */
 let totalDesafios = 0;
-const estadoSalvo = lerEstado();
-const resolvidos = new Set(estadoSalvo.feitos);
-const rascunhos = estadoSalvo.rascunhos;
 
 function montarConteudo() {
   const alvo = $('#conteudo');
@@ -514,9 +735,11 @@ function ligarInteracoes() {
   });
 }
 
-function recomecar() {
-  if (!confirm('Isto apaga o seu progresso e as consultas que você escreveu. Continuar?')) return;
+async function recomecar() {
+  if (!confirm('Isto apaga o seu progresso e as consultas que você escreveu, aqui e na sua ficha. Continuar?')) return;
   try { localStorage.removeItem(CHAVE); } catch {}
+  resolvidos = new Set(); rascunhos = {};
+  try { await gravarNoBanco(); } catch {}
   location.reload();
 }
 

@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="assets/base.css">
 <style>
 .palco{padding:26px 0 70px}
-.lab-intro{max-width:70ch}
+.lab-intro{max-width:none}
 .lab-intro p{font-size:17.5px;color:var(--tinta-fraca);margin-bottom:12px}
 
 /* estado de carregamento do motor */
@@ -23,14 +23,26 @@
 
 /* painel do banco */
 .banco{border:2px solid var(--tinta);background:var(--papel);margin:22px 0}
+.marca-salvo{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--tinta-fraca);white-space:nowrap}
+.marca-salvo.bom{color:#3F6B3A}
+.marca-salvo.ruim{color:var(--carimbo)}
+.porta-lab{
+  border:2px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);background:var(--papel);
+  padding:28px 26px 30px;max-width:680px;margin:26px 0
+}
+.porta-lab h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:28px;line-height:1.05;margin-bottom:8px}
+.porta-lab p{color:var(--tinta-fraca);font-size:17px;margin-bottom:8px}
+.porta-lab .acoes{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.banco-pe{font-size:13.5px;color:var(--tinta-fraca);padding:10px 14px 0;margin:0}
 .banco-cab{background:var(--tinta);color:var(--papel);padding:10px 16px;font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:15px}
 .tabelas{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0}
 .tabela{border-top:1px solid var(--papel-linha);padding:12px 16px}
 .tabela:nth-child(n+3){border-top:1px solid var(--tinta)}
 .tabela h4{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--carimbo);margin-bottom:6px}
 .tabela ul{list-style:none;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--tinta-fraca);line-height:1.7}
-.tabela .pk{color:var(--carimbo);font-weight:700}
-.tabela .fk{color:var(--latao);font-weight:700}
+.tabela h4 small{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:400;color:var(--tinta-fraca);margin-left:5px}
+.tabela .pk,.banco-pe .pk{color:var(--carimbo);font-weight:700}
+.tabela .fk,.banco-pe .fk{color:var(--latao);font-weight:700}
 
 /* console */
 .console{border:2px solid var(--tinta);box-shadow:6px 6px 0 var(--tinta);background:var(--papel);margin:22px 0}
@@ -61,7 +73,7 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
 
 .licao{border-left:3px solid var(--borda);padding:14px 0 14px 18px;margin:24px 0}
 .licao h3{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:20px;margin-bottom:8px}
-.licao>p{font-size:16.5px;color:var(--tinta);margin-bottom:10px;max-width:68ch}
+.licao>p{font-size:16.5px;color:var(--tinta);margin-bottom:10px;max-width:none}
 /* o enunciado do caso mora dentro da lição, mas não é leitura corrida:
    é uma linha curta numa caixa, e fica melhor ocupando a largura toda */
 .desafio-corpo p{max-width:none}
@@ -91,7 +103,7 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
 #btnRecomecar{margin-left:auto;flex:none}
 .salvo-aviso{
   font-size:14.5px;color:var(--tinta-fraca);margin:-8px 0 22px;
-  border-left:3px solid var(--borda);padding:2px 0 2px 12px;max-width:76ch
+  border-left:3px solid var(--borda);padding:2px 0 2px 12px;max-width:none
 }
 
 @media(max-width:860px){
@@ -114,6 +126,12 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
   </div>
 
   <h1 class="titulo">O <em>Laboratório</em></h1>
+  <!-- quem não entrou para aqui -->
+  <div class="porta-lab" id="portaLab" hidden></div>
+
+  <!-- daqui para baixo é só para quem entrou -->
+  <div id="areaLab" hidden>
+
   <div class="lab-intro">
     <p>O banco da <strong>Loja Aurora</strong> — uma papelaria online — está aqui, vivo, dentro desta página. Você escreve a consulta, aperta <strong>Rodar</strong> e vê o resultado na hora. Nada para instalar.</p>
     <p>Trabalhe de cima para baixo: cada lição explica um comando, mostra um exemplo que você pode rodar, e traz desafios para você resolver escrevendo a sua própria consulta. Some pontos resolvendo os casos.</p>
@@ -126,23 +144,17 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
     <span style="font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:13px;font-weight:600">Casos resolvidos</span>
     <b><span id="feitos">0</span>/<span id="total">0</span></b>
     <div class="barra-lab"><span id="barraLab"></span></div>
+    <span class="marca-salvo" id="marcaSalvo"></span>
     <button type="button" id="btnRecomecar" class="btn-mini vazado" title="Apaga o progresso guardado neste navegador">Recomeçar</button>
   </div>
-  <p class="salvo-aviso">O seu progresso e as consultas que você escreve ficam guardados <b>neste navegador</b>. Pode fechar a aba e voltar depois — inclusive amanhã. Em computador da escola, use sempre a mesma máquina.</p>
+  <p class="salvo-aviso">O seu progresso e as consultas que você escreve ficam guardados <b>na sua ficha</b>. Pode fechar o navegador, trocar de computador e continuar de onde parou — é só entrar com a mesma conta.</p>
 
-  <!-- o banco -->
+  <!-- o banco: montado por JS a partir do próprio banco, para nunca faltar coluna -->
   <div class="banco">
-    <div class="banco-cab">O banco: 4 tabelas</div>
-    <div class="tabelas">
-      <div class="tabela"><h4>clientes</h4><ul>
-        <li class="pk">id_cliente</li><li>nome</li><li>email</li><li>cidade</li><li>status_cliente <span style="color:var(--tinta-fraca)">(ativo/inativo)</span></li><li>data_cadastro</li></ul></div>
-      <div class="tabela"><h4>produtos</h4><ul>
-        <li class="pk">id_produto</li><li>nome</li><li>categoria</li><li>preco</li><li>estoque</li></ul></div>
-      <div class="tabela"><h4>pedidos</h4><ul>
-        <li class="pk">id_pedido</li><li class="fk">id_cliente</li><li>data_pedido</li><li>status <span style="color:var(--tinta-fraca)">(pago/aberto/…)</span></li></ul></div>
-      <div class="tabela"><h4>itens_pedido</h4><ul>
-        <li class="fk">id_pedido</li><li class="fk">id_produto</li><li>quantidade</li><li>preco_unit</li></ul></div>
-    </div>
+    <div class="banco-cab" id="bancoCab">O banco</div>
+    <div class="tabelas" id="tabelas"></div>
+    <p class="banco-pe"><span class="pk">assim</span> é chave primária ·
+       <span class="fk">assim</span> é chave estrangeira (aponta para outra tabela)</p>
   </div>
 
   <!-- console livre -->
@@ -159,6 +171,7 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
 
   <div id="conteudo"></div>
 
+  </div>
 </main>
 
 <footer class="rodape env">
@@ -169,6 +182,6 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
 <script type="module" src="assets/nav.js"></script>
 <script src="assets/sqljs/sql-wasm.js"></script>
 <script src="assets/aurora-db.sql.js"></script>
-<script src="assets/laboratorio.js"></script>
+<script type="module" src="assets/laboratorio.js"></script>
 </body>
 </html>
