@@ -4,7 +4,7 @@
    cai no que ficou guardado. Assim o app abre mesmo sem internet, mas não
    trava numa versão velha quando há conexão. */
 
-const CACHE = 'sindicato-v1';
+const CACHE = 'sindicato-v3';
 
 // o essencial para a casca do app abrir offline
 const BASICO = [
@@ -13,6 +13,7 @@ const BASICO = [
   'assets/base.css', 'assets/config.js', 'assets/sindicato.js',
   'assets/nav.js', 'assets/quadro.js', 'assets/placar.js',
   'assets/entrar.js', 'assets/forum.js',
+  'laboratorio.html', 'assets/laboratorio.js', 'assets/aurora-db.sql.js',
   'favicon.svg', 'icon-192.png', 'icon-512.png', 'manifest.json'
 ];
 
@@ -42,6 +43,13 @@ self.addEventListener('fetch', (e) => {
         caches.open(CACHE).then((c) => c.put(req, copia)).catch(() => {});
         return resp;
       })
-      .catch(() => caches.match(req).then((r) => r || caches.match('index.html')))
+      .catch(() => caches.match(req).then((r) => {
+        if (r) return r;
+        // Só a navegação pode cair na página inicial. Devolver HTML no lugar
+        // de um .js ou .css quebra a página de um jeito difícil de entender:
+        // o navegador recebe "<!DOCTYPE html>" onde esperava código.
+        if (req.mode === 'navigate') return caches.match('index.html');
+        return Response.error();
+      }))
   );
 });

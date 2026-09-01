@@ -48,8 +48,18 @@ async function abrir() {
 }
 
 function ligarMotor() {
+  /* Se demorar muito, avisa em vez de deixar a tela parada: numa internet
+     ruim o motor do banco (640 KB) leva um tempo, e sem retorno o aluno
+     acha que a página travou. */
+  const demorou = setTimeout(() => {
+    const m = $('#motor');
+    if (m) m.innerHTML = 'Ainda baixando o banco de dados (são 640 KB). ' +
+      'Em internet lenta pode levar um minuto — deixe a página aberta.';
+  }, 8000);
+
   return initSqlJs({ locateFile: f => 'assets/sqljs/' + f })
     .then(async SQL => {
+      clearTimeout(demorou);
       db = new SQL.Database();
       db.run(window.AURORA_SQL);
       await carregarProgresso();
@@ -62,7 +72,10 @@ function ligarMotor() {
       rodarNaSaida($('#sqlLivre').value, $('#saidaLivre'));
     })
     .catch(e => {
-      $('#motor').innerHTML = 'Não consegui ligar o banco. Recarregue a página (F5). Detalhe: ' + esc(e.message || e);
+      clearTimeout(demorou);
+      const m = $('#motor');
+      if (m) m.innerHTML = 'Não consegui ligar o banco de dados. Puxe a página para baixo para recarregar, ' +
+        'ou feche e abra de novo. Se insistir, avise a docente.<br><small>' + esc(e.message || e) + '</small>';
     });
 }
 

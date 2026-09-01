@@ -127,17 +127,20 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
 
   <h1 class="titulo">O <em>Laboratório</em></h1>
   <!-- quem não entrou para aqui -->
-  <div class="porta-lab" id="portaLab" hidden></div>
-
-  <!-- daqui para baixo é só para quem entrou -->
-  <div id="areaLab" hidden>
-
   <div class="lab-intro">
     <p>O banco da <strong>Loja Aurora</strong> — uma papelaria online — está aqui, vivo, dentro desta página. Você escreve a consulta, aperta <strong>Rodar</strong> e vê o resultado na hora. Nada para instalar.</p>
     <p>Trabalhe de cima para baixo: cada lição explica um comando, mostra um exemplo que você pode rodar, e traz desafios para você resolver escrevendo a sua própria consulta. Some pontos resolvendo os casos.</p>
   </div>
 
-  <div id="motor" class="carregando-motor">Ligando o banco de dados… (primeira vez pode levar alguns segundos)</div>
+  <!-- A porta e o aviso de carregamento ficam FORA da área escondida.
+       Se ficarem dentro, o aluno olha para uma tela vazia enquanto o banco
+       baixa — e conclui, com razão, que a página não abriu. -->
+  <div class="porta-lab" id="portaLab" hidden></div>
+
+  <div id="motor" class="carregando-motor">Ligando o banco de dados… (na primeira vez leva alguns segundos)</div>
+
+  <!-- daqui para baixo é só para quem entrou -->
+  <div id="areaLab" hidden>
 
   <!-- progresso -->
   <div class="progresso-lab" id="progresso" hidden>
