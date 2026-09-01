@@ -46,4 +46,7 @@ create policy "lab: atualizo o meu" on public.lab_progresso
 
 grant select on public.lab_progresso to authenticated;
 grant insert (perfil_id, feitos, rascunhos)               on public.lab_progresso to authenticated;
-grant update (feitos, rascunhos, atualizado_em)           on public.lab_progresso to authenticated;
+-- perfil_id entra no update por causa do upsert: o ON CONFLICT DO UPDATE
+-- do PostgREST também escreve nessa coluna. A policy continua exigindo que
+-- ela seja igual ao próprio auth.uid(), então ninguém grava na ficha alheia.
+grant update (perfil_id, feitos, rascunhos, atualizado_em) on public.lab_progresso to authenticated;
