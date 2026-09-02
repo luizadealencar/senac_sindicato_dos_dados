@@ -315,13 +315,13 @@ const MODULOS = [
           { p: 'Mostre o nome dos clientes e <b>quantas letras</b> cada nome tem.', r: 'SELECT nome, LENGTH(nome) FROM clientes;', dica: 'LENGTH(nome)' },
           { p: 'Monte uma coluna única no formato <b>nome - cidade</b> para cada cliente (com espaço, hífen, espaço).', r: "SELECT nome || ' - ' || cidade FROM clientes;", dica: "No SQLite: a || ' - ' || b. No MySQL seria CONCAT(a,' - ',b)." },
           { p: 'Mostre o <b>ano de cada pedido</b> junto com o id (use os 4 primeiros caracteres da data).', r: 'SELECT id_pedido, SUBSTR(data_pedido, 1, 4) FROM pedidos;', dica: 'SUBSTR(data_pedido, 1, 4)' },
-          { p: 'Conte <b>quantos pedidos houve em cada mês</b> (use os 7 primeiros caracteres da data, tipo 2026-04), do mês mais movimentado para o menos.', r: 'SELECT SUBSTR(data_pedido,1,7) AS mes, COUNT(*) AS qtd FROM pedidos GROUP BY mes ORDER BY qtd DESC, mes ASC;', dica: 'Agrupe por SUBSTR(data_pedido,1,7)' }
+          { p: 'Conte <b>quantos pedidos houve em cada mês</b> (use os 7 primeiros caracteres da data, tipo 2026-04), do mês mais movimentado para o menos.', r: 'SELECT SUBSTR(data_pedido,1,7) AS mes, COUNT(*) AS qtd FROM pedidos GROUP BY mes ORDER BY qtd DESC, mes ASC;', ordenado: true, dica: 'Agrupe por SUBSTR(data_pedido,1,7)' }
         ,
           { p: 'Mostre a <b>categoria em minúsculas</b> de cada produto, junto com o nome.', r: 'SELECT nome, LOWER(categoria) FROM produtos;', dica: 'LOWER(categoria)' }
         ,
           { p: 'Mostre o nome dos clientes cujo <b>nome tem mais de 12 letras</b>.', r: 'SELECT nome FROM clientes WHERE LENGTH(nome) > 12;', dica: 'WHERE LENGTH(nome) > 12' }
         ,
-          { p: 'Monte uma etiqueta no formato <b>produto (categoria)</b> para cada produto.', r: "SELECT nome || ' (' || categoria || ')' FROM produtos;", dica: 'Junte com || e não esqueça os parênteses dentro das aspas.' }
+          { p: 'Monte uma coluna única no formato <b>nome (categoria)</b> para cada produto — o nome, e a categoria entre parênteses.', r: "SELECT nome || ' (' || categoria || ')' FROM produtos;", dica: 'Junte com || e não esqueça os parênteses dentro das aspas.' }
         ,
           { p: 'Mostre <b>quantos pedidos houve em cada ano</b> (use os 4 primeiros caracteres da data).', r: 'SELECT SUBSTR(data_pedido,1,4) AS ano, COUNT(*) FROM pedidos GROUP BY ano;', dica: 'GROUP BY SUBSTR(data_pedido,1,4)' }
         ]
@@ -332,12 +332,12 @@ const MODULOS = [
         html: `<code>LIMIT</code> corta o resultado, e o <code>OFFSET</code> diz quantas linhas <b>pular</b> antes de começar. É assim que um site monta a página 2 de uma lista. Sem <code>ORDER BY</code> a divisão não tem sentido, porque a ordem pode mudar.`,
         exemplo: `-- as 5 primeiras linhas (página 1)\nSELECT nome, preco FROM produtos ORDER BY nome LIMIT 5;\n\n-- as 5 seguintes (página 2): pula 5 e traz 5\nSELECT nome, preco FROM produtos ORDER BY nome LIMIT 5 OFFSET 5;`,
         desafios: [
-          { p: 'Mostre a <b>segunda página</b> da lista de clientes em ordem alfabética, com 5 por página (ou seja: pule 5 e traga 5).', r: 'SELECT nome FROM clientes ORDER BY nome LIMIT 5 OFFSET 5;', ordenado: true, dica: 'ORDER BY nome LIMIT 5 OFFSET 5' },
-          { p: 'Mostre o <b>segundo produto mais caro</b> (só ele: pule o primeiro e traga um).', r: 'SELECT nome, preco FROM produtos ORDER BY preco DESC LIMIT 1 OFFSET 1;', ordenado: true, dica: 'ORDER BY preco DESC LIMIT 1 OFFSET 1' }
+          { p: 'Mostre o <b>nome</b> dos clientes da <b>segunda página</b>, em ordem alfabética, com 5 por página (ou seja: pule 5 e traga 5).', r: 'SELECT nome FROM clientes ORDER BY nome ASC LIMIT 5 OFFSET 5;', ordenado: true, dica: 'ORDER BY nome ASC LIMIT 5 OFFSET 5' },
+          { p: 'Mostre o <b>nome e o preço</b> do <b>segundo produto mais caro</b> (só ele: pule o primeiro e traga um).', r: 'SELECT nome, preco FROM produtos ORDER BY preco DESC LIMIT 1 OFFSET 1;', ordenado: true, dica: 'ORDER BY preco DESC LIMIT 1 OFFSET 1' }
         ,
-          { p: 'Mostre a <b>terceira página</b> dos produtos em ordem alfabética, com 4 por página.', r: 'SELECT nome FROM produtos ORDER BY nome LIMIT 4 OFFSET 8;', ordenado: true, dica: 'Página 3 com 4 por página: pula 8.' }
+          { p: 'Mostre o <b>nome</b> dos produtos da <b>terceira página</b>, em ordem alfabética, com 4 por página.', r: 'SELECT nome FROM produtos ORDER BY nome ASC LIMIT 4 OFFSET 8;', ordenado: true, dica: 'ORDER BY nome ASC e, para a página 3 com 4 por página, LIMIT 4 OFFSET 8.' }
         ,
-          { p: 'Mostre do <b>terceiro ao quinto cliente</b> em ordem alfabética.', r: 'SELECT nome FROM clientes ORDER BY nome LIMIT 3 OFFSET 2;', ordenado: true, dica: 'Pula 2 e traz 3.' }
+          { p: 'Mostre o <b>nome</b> do <b>terceiro ao quinto cliente</b>, em ordem alfabética.', r: 'SELECT nome FROM clientes ORDER BY nome ASC LIMIT 3 OFFSET 2;', ordenado: true, dica: 'ORDER BY nome ASC, depois LIMIT 3 OFFSET 2.' }
         ]
       }
     ]
@@ -381,7 +381,7 @@ const MODULOS = [
           { p: 'Mostre <b>quantos produtos há em cada categoria</b>, da categoria com mais produtos para a com menos.', r: 'SELECT categoria, COUNT(*) AS qtd FROM produtos GROUP BY categoria ORDER BY qtd DESC;', ordenado: true, dica: 'GROUP BY categoria e depois ORDER BY a contagem DESC' },
           { p: 'Mostre o <b>estoque total por categoria</b> (categoria e a soma do estoque).', r: 'SELECT categoria, SUM(estoque) FROM produtos GROUP BY categoria;', dica: 'SUM(estoque) com GROUP BY categoria' },
           { p: 'Contando <b>só os clientes ativos</b>, mostre quantos há em cada cidade.', r: "SELECT cidade, COUNT(*) FROM clientes WHERE status_cliente = 'ativo' GROUP BY cidade;", dica: 'O WHERE vem antes do GROUP BY.' },
-          { p: 'Mostre <b>quantos pedidos cada cliente fez</b> (id do cliente e a contagem), do que mais pediu para o que menos pediu.', r: 'SELECT id_cliente, COUNT(*) AS pedidos FROM pedidos GROUP BY id_cliente ORDER BY pedidos DESC, id_cliente ASC;', dica: 'GROUP BY id_cliente' },
+          { p: 'Mostre <b>quantos pedidos cada cliente fez</b> (id do cliente e a contagem), do que mais pediu para o que menos pediu.', r: 'SELECT id_cliente, COUNT(*) AS pedidos FROM pedidos GROUP BY id_cliente ORDER BY pedidos DESC, id_cliente ASC;', ordenado: true, dica: 'GROUP BY id_cliente' },
           { p: 'Mostre, <b>para cada cidade e cada status</b>, quantos clientes existem (cidade, status e a contagem).', r: 'SELECT cidade, status_cliente, COUNT(*) FROM clientes GROUP BY cidade, status_cliente;', dica: 'Dá para agrupar por duas colunas: GROUP BY cidade, status_cliente' }
         ,
           { p: 'Mostre <b>quantos itens diferentes cada pedido tem</b> (id do pedido e a contagem de linhas).', r: 'SELECT id_pedido, COUNT(*) AS itens FROM itens_pedido GROUP BY id_pedido;', dica: 'GROUP BY id_pedido' }
@@ -428,7 +428,7 @@ const MODULOS = [
         ,
           { p: "Classifique cada pedido: 'fechado' quando o status for pago ou enviado, senão 'em aberto'. Mostre o id e a classificação.", r: "SELECT id_pedido, CASE WHEN status IN ('pago','enviado') THEN 'fechado' ELSE 'em aberto' END AS situacao FROM pedidos;", dica: "CASE WHEN status IN ('pago','enviado') THEN ... ELSE ... END" }
         ,
-          { p: "Mostre cada produto com o rótulo <b>'em falta'</b> quando o estoque for menor que 20, e <b>'ok'</b> nos demais.", r: "SELECT nome, estoque, CASE WHEN estoque < 20 THEN 'em falta' ELSE 'ok' END AS aviso FROM produtos;", dica: "CASE WHEN estoque < 20 THEN 'em falta' ELSE 'ok' END" }
+          { p: "Mostre o <b>nome e o estoque</b> de cada produto, com o rótulo <b>'em falta'</b> quando o estoque for menor que 20 e <b>'ok'</b> nos demais.", r: "SELECT nome, estoque, CASE WHEN estoque < 20 THEN 'em falta' ELSE 'ok' END AS aviso FROM produtos;", dica: "CASE WHEN estoque < 20 THEN 'em falta' ELSE 'ok' END" }
         ,
           { p: 'Conte <b>quantos produtos há em cada faixa de preço</b>: até 10, de 10 a 30, e acima de 30 (faixa e contagem).', r: "SELECT CASE WHEN preco <= 10 THEN 'ate 10' WHEN preco <= 30 THEN '10 a 30' ELSE 'acima de 30' END AS faixa, COUNT(*) FROM produtos GROUP BY faixa;", dica: 'Dá para agrupar pelo apelido da coluna criada com CASE.' }
         ]
@@ -496,7 +496,7 @@ const MODULOS = [
           { p: 'Liste o nome dos <b>clientes que nunca fizeram pedido</b>.', r: 'SELECT c.nome FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente WHERE p.id_pedido IS NULL;', dica: 'LEFT JOIN e depois WHERE p.id_pedido IS NULL' },
           { p: 'Liste o nome dos <b>produtos que nunca foram vendidos</b>.', r: 'SELECT pr.nome FROM produtos pr LEFT JOIN itens_pedido i ON i.id_produto = pr.id_produto WHERE i.id_produto IS NULL;', dica: 'LEFT JOIN com itens_pedido e IS NULL' },
           { p: 'Mostre <b>todos os clientes</b> e quantos pedidos cada um fez — inclusive os que fizeram zero (nome e a contagem).', r: 'SELECT c.nome, COUNT(p.id_pedido) AS pedidos FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente GROUP BY c.id_cliente, c.nome;', dica: 'COUNT(p.id_pedido) conta só o que existe; COUNT(*) contaria a linha vazia também.' },
-          { p: 'Mostre <b>todos os produtos</b> e o total de unidades vendidas de cada um, colocando <b>0</b> onde nunca vendeu.', r: 'SELECT pr.nome, COALESCE(SUM(i.quantidade), 0) AS vendidas FROM produtos pr LEFT JOIN itens_pedido i ON i.id_produto = pr.id_produto GROUP BY pr.id_produto, pr.nome;', dica: 'COALESCE(SUM(i.quantidade), 0)' }
+          { p: 'Mostre o <b>nome</b> de <b>todos os produtos</b> e o total de unidades vendidas de cada um, colocando <b>0</b> onde nunca vendeu.', r: 'SELECT pr.nome, COALESCE(SUM(i.quantidade), 0) AS vendidas FROM produtos pr LEFT JOIN itens_pedido i ON i.id_produto = pr.id_produto GROUP BY pr.id_produto, pr.nome;', dica: 'COALESCE(SUM(i.quantidade), 0)' }
         ,
           { p: 'Mostre <b>todos os clientes com o total que já gastaram</b>, colocando 0 em quem nunca comprou.', r: 'SELECT c.nome, COALESCE(SUM(i.quantidade * i.preco_unit), 0) AS gasto FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente LEFT JOIN itens_pedido i ON i.id_pedido = p.id_pedido GROUP BY c.id_cliente, c.nome;', dica: 'Dois LEFT JOIN encadeados e COALESCE na soma.' }
         ,
