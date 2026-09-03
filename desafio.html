@@ -61,12 +61,16 @@
 .pergunta-pe{margin-top:18px;display:flex;justify-content:flex-end}
 
 /* tela final */
-.final{border:2px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);background:var(--papel);padding:30px 28px;text-align:center;max-width:640px}
-.final .nota{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:64px;line-height:1;color:var(--carimbo);margin:6px 0}
-.final .patente-sel{display:inline-block;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:15px;font-weight:600;border:2px solid var(--tinta);padding:6px 16px;margin:8px 0 4px}
-.final h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:28px;margin-bottom:8px}
-.final p{color:var(--tinta-fraca);font-size:17px;max-width:52ch;margin:0 auto 8px}
-.final .acoes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.final{border:2px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);background:var(--papel);padding:26px 26px 24px;text-align:center;max-width:520px}
+.final .nota{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:58px;line-height:1;color:var(--carimbo);margin:4px 0 10px}
+.final-linha{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.final .patente-sel{display:inline-block;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:14px;font-weight:600;border:2px solid var(--tinta);padding:5px 14px}
+.final-pct{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-weight:800;font-size:16px;color:var(--tinta)}
+.final-xp{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--tinta-fraca);background:var(--papel-barra);border:2px solid var(--tinta);padding:9px 16px;display:inline-block;margin-bottom:14px}
+.final-xp b{color:var(--carimbo);font-size:22px;vertical-align:-1px}
+.final-recado{color:var(--tinta-fraca);font-size:15.5px;line-height:1.45;max-width:42ch;margin:0 auto 12px}
+.final-reg{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.45;color:var(--tinta-fraca);max-width:42ch;margin:0 auto}
+.final .acoes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
 
 @media(max-width:860px){
   .palco{padding:20px 0 46px}
@@ -620,11 +624,13 @@ function finalizar(){
   $('#finalCartao').innerHTML = `
     <span class="rot" style="color:var(--carimbo)">Resultado do interrogatório</span>
     <div class="nota">${acertos}/${total}</div>
-    <span class="patente-sel">${patente}</span>
-    <h2 style="margin-top:10px">${pct}% de acerto</h2>
-    <p style="font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--carimbo);font-weight:700;margin:4px 0 6px">Você conseguiu ${xp} XP</p>
-    <p>${recado}</p>
-    <p id="registroStatus" class="mono" style="font-size:14px">Registrando o resultado da célula…</p>
+    <div class="final-linha">
+      <span class="patente-sel">${patente}</span>
+      <span class="final-pct">${pct}% de acerto</span>
+    </div>
+    <div class="final-xp">Você conseguiu <b>${xp}</b> XP</div>
+    <p class="final-recado">${recado}</p>
+    <p id="registroStatus" class="final-reg">Registrando a entrega…</p>
     <div class="acoes">
       <a class="btn" href="index.html#placar">Ver o placar</a>
     </div>`;
@@ -646,7 +652,7 @@ async function registrar(acertos, total){
       missao: 6
     });
     if (error) throw error;
-    if (el) el.innerHTML = 'Resultado registrado para a célula <b>' + (eu.celula || '—') + '</b>. A docente lança o XP.';
+    if (el) el.innerHTML = 'Enviado ao fórum como entrega da célula <b>' + (eu.celula || '—') + '</b>. A docente confere e lança o XP.';
   } catch (e) {
     if (el) el.textContent = 'Não consegui registrar automaticamente. Tire um print e entregue no fórum.';
     console.warn('registro do desafio:', e.message || e);
