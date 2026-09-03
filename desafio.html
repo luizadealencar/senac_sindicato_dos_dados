@@ -91,7 +91,7 @@
   </div>
 
   <h1 class="titulo">O <em>Desafio</em></h1>
-  <p class="subtitulo">O cofre está trancado com dez perguntas. Cada uma testa um golpe de SQL que vocês aprenderam no Ato IV. Errar não elimina — mas o placar conta. Respondam em célula.</p>
+  <p class="subtitulo">O cofre está trancado com <span id="quantas2">30</span> perguntas. Cada uma testa um golpe de SQL que vocês aprenderam no Ato IV. Errar não elimina — mas o placar conta. Respondam em célula.</p>
 
   <!-- trava: só para filiados -->
   <section id="trava" class="abertura" hidden>
@@ -109,7 +109,7 @@
   <!-- abertura -->
   <section id="abertura" class="abertura" hidden>
     <h2>Antes de começar</h2>
-    <p>São <strong>10 perguntas</strong> sobre o banco da <strong>Loja Aurora</strong> (uma loja online de papelaria). Cada pergunta mostra as alternativas; ao escolher, você vê na hora se acertou e por quê.</p>
+    <p>São <strong><span id="quantas">30</span> perguntas</strong> sobre o banco da <strong>Loja Aurora</strong> (uma loja online de papelaria). Cada pergunta mostra as alternativas; ao escolher, você vê na hora se acertou e por quê.</p>
     <p>Tabelas em jogo: <span class="mono">clientes</span>, <span class="mono">produtos</span>, <span class="mono">pedidos</span> e <span class="mono">itens_pedido</span>.</p>
     <div class="acoes"><button class="btn" type="button" id="btnComecar">Encarar o Boss</button></div>
   </section>
@@ -117,7 +117,7 @@
   <!-- quiz -->
   <section id="quiz" hidden>
     <div class="progresso">
-      <span class="passo" id="passo">Pergunta 1 de 10</span>
+      <span class="passo" id="passo">Pergunta 1</span>
       <div class="barra"><span id="barra"></span></div>
       <span class="placar-mini">Acertos: <b id="acertos">0</b></span>
     </div>
@@ -259,11 +259,259 @@ const PERGUNTAS = [
     ],
     certa: 2,
     porque: "DELETE sem WHERE apaga a tabela inteira, linha por linha, sem perguntar. Regra de ouro: escreva o WHERE antes do DELETE."
+  },
+
+  /* ---- casos vindos do Laboratório ---- */
+  {
+    p: "Qual consulta conta <b>quantos clientes há em cada cidade</b>?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT cidade, COUNT(*) FROM clientes;",
+      "SELECT COUNT(cidade) FROM clientes ORDER BY cidade;",
+      "SELECT cidade, COUNT(*) FROM clientes GROUP BY cidade;",
+      "SELECT cidade, COUNT(*) FROM clientes WHERE cidade;"
+    ],
+    certa: 2,
+    porque: "Para virar “um número por grupo”, a agregação precisa do GROUP BY. Sem ele, o COUNT(*) devolveria um número só para a tabela inteira."
+  },
+  {
+    p: "Você quer as <b>cidades com mais de 3 clientes</b>. Qual está certa?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT cidade, COUNT(*) FROM clientes GROUP BY cidade HAVING COUNT(*) > 3;",
+      "SELECT cidade, COUNT(*) FROM clientes WHERE COUNT(*) > 3 GROUP BY cidade;",
+      "SELECT cidade, COUNT(*) FROM clientes GROUP BY cidade WHERE COUNT(*) > 3;",
+      "SELECT cidade FROM clientes WHERE cidade > 3;"
+    ],
+    certa: 0,
+    porque: "O WHERE filtra linhas antes de agrupar e não enxerga COUNT. Quem filtra o resultado do grupo é o HAVING, e ele vem depois do GROUP BY."
+  },
+  {
+    p: "Qual a diferença entre <b>WHERE</b> e <b>HAVING</b>?",
+    codigo: null, mono: false,
+    alts: [
+      "São sinônimos: dá para usar qualquer um dos dois.",
+      "WHERE só funciona com texto e HAVING só com número.",
+      "HAVING vem antes do GROUP BY e o WHERE depois.",
+      "WHERE filtra linhas antes de agrupar; HAVING filtra grupos depois de agrupar."
+    ],
+    certa: 3,
+    porque: "Essa é a regra que resolve quase todo erro de agrupamento: o WHERE age na linha crua, o HAVING age no grupo já formado."
+  },
+  {
+    p: "Os clientes sem telefone têm <code>NULL</code> nessa coluna. Como listá-los?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT nome FROM clientes WHERE telefone = NULL;",
+      "SELECT nome FROM clientes WHERE telefone IS NULL;",
+      "SELECT nome FROM clientes WHERE telefone = '';",
+      "SELECT nome FROM clientes WHERE telefone = 'NULL';"
+    ],
+    certa: 1,
+    porque: "NULL é ausência de informação e não se compara com =. Só IS NULL e IS NOT NULL funcionam. O = NULL não dá erro: devolve nada, que é pior."
+  },
+  {
+    p: "Qual consulta acha os <b>clientes que nunca fizeram pedido</b>?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT c.nome FROM clientes c JOIN pedidos p ON p.id_cliente = c.id_cliente WHERE p.id_pedido IS NULL;",
+      "SELECT c.nome FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente;",
+      "SELECT c.nome FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente WHERE p.id_pedido IS NULL;",
+      "SELECT nome FROM clientes WHERE pedidos = 0;"
+    ],
+    certa: 2,
+    porque: "O LEFT JOIN mantém todo cliente, mesmo sem par em pedidos, e preenche com NULL. Quem ficou com NULL é justamente quem nunca comprou. Com JOIN comum esses clientes sumiriam."
+  },
+  {
+    p: "O que o <code>DISTINCT</code> faz?",
+    codigo: null, mono: false,
+    alts: [
+      "Ordena o resultado sem repetir.",
+      "Conta quantos valores diferentes existem.",
+      "Apaga as linhas repetidas da tabela.",
+      "Remove as linhas repetidas do resultado."
+    ],
+    certa: 3,
+    porque: "Ele só muda o que aparece na tela — a tabela continua intacta. Para contar os diferentes, aí sim seria COUNT(DISTINCT coluna)."
+  },
+  {
+    p: "Qual consulta traz a <b>segunda página</b> de uma lista de 5 em 5, em ordem alfabética?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT nome FROM clientes ORDER BY nome ASC LIMIT 5 OFFSET 5;",
+      "SELECT nome FROM clientes ORDER BY nome ASC LIMIT 5;",
+      "SELECT nome FROM clientes ORDER BY nome ASC OFFSET 5;",
+      "SELECT nome FROM clientes LIMIT 2 OFFSET 5;"
+    ],
+    certa: 0,
+    porque: "O LIMIT diz quantas linhas trazer e o OFFSET quantas pular. Página 2 de 5 em 5 pula as 5 primeiras. Sem ORDER BY a divisão em páginas não teria sentido."
+  },
+  {
+    p: "Quais produtos custam <b>mais que a média</b> do catálogo?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT nome, preco FROM produtos WHERE preco > AVG(preco);",
+      "SELECT nome, preco FROM produtos WHERE preco > (SELECT AVG(preco) FROM produtos);",
+      "SELECT nome, preco FROM produtos HAVING preco > AVG(preco);",
+      "SELECT nome, AVG(preco) FROM produtos WHERE preco > AVG(preco);"
+    ],
+    certa: 1,
+    porque: "A média precisa ser calculada antes, por uma consulta à parte entre parênteses. Um WHERE não aceita função de agregação direto."
+  },
+  {
+    p: "Qual a diferença entre <code>UNION</code> e <code>UNION ALL</code>?",
+    codigo: null, mono: false,
+    alts: [
+      "UNION junta colunas; UNION ALL junta linhas.",
+      "UNION ALL é mais lento porque ordena o resultado.",
+      "Não há diferença, só o nome muda.",
+      "UNION remove as linhas repetidas; UNION ALL mantém todas."
+    ],
+    certa: 3,
+    porque: "Os dois empilham um resultado embaixo do outro e exigem o mesmo número de colunas. O UNION ainda dá o trabalho extra de tirar as repetidas."
+  },
+  {
+    p: "Você quer marcar cada produto como 'barato' ou 'caro' numa coluna nova. Qual comando usa?",
+    codigo: null, mono: false,
+    alts: [
+      "IF preco < 10 THEN 'barato' ELSE 'caro'",
+      "SWITCH preco WHEN < 10 THEN 'barato'",
+      "CASE WHEN preco < 10 THEN 'barato' ELSE 'caro' END",
+      "WHERE preco < 10 THEN 'barato'"
+    ],
+    certa: 2,
+    porque: "O CASE é o se/senão do SQL, e sempre termina com END. Ele cria uma coluna calculada na hora, sem mexer na tabela."
+  },
+  {
+    p: "No SQLite, como se juntam dois textos numa coluna só?",
+    codigo: null, mono: false,
+    alts: [
+      "Com o sinal de +, assim: nome + ' - ' + cidade",
+      "Com <code>||</code>, assim: nome || ' - ' || cidade",
+      "Com a função JOIN(nome, cidade)",
+      "Com vírgula: SELECT nome, cidade"
+    ],
+    certa: 1,
+    porque: "No SQLite é o ||. Vale guardar que o MySQL faz o mesmo com CONCAT(nome, ' - ', cidade) — é uma das poucas diferenças que você vai encontrar entre os dois."
+  },
+  {
+    p: "Qual filtro pega os produtos cujo nome <b>contém</b> a palavra Neon?",
+    codigo: null, mono: true,
+    alts: [
+      "WHERE nome LIKE '%Neon%'",
+      "WHERE nome LIKE 'Neon'",
+      "WHERE nome = '%Neon%'",
+      "WHERE nome CONTAINS 'Neon'"
+    ],
+    certa: 0,
+    porque: "O % vale por “qualquer coisa”. Nas duas pontas, encontra a palavra em qualquer posição. Sozinho no fim, 'Neon%' acharia só o que começa com Neon."
+  },
+  {
+    p: "<code>WHERE preco BETWEEN 10 AND 20</code> inclui o 10 e o 20?",
+    codigo: null, mono: false,
+    alts: [
+      "Não, ele exclui os dois extremos.",
+      "Inclui o 10 mas não o 20.",
+      "Sim, o BETWEEN inclui os dois extremos.",
+      "Depende do banco de dados."
+    ],
+    certa: 2,
+    porque: "O BETWEEN é inclusivo: equivale a preco >= 10 AND preco <= 20."
+  },
+  {
+    p: "Qual consulta conta <b>quantas cidades diferentes</b> existem no cadastro?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT DISTINCT COUNT(cidade) FROM clientes;",
+      "SELECT COUNT(cidade) FROM clientes;",
+      "SELECT DISTINCT cidade FROM clientes;",
+      "SELECT COUNT(DISTINCT cidade) FROM clientes;"
+    ],
+    certa: 3,
+    porque: "O DISTINCT vai dentro do COUNT. A última opção até lista as cidades diferentes, mas não conta quantas são."
+  },
+  {
+    p: "Numa consulta com <code>GROUP BY categoria</code>, o que pode aparecer no SELECT?",
+    codigo: null, mono: false,
+    alts: [
+      "Qualquer coluna da tabela, sem restrição.",
+      "A própria categoria e funções de agregação como COUNT, SUM e AVG.",
+      "Só as funções de agregação, nunca a categoria.",
+      "Só as colunas de texto."
+    ],
+    certa: 1,
+    porque: "A regra: o que não está dentro de uma função de agregação precisa estar no GROUP BY. Pedir o nome do produto aqui não faria sentido — são vários nomes por categoria."
+  },
+  {
+    p: "Você quer o <b>total faturado por categoria</b>, juntando itens vendidos e produtos. Qual está certa?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT pr.categoria, SUM(i.quantidade * i.preco_unit) FROM itens_pedido i JOIN produtos pr ON pr.id_produto = i.id_produto GROUP BY pr.categoria;",
+      "SELECT pr.categoria, SUM(i.quantidade) FROM itens_pedido i, produtos pr GROUP BY pr.categoria;",
+      "SELECT categoria, SUM(quantidade * preco_unit) FROM produtos GROUP BY categoria;",
+      "SELECT pr.categoria, SUM(i.quantidade * i.preco_unit) FROM itens_pedido i JOIN produtos pr GROUP BY pr.categoria;"
+    ],
+    certa: 0,
+    porque: "O JOIN precisa do ON dizendo qual coluna liga as duas tabelas. Sem ele, o banco cruza tudo com tudo — ou nem aceita a consulta."
+  },
+  {
+    p: "O que esta consulta responde?",
+    codigo: "SELECT SUM(CASE WHEN status = 'pago' THEN 1 ELSE 0 END) AS pagos\nFROM pedidos;", mono: false,
+    alts: [
+      "A soma dos valores dos pedidos pagos.",
+      "Todos os pedidos, marcando os pagos com 1.",
+      "Nada: CASE não funciona dentro de SUM.",
+      "Quantos pedidos estão com status 'pago'."
+    ],
+    certa: 3,
+    porque: "O CASE devolve 1 para o que interessa e 0 para o resto; somando, você conta só o que bate. É o jeito de contar duas coisas diferentes na mesma linha de resultado."
+  },
+  {
+    p: "Para que serve o <code>COALESCE(telefone, 'sem telefone')</code>?",
+    codigo: null, mono: false,
+    alts: [
+      "Apagar os telefones vazios da tabela.",
+      "Conferir se o telefone é válido.",
+      "Mostrar 'sem telefone' quando a coluna estiver vazia (NULL).",
+      "Preencher a coluna telefone no banco."
+    ],
+    certa: 2,
+    porque: "Ele troca o NULL por um valor de reserva só na exibição — a tabela não muda. No MySQL o IFNULL faz a mesma coisa."
+  },
+  {
+    p: "Numa consulta com WHERE, GROUP BY e HAVING, qual é a ordem de execução?",
+    codigo: null, mono: false,
+    alts: [
+      "WHERE filtra as linhas, depois GROUP BY agrupa, depois HAVING filtra os grupos.",
+      "GROUP BY agrupa, depois WHERE filtra, depois HAVING ordena.",
+      "HAVING filtra primeiro, depois WHERE, depois GROUP BY.",
+      "Os três acontecem ao mesmo tempo."
+    ],
+    certa: 0,
+    porque: "Entender essa ordem explica por que o WHERE não enxerga COUNT: quando ele roda, os grupos ainda nem existem."
+  },
+  {
+    p: "Qual consulta mostra os produtos <b>ordenados por categoria (A-Z) e, dentro de cada uma, do mais caro para o mais barato</b>?",
+    codigo: null, mono: true,
+    alts: [
+      "SELECT nome, categoria, preco FROM produtos ORDER BY categoria, preco;",
+      "SELECT nome, categoria, preco FROM produtos ORDER BY categoria ASC, preco DESC;",
+      "SELECT nome, categoria, preco FROM produtos ORDER BY categoria ASC AND preco DESC;",
+      "SELECT nome, categoria, preco FROM produtos ORDER BY preco DESC, categoria ASC;"
+    ],
+    certa: 1,
+    porque: "Dá para ordenar por várias colunas separadas por vírgula, cada uma com a sua direção. A ordem em que aparecem é o que decide: primeiro a categoria, e o preço só desempata dentro dela."
   }
 ];
 
 const $ = s => document.querySelector(s);
 let atual = 0, acertos = 0, respondeu = false;
+/* o número de perguntas sai do próprio array, para o texto da abertura
+   nunca discordar da quantidade real */
+(() => { const el = document.getElementById('quantas');
+         if (el) el.textContent = PERGUNTAS.length;
+         const el2 = document.getElementById('quantas2');
+         if (el2) el2.textContent = PERGUNTAS.length; })();
 let eu = null;             // perfil do filiado logado
 
 // ---- porta de entrada: só filiado passa ----

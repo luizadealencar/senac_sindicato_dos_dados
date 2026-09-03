@@ -158,15 +158,80 @@ function montarEsquema() {
 /* ---------- conferir desafio ---------- */
 function normaliza(valores) { return valores.map(l => JSON.stringify(l)); }
 
+/* Quais linhas do gabarito estão empatadas na ordenação.
+   Sem isto, um caso como "do mais vendido para o menos" reprovaria o aluno
+   que pôs dois empatados em ordem diferente da minha — sendo que o enunciado
+   não diz como desempatar. Devolve blocos [início, fim] intercambiáveis. */
+function blocosDeEmpate(sqlRef, quantasLinhas) {
+  const limpo = sqlRef.trim().replace(/;\s*$/, '');
+
+  /* acha o ORDER BY que está fora de parênteses (o de fora, não o de subconsulta) */
+  let nivel = 0, pos = -1;
+  for (let i = 0; i < limpo.length; i++) {
+    const c = limpo[i];
+    if (c === '(') nivel++;
+    else if (c === ')') nivel--;
+    else if (nivel === 0 && /^order\s+by\b/i.test(limpo.slice(i))) pos = i;
+  }
+  if (pos < 0) return null;
+
+  let exprs = limpo.slice(pos).replace(/^order\s+by\s+/i, '');
+  const lim = exprs.search(/\s+LIMIT\b/i);
+  if (lim >= 0) exprs = exprs.slice(0, lim);
+
+  const colunas = exprs.split(',')
+    .map(t => t.trim().replace(/\s+(ASC|DESC)$/i, '').trim())
+    .filter(Boolean);
+  if (!colunas.length) return null;
+
+  let chaves;
+  try {
+    chaves = exec(`SELECT ${colunas.join(', ')} FROM (${limpo})`).values;
+  } catch { return null; }                    // não deu para saber: cobra ordem exata
+  if (chaves.length !== quantasLinhas) return null;
+
+  const blocos = [];
+  let ini = 0;
+  for (let i = 1; i <= chaves.length; i++) {
+    const fimDoBloco = i === chaves.length ||
+      JSON.stringify(chaves[i]) !== JSON.stringify(chaves[i - 1]);
+    if (fimDoBloco) { blocos.push([ini, i - 1]); ini = i; }
+  }
+  return blocos;
+}
+
 function conferir(sqlAluno, sqlRef, ordenado) {
   let ra, rb;
   try { rb = exec(sqlRef); } catch (e) { return { ok: false, msg: 'Gabarito com problema — avise a docente.' }; }
   try { ra = exec(sqlAluno); }
   catch (e) { return { ok: false, msg: 'O seu SQL deu erro: ' + e.message }; }
 
-  let A = normaliza(ra.values), B = normaliza(rb.values);
-  if (!ordenado) { A = A.slice().sort(); B = B.slice().sort(); }
-  const igual = A.length === B.length && A.every((x, i) => x === B[i]);
+  const A = normaliza(ra.values), B = normaliza(rb.values);
+
+  if (A.length !== B.length) {
+    if (ra.columns.length !== rb.columns.length)
+      return { ok: false, msg: 'Quase — o número de colunas está diferente do pedido.' };
+    return { ok: false, msg: `O resultado veio com ${A.length} linha(s) e o pedido dá ${B.length}. Confira os filtros.` };
+  }
+
+  let igual;
+  if (!ordenado) {
+    const a = A.slice().sort(), b = B.slice().sort();
+    igual = a.every((x, i) => x === b[i]);
+  } else {
+    const blocos = blocosDeEmpate(sqlRef, B.length);
+    if (!blocos) {
+      igual = A.every((x, i) => x === B[i]);
+    } else {
+      /* dentro de um bloco empatado a ordem é livre; entre blocos, não */
+      igual = blocos.every(([ini, fim]) => {
+        const a = A.slice(ini, fim + 1).sort();
+        const b = B.slice(ini, fim + 1).sort();
+        return a.every((x, i) => x === b[i]);
+      });
+    }
+  }
+
   if (igual) return { ok: true };
   if (ra.columns.length !== rb.columns.length)
     return { ok: false, msg: 'Quase — o número de colunas está diferente do pedido.' };
@@ -315,7 +380,7 @@ const MODULOS = [
           { p: 'Mostre o nome dos clientes e <b>quantas letras</b> cada nome tem.', r: 'SELECT nome, LENGTH(nome) FROM clientes;', dica: 'LENGTH(nome)' },
           { p: 'Monte uma coluna única no formato <b>nome - cidade</b> para cada cliente (com espaço, hífen, espaço).', r: "SELECT nome || ' - ' || cidade FROM clientes;", dica: "No SQLite: a || ' - ' || b. No MySQL seria CONCAT(a,' - ',b)." },
           { p: 'Mostre o <b>ano de cada pedido</b> junto com o id (use os 4 primeiros caracteres da data).', r: 'SELECT id_pedido, SUBSTR(data_pedido, 1, 4) FROM pedidos;', dica: 'SUBSTR(data_pedido, 1, 4)' },
-          { p: 'Conte <b>quantos pedidos houve em cada mês</b> (use os 7 primeiros caracteres da data, tipo 2026-04), do mês mais movimentado para o menos.', r: 'SELECT SUBSTR(data_pedido,1,7) AS mes, COUNT(*) AS qtd FROM pedidos GROUP BY mes ORDER BY qtd DESC, mes ASC;', ordenado: true, dica: 'Agrupe por SUBSTR(data_pedido,1,7)' }
+          { p: 'Conte <b>quantos pedidos houve em cada mês</b> (use os 7 primeiros caracteres da data, tipo 2026-04), do mês mais movimentado para o menos.', r: 'SELECT SUBSTR(data_pedido,1,7) AS mes, COUNT(*) AS qtd FROM pedidos GROUP BY mes ORDER BY qtd DESC;', ordenado: true, dica: 'Agrupe por SUBSTR(data_pedido,1,7)' }
         ,
           { p: 'Mostre a <b>categoria em minúsculas</b> de cada produto, junto com o nome.', r: 'SELECT nome, LOWER(categoria) FROM produtos;', dica: 'LOWER(categoria)' }
         ,
@@ -381,7 +446,7 @@ const MODULOS = [
           { p: 'Mostre <b>quantos produtos há em cada categoria</b>, da categoria com mais produtos para a com menos.', r: 'SELECT categoria, COUNT(*) AS qtd FROM produtos GROUP BY categoria ORDER BY qtd DESC;', ordenado: true, dica: 'GROUP BY categoria e depois ORDER BY a contagem DESC' },
           { p: 'Mostre o <b>estoque total por categoria</b> (categoria e a soma do estoque).', r: 'SELECT categoria, SUM(estoque) FROM produtos GROUP BY categoria;', dica: 'SUM(estoque) com GROUP BY categoria' },
           { p: 'Contando <b>só os clientes ativos</b>, mostre quantos há em cada cidade.', r: "SELECT cidade, COUNT(*) FROM clientes WHERE status_cliente = 'ativo' GROUP BY cidade;", dica: 'O WHERE vem antes do GROUP BY.' },
-          { p: 'Mostre <b>quantos pedidos cada cliente fez</b> (id do cliente e a contagem), do que mais pediu para o que menos pediu.', r: 'SELECT id_cliente, COUNT(*) AS pedidos FROM pedidos GROUP BY id_cliente ORDER BY pedidos DESC, id_cliente ASC;', ordenado: true, dica: 'GROUP BY id_cliente' },
+          { p: 'Mostre <b>quantos pedidos cada cliente fez</b> (id do cliente e a contagem), do que mais pediu para o que menos pediu.', r: 'SELECT id_cliente, COUNT(*) AS pedidos FROM pedidos GROUP BY id_cliente ORDER BY pedidos DESC;', ordenado: true, dica: 'GROUP BY id_cliente' },
           { p: 'Mostre, <b>para cada cidade e cada status</b>, quantos clientes existem (cidade, status e a contagem).', r: 'SELECT cidade, status_cliente, COUNT(*) FROM clientes GROUP BY cidade, status_cliente;', dica: 'Dá para agrupar por duas colunas: GROUP BY cidade, status_cliente' }
         ,
           { p: 'Mostre <b>quantos itens diferentes cada pedido tem</b> (id do pedido e a contagem de linhas).', r: 'SELECT id_pedido, COUNT(*) AS itens FROM itens_pedido GROUP BY id_pedido;', dica: 'GROUP BY id_pedido' }
