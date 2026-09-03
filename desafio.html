@@ -607,13 +607,14 @@ function finalizar(){
   $('#fim').hidden = false;
   const total = PERGUNTAS.length;
   const pct = Math.round(acertos / total * 100);
+  const xp = acertos * 10;   // cada acerto vale 10 XP
 
   let patente, recado;
-  if (acertos === total)      { patente = 'Lenda do Cofre';   recado = 'Gabaritou. O cofre se abriu sem resistência.'; }
-  else if (acertos >= 8)      { patente = 'Veterano';         recado = 'Quase perfeito — o Ato IV está dominado.'; }
-  else if (acertos >= 6)      { patente = 'Operador';         recado = 'Passou no Boss. Revise os pontos que escaparam.'; }
-  else if (acertos >= 4)      { patente = 'Agente';           recado = 'Deu para escapar, mas volte ao caderno reforçar SQL.'; }
-  else                        { patente = 'Novato';           recado = 'O cofre resistiu. Reveja a Consulta rápida e tente de novo.'; }
+  if (pct >= 90)      { patente = 'Lenda do Cofre'; recado = 'Impecável. O cofre se abriu sem resistência.'; }
+  else if (pct >= 70) { patente = 'Veterano';       recado = 'Muito bom — o Ato IV está dominado.'; }
+  else if (pct >= 50) { patente = 'Operador';       recado = 'Passou no Boss. Revise os pontos que escaparam.'; }
+  else if (pct >= 30) { patente = 'Agente';         recado = 'Deu para escapar, mas volte ao caderno reforçar SQL.'; }
+  else                { patente = 'Novato';         recado = 'O cofre resistiu. Reveja a Consulta rápida com calma.'; }
 
   $('#seloTopo').textContent = 'Caso encerrado';
   $('#finalCartao').innerHTML = `
@@ -621,18 +622,12 @@ function finalizar(){
     <div class="nota">${acertos}/${total}</div>
     <span class="patente-sel">${patente}</span>
     <h2 style="margin-top:10px">${pct}% de acerto</h2>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--carimbo);font-weight:700;margin:4px 0 6px">Você conseguiu ${xp} XP</p>
     <p>${recado}</p>
     <p id="registroStatus" class="mono" style="font-size:14px">Registrando o resultado da célula…</p>
     <div class="acoes">
       <a class="btn" href="index.html#placar">Ver o placar</a>
-      <button class="btn vazado" type="button" id="btnDeNovo">Tentar de novo</button>
     </div>`;
-  $('#btnDeNovo').addEventListener('click', () => {
-    atual = 0; acertos = 0;
-    $('#fim').hidden = true; $('#quiz').hidden = false;
-    $('#seloTopo').textContent = 'O interrogatório';
-    mostrar();
-  });
   window.scrollTo({ top: 0, behavior: 'smooth' });
   registrar(acertos, total);
 }
@@ -646,7 +641,7 @@ async function registrar(acertos, total){
     const { error } = await sb.from('topicos').insert({
       autor_id: eu.id,
       titulo: 'Desafio (Boss do Ato IV)' + (eu.celula ? ' · ' + eu.celula : ''),
-      corpo: 'Resultado do Desafio: ' + acertos + '/' + total + ' acertos.',
+      corpo: 'Resultado do Desafio: ' + acertos + '/' + total + ' acertos = ' + (acertos * 10) + ' XP.',
       categoria: 'entrega',
       missao: 6
     });
