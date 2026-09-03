@@ -527,10 +527,36 @@ let eu = null;             // perfil do filiado logado
   if (!user) { travar(); return; }
   if (perfil && perfil.filiado === false) { travar('Sua conta existe, mas a ficha ainda não foi carimbada. Volte ao Entrar e digite o código da turma.'); return; }
   eu = perfil || { id: user.id, celula: '', nome: user.email };
+
+  // uma tentativa só: se já existe entrega do Desafio desta pessoa, tranca.
+  if (sb && eu.id) {
+    try {
+      const { data } = await sb.from('topicos')
+        .select('corpo, criado_em')
+        .eq('autor_id', eu.id)
+        .ilike('titulo', 'Desafio%')
+        .limit(1);
+      if (data && data.length) { travarFeito(data[0]); return; }
+    } catch (e) { /* se a checagem falhar, deixa passar para não travar por engano */ }
+  }
+
   $('#carregando').hidden = true;
   $('#trava').hidden = true;
   $('#abertura').hidden = false;
 })();
+
+// tela de "já fez" — o Desafio tem tentativa única
+function travarFeito(reg){
+  $('#carregando').hidden = true;
+  $('#abertura').hidden = true;
+  const seu = (reg && reg.corpo) ? String(reg.corpo).replace('Resultado do Desafio:', '').trim() : '';
+  const t = $('#trava');
+  t.innerHTML = `
+    <h2>Você já enfrentou o Boss</h2>
+    <p>O Desafio tem <b>uma tentativa só</b>, e a sua já está registrada${seu ? ' — você fez <b>' + esc(seu) + '</b>' : ''}. Se precisar refazer, fale com a docente.</p>
+    <div class="acoes"><a class="btn" href="index.html#placar">Ver o placar</a></div>`;
+  t.hidden = false;
+}
 
 function travar(msg){
   $('#carregando').hidden = true;
