@@ -637,14 +637,17 @@ function montarMateria() {
     if (cx) cx.open = false;
     const barra = document.getElementById('progresso');
     const folga = (barra && !barra.hidden ? barra.offsetHeight : 0) + 16;
-    /* Salto seco, e não suave: numa página de vinte mil pixels o Chrome
-       interrompe a animação no meio do caminho e o aluno fica perdido.
-       Dois quadros, para o painel já ter fechado quando a conta é feita. */
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const y = destino.getBoundingClientRect().top + window.pageYOffset - folga;
-      window.scrollTo({ top: y, behavior: 'instant' });
-      history.replaceState(null, '', a.getAttribute('href'));
-    }));
+    /* Fechar o painel encurta a página acima do destino, então é preciso
+       forçar o recálculo do layout ANTES de medir — daí a leitura de
+       offsetHeight, cujo valor não interessa.
+       O salto é seco: 'instant', e não 'auto', porque o base.css define
+       scroll-behavior:smooth e numa página de cinquenta mil pixels o
+       próprio Chrome cancela a animação no meio do caminho. E nada de
+       requestAnimationFrame, que não dispara com a aba em segundo plano. */
+    void document.body.offsetHeight;
+    const y = destino.getBoundingClientRect().top + window.pageYOffset - folga;
+    window.scrollTo({ top: y, behavior: 'instant' });
+    history.replaceState(null, '', a.getAttribute('href'));
   });
 }
 
