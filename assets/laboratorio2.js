@@ -192,7 +192,32 @@ function conferir(sqlAluno, caso) {
   if (String(obtido[i]).startsWith('ERRO:')) {
     return { ok: false, msg: 'O banco não ficou como o pedido: ' + obtido[i].slice(5) };
   }
-  return { ok: false, msg: caso.pista || 'O banco não ficou do jeito pedido. Confira nomes, colunas e o filtro do WHERE.' };
+  return { ok: false, msg: caso.pista || recadoPorTipo(caso.r) };
+}
+
+/* A dica do erro muda conforme o comando: falar em "filtro do WHERE" num
+   CREATE TABLE só confunde quem está começando. */
+function recadoPorTipo(sqlGabarito) {
+  const c = sqlGabarito.trim().toUpperCase();
+  if (c.startsWith('CREATE TABLE'))
+    return 'O banco não ficou do jeito pedido. Confira o nome da tabela, o nome de cada coluna e as restrições (PRIMARY KEY, NOT NULL, UNIQUE, DEFAULT, CHECK).';
+  if (c.startsWith('CREATE INDEX') || c.startsWith('CREATE UNIQUE'))
+    return 'O banco não ficou do jeito pedido. Confira o nome do índice, a tabela e a coluna.';
+  if (c.startsWith('CREATE VIEW'))
+    return 'O banco não ficou do jeito pedido. Confira o nome da view e a consulta que ela guarda.';
+  if (c.startsWith('ALTER TABLE'))
+    return 'O banco não ficou do jeito pedido. Confira a tabela, o nome da coluna e qual forma de ALTER o caso pede.';
+  if (c.startsWith('DROP'))
+    return 'O banco não ficou do jeito pedido. Confira o que devia sumir e o que devia ficar de pé.';
+  if (c.startsWith('INSERT'))
+    return 'O banco não ficou do jeito pedido. Confira as colunas, os valores e a ordem entre eles.';
+  if (c.startsWith('UPDATE'))
+    return 'O banco não ficou do jeito pedido. Confira o SET e, principalmente, o WHERE: sem ele o comando muda a tabela inteira.';
+  if (c.startsWith('DELETE'))
+    return 'O banco não ficou do jeito pedido. Confira o WHERE: sem ele o comando apaga tudo.';
+  if (c.startsWith('BEGIN'))
+    return 'O banco não ficou do jeito pedido. Confira a ordem dos comandos e se a transação termina em COMMIT ou ROLLBACK, como o caso pede.';
+  return 'O banco não ficou do jeito pedido. Confira nomes, colunas e as condições do comando.';
 }
 
 /* ==========================================================================
