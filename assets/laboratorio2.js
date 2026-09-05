@@ -11,6 +11,7 @@
    ========================================================================== */
 
 import { sb, configurado, sessao, esc } from './sindicato.js';
+import { htmlEtiquetas, etiquetasDe, textoDe } from './etiquetas.js';
 
 let SQL = null;          // a biblioteca
 let sementeDoBanco = null;  // bytes do banco recém-criado, para repor quando quiser
@@ -155,7 +156,10 @@ function estadoDe(banco, verificacoes) {
       const u = r.length ? r[r.length - 1] : { columns: [], values: [] };
       return JSON.stringify({ c: u.columns, v: u.values });
     } catch (e) {
-      return 'ERRO:' + e.message;      // a tabela pode nem existir: isso também é um estado
+      /* Só interessa QUE recusou, não a frase do erro: um aluno que dê nome
+         à restrição (CONSTRAINT chk_valor CHECK ...) recebe outra mensagem
+         e estaria igualmente certo. */
+      return 'RECUSOU';
     }
   });
 }
@@ -356,13 +360,13 @@ const MODULOS = [
         exemplo: "CREATE TABLE promocoes (\n  id_promocao INTEGER PRIMARY KEY,\n  nome TEXT NOT NULL UNIQUE,\n  percentual REAL CHECK (percentual BETWEEN 1 AND 90),\n  ativa INTEGER DEFAULT 1\n);",
         desafios: [
           { p: "Crie a tabela <b>marcas</b> com <b>id_marca</b> (chave primária) e <b>nome</b> (texto, obrigatório e <b>único</b>).", r: "CREATE TABLE marcas (id_marca INTEGER PRIMARY KEY, nome TEXT NOT NULL UNIQUE);", v: ["SELECT name, \"notnull\", pk FROM pragma_table_info('marcas');", "SELECT COUNT(*) FROM pragma_index_list('marcas') WHERE origin='u';"], dica: "UNIQUE vai junto do NOT NULL, na mesma coluna." },
-          { p: "Crie a tabela <b>assinaturas</b> com <b>id_assinatura</b> (chave primária), <b>id_cliente</b> (inteiro) e <b>plano</b> (texto) com valor padrão <b>'basico'</b>.", r: "CREATE TABLE assinaturas (id_assinatura INTEGER PRIMARY KEY, id_cliente INTEGER, plano TEXT DEFAULT 'basico');", v: ["SELECT name, dflt_value FROM pragma_table_info('assinaturas');"], dica: "DEFAULT 'basico' logo depois do tipo da coluna." },
-          { p: "Crie a tabela <b>notas_fiscais</b> com <b>id_nota</b> (chave primária), <b>valor</b> (decimal, obrigatório) e uma regra que só aceite <b>valor maior que zero</b>.", r: "CREATE TABLE notas_fiscais (id_nota INTEGER PRIMARY KEY, valor REAL NOT NULL CHECK (valor > 0));", v: ["SELECT sql FROM sqlite_master WHERE name='notas_fiscais';"], dica: "CHECK (valor > 0) depois da coluna." },
-          { p: "Crie a tabela <b>funcionarios</b> com <b>id_funcionario</b> (chave primária), <b>nome</b> (obrigatório) e <b>salario</b> (decimal) com padrão <b>1500</b>.", r: "CREATE TABLE funcionarios (id_funcionario INTEGER PRIMARY KEY, nome TEXT NOT NULL, salario REAL DEFAULT 1500);", v: ["SELECT name, \"notnull\", dflt_value FROM pragma_table_info('funcionarios');"], dica: "DEFAULT 1500, sem aspas por ser número." },
+          { p: "Crie a tabela <b>assinaturas</b> com <b>id_assinatura</b> (chave primária), <b>id_cliente</b> (inteiro) e <b>plano</b> (texto) com valor padrão <b>'basico'</b>.", r: "CREATE TABLE assinaturas (id_assinatura INTEGER PRIMARY KEY, id_cliente INTEGER, plano TEXT DEFAULT 'basico');", v: ["SELECT name, pk FROM pragma_table_info('assinaturas');", "INSERT INTO assinaturas (id_assinatura, id_cliente) VALUES (1, 7);", "SELECT id_assinatura, id_cliente, plano FROM assinaturas;"], dica: "DEFAULT 'basico' logo depois do tipo da coluna." },
+          { p: "Crie a tabela <b>notas_fiscais</b> com <b>id_nota</b> (chave primária), <b>valor</b> (decimal, obrigatório) e uma regra que só aceite <b>valor maior que zero</b>.", r: "CREATE TABLE notas_fiscais (id_nota INTEGER PRIMARY KEY, valor REAL NOT NULL CHECK (valor > 0));", v: ["SELECT name, \"notnull\", pk FROM pragma_table_info('notas_fiscais');", "INSERT INTO notas_fiscais (id_nota, valor) VALUES (1, 25.5);", "INSERT INTO notas_fiscais (id_nota, valor) VALUES (2, 0);", "SELECT id_nota, valor FROM notas_fiscais ORDER BY id_nota;"], dica: "CHECK (valor > 0) depois da coluna." },
+          { p: "Crie a tabela <b>funcionarios</b> com <b>id_funcionario</b> (chave primária), <b>nome</b> (obrigatório) e <b>salario</b> (decimal) com padrão <b>1500</b>.", r: "CREATE TABLE funcionarios (id_funcionario INTEGER PRIMARY KEY, nome TEXT NOT NULL, salario REAL DEFAULT 1500);", v: ["SELECT name, \"notnull\", pk FROM pragma_table_info('funcionarios');", "INSERT INTO funcionarios (id_funcionario, nome) VALUES (1, 'Ana');", "SELECT id_funcionario, nome, salario FROM funcionarios;"], dica: "DEFAULT 1500, sem aspas por ser número." },
           { p: "Crie a tabela <b>status_pedido</b> com <b>sigla</b> (texto, chave primária) e <b>descricao</b> (texto, obrigatório e único).", r: "CREATE TABLE status_pedido (sigla TEXT PRIMARY KEY, descricao TEXT NOT NULL UNIQUE);", v: ["SELECT name, \"notnull\", pk FROM pragma_table_info('status_pedido');", "SELECT COUNT(*) FROM pragma_index_list('status_pedido') WHERE origin='u';"], dica: "Chave primária de texto e a descrição com NOT NULL UNIQUE." },
-          { p: "Crie a tabela <b>metas</b> com <b>id_meta</b> (chave primária), <b>mes</b> (texto) e <b>quantidade</b> (inteiro) que só aceite valores <b>de 0 a 1000</b>.", r: "CREATE TABLE metas (id_meta INTEGER PRIMARY KEY, mes TEXT, quantidade INTEGER CHECK (quantidade BETWEEN 0 AND 1000));", v: ["SELECT sql FROM sqlite_master WHERE name='metas';"], dica: "CHECK (quantidade BETWEEN 0 AND 1000)." },
-          { p: "Crie a tabela <b>brindes</b> com <b>id_brinde</b> (chave primária), <b>nome</b> (obrigatório) e <b>estoque</b> (inteiro) com padrão <b>0</b>.", r: "CREATE TABLE brindes (id_brinde INTEGER PRIMARY KEY, nome TEXT NOT NULL, estoque INTEGER DEFAULT 0);", v: ["SELECT name, \"notnull\", dflt_value FROM pragma_table_info('brindes');"], dica: "DEFAULT 0 evita estoque em branco." },
-          { p: "Crie a tabela <b>promocoes</b> com <b>id_promocao</b> (chave primária), <b>nome</b> (obrigatório e único), <b>percentual</b> (decimal) que só aceite <b>entre 1 e 90</b>, e <b>ativa</b> (inteiro) com padrão <b>1</b>.", r: "CREATE TABLE promocoes (id_promocao INTEGER PRIMARY KEY, nome TEXT NOT NULL UNIQUE, percentual REAL CHECK (percentual BETWEEN 1 AND 90), ativa INTEGER DEFAULT 1);", v: ["SELECT sql FROM sqlite_master WHERE name='promocoes';"], dica: "Junte tudo: NOT NULL, UNIQUE, CHECK e DEFAULT na mesma tabela." }
+          { p: "Crie a tabela <b>metas</b> com <b>id_meta</b> (chave primária), <b>mes</b> (texto) e <b>quantidade</b> (inteiro) que só aceite valores <b>de 0 a 1000</b> — as pontas contam como válidas.", r: "CREATE TABLE metas (id_meta INTEGER PRIMARY KEY, mes TEXT, quantidade INTEGER CHECK (quantidade BETWEEN 0 AND 1000));", v: ["SELECT name, pk FROM pragma_table_info('metas');", "INSERT INTO metas (id_meta, mes, quantidade) VALUES (1, 'jan', 500);", "INSERT INTO metas (id_meta, mes, quantidade) VALUES (2, 'fev', -1);", "INSERT INTO metas (id_meta, mes, quantidade) VALUES (3, 'mar', 1001);", "SELECT id_meta, mes, quantidade FROM metas ORDER BY id_meta;"], dica: "CHECK (quantidade BETWEEN 0 AND 1000)." },
+          { p: "Crie a tabela <b>brindes</b> com <b>id_brinde</b> (chave primária), <b>nome</b> (obrigatório) e <b>estoque</b> (inteiro) com padrão <b>0</b>.", r: "CREATE TABLE brindes (id_brinde INTEGER PRIMARY KEY, nome TEXT NOT NULL, estoque INTEGER DEFAULT 0);", v: ["SELECT name, \"notnull\", pk FROM pragma_table_info('brindes');", "INSERT INTO brindes (id_brinde, nome) VALUES (1, 'Caneta');", "SELECT id_brinde, nome, estoque FROM brindes;"], dica: "DEFAULT 0 evita estoque em branco." },
+          { p: "Crie a tabela <b>promocoes</b> com <b>id_promocao</b> (chave primária), <b>nome</b> (obrigatório e único), <b>percentual</b> (decimal) que só aceite <b>de 1 a 90</b> (as pontas contam como válidas), e <b>ativa</b> (inteiro) com padrão <b>1</b>.", r: "CREATE TABLE promocoes (id_promocao INTEGER PRIMARY KEY, nome TEXT NOT NULL UNIQUE, percentual REAL CHECK (percentual BETWEEN 1 AND 90), ativa INTEGER DEFAULT 1);", v: ["SELECT name, \"notnull\", pk FROM pragma_table_info('promocoes');", "INSERT INTO promocoes (id_promocao, nome, percentual) VALUES (1, 'Verao', 10);", "INSERT INTO promocoes (id_promocao, nome, percentual) VALUES (2, 'Verao', 20);", "INSERT INTO promocoes (id_promocao, nome, percentual) VALUES (3, 'Inverno', 95);", "SELECT id_promocao, nome, percentual, ativa FROM promocoes ORDER BY id_promocao;"], dica: "Junte tudo: NOT NULL, UNIQUE, CHECK e DEFAULT na mesma tabela." }
         ]
       }
       ,
@@ -414,13 +418,13 @@ const MODULOS = [
         exemplo: "ALTER TABLE clientes ADD COLUMN observacao TEXT;\nALTER TABLE clientes RENAME COLUMN status_cliente TO situacao;\nALTER TABLE itens_pedido RENAME TO itens_do_pedido;",
         desafios: [
           { p: "Acrescente à tabela <b>clientes</b> a coluna <b>observacao</b>, do tipo texto.", r: "ALTER TABLE clientes ADD COLUMN observacao TEXT;", v: ["SELECT name FROM pragma_table_info('clientes');"], dica: "ALTER TABLE tabela ADD COLUMN nome TIPO;" },
-          { p: "Acrescente a <b>produtos</b> a coluna <b>peso_gramas</b>, inteiro, com valor padrão <b>0</b>.", r: "ALTER TABLE produtos ADD COLUMN peso_gramas INTEGER DEFAULT 0;", v: ["SELECT name, dflt_value FROM pragma_table_info('produtos');", "SELECT id_produto, peso_gramas FROM produtos ORDER BY id_produto;"], dica: "O DEFAULT vale para as linhas que já existem." },
-          { p: "Acrescente a <b>pedidos</b> a coluna <b>observacao</b> (texto) e a coluna <b>frete</b> (decimal, padrão 0).", r: "ALTER TABLE pedidos ADD COLUMN observacao TEXT;\nALTER TABLE pedidos ADD COLUMN frete REAL DEFAULT 0;", v: ["SELECT name, dflt_value FROM pragma_table_info('pedidos');"], dica: "Uma coluna por comando: são dois ALTER." },
+          { p: "Acrescente a <b>produtos</b> a coluna <b>peso_gramas</b>, inteiro, com valor padrão <b>0</b>.", r: "ALTER TABLE produtos ADD COLUMN peso_gramas INTEGER DEFAULT 0;", v: ["SELECT name FROM pragma_table_info('produtos');", "SELECT id_produto, peso_gramas FROM produtos ORDER BY id_produto;"], dica: "O DEFAULT vale para as linhas que já existem." },
+          { p: "Acrescente a <b>pedidos</b> a coluna <b>observacao</b> (texto) e a coluna <b>frete</b> (decimal, padrão 0).", r: "ALTER TABLE pedidos ADD COLUMN observacao TEXT;\nALTER TABLE pedidos ADD COLUMN frete REAL DEFAULT 0;", v: ["SELECT name FROM pragma_table_info('pedidos');", "SELECT id_pedido, observacao, frete FROM pedidos ORDER BY id_pedido;"], dica: "Uma coluna por comando: são dois ALTER." },
           { p: "Renomeie a tabela <b>itens_pedido</b> para <b>itens_do_pedido</b>.", r: "ALTER TABLE itens_pedido RENAME TO itens_do_pedido;", v: ["SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name;"], dica: "ALTER TABLE atual RENAME TO novo; (no MySQL também vale RENAME TABLE a TO b)" },
           { p: "Renomeie, na tabela <b>clientes</b>, a coluna <b>status_cliente</b> para <b>situacao</b>.", r: "ALTER TABLE clientes RENAME COLUMN status_cliente TO situacao;", v: ["SELECT name FROM pragma_table_info('clientes');", "SELECT id_cliente, situacao FROM clientes ORDER BY id_cliente;"], dica: "ALTER TABLE tabela RENAME COLUMN antiga TO nova;" },
           { p: "Crie a tabela <b>ficha_teste</b> com as colunas <b>a</b> (inteiro), <b>b</b> (texto) e <b>c</b> (texto); depois <b>apague a coluna b</b>.", r: "CREATE TABLE ficha_teste (a INTEGER, b TEXT, c TEXT);\nALTER TABLE ficha_teste DROP COLUMN b;", v: ["SELECT name FROM pragma_table_info('ficha_teste');"], dica: "ALTER TABLE tabela DROP COLUMN coluna; — existe no SQLite desde 2021 e no MySQL há muito tempo." },
           { p: "Crie a tabela <b>rascunho</b> com uma coluna <b>a</b> (inteiro), depois acrescente a coluna <b>b</b> (texto) e renomeie a tabela para <b>rascunho_final</b>.", r: "CREATE TABLE rascunho (a INTEGER);\nALTER TABLE rascunho ADD COLUMN b TEXT;\nALTER TABLE rascunho RENAME TO rascunho_final;", v: ["SELECT name FROM pragma_table_info('rascunho_final');", "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('rascunho','rascunho_final');"], dica: "Três comandos em sequência." },
-          { p: "Acrescente a <b>clientes</b> a coluna <b>pontos</b> (inteiro, padrão 0) e confira que todos os clientes já nascem com zero.", r: "ALTER TABLE clientes ADD COLUMN pontos INTEGER DEFAULT 0;", v: ["SELECT name, dflt_value FROM pragma_table_info('clientes');", "SELECT COUNT(*) FROM clientes WHERE pontos = 0;"], dica: "ADD COLUMN pontos INTEGER DEFAULT 0" }
+          { p: "Acrescente a <b>clientes</b> a coluna <b>pontos</b> (inteiro, padrão 0) e confira que todos os clientes já nascem com zero.", r: "ALTER TABLE clientes ADD COLUMN pontos INTEGER DEFAULT 0;", v: ["SELECT name FROM pragma_table_info('clientes');", "SELECT COUNT(*) FROM clientes WHERE pontos = 0;"], dica: "ADD COLUMN pontos INTEGER DEFAULT 0" }
         ]
       }
       ,
@@ -444,8 +448,8 @@ const MODULOS = [
         desafios: [
           { p: "Crie um índice chamado <b>idx_clientes_cidade</b> sobre a coluna <b>cidade</b> da tabela <b>clientes</b>.", r: "CREATE INDEX idx_clientes_cidade ON clientes (cidade);", v: ["SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%' ORDER BY name;"], dica: "CREATE INDEX nome ON tabela (coluna);" },
           { p: "Crie o índice <b>idx_produtos_categoria</b> sobre a coluna <b>categoria</b> de <b>produtos</b>.", r: "CREATE INDEX idx_produtos_categoria ON produtos (categoria);", v: ["SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%' ORDER BY name;"], dica: "O nome do índice é escolha sua; use idx_ para reconhecer depois." },
-          { p: "Crie um índice <b>único</b> chamado <b>idx_clientes_email</b> sobre <b>email</b> em <b>clientes</b>.", r: "CREATE UNIQUE INDEX idx_clientes_email ON clientes (email);", v: ["SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%' ORDER BY name;", "SELECT sql FROM sqlite_master WHERE name='idx_clientes_email';"], dica: "CREATE UNIQUE INDEX impede dois valores iguais na coluna." },
-          { p: "Crie o índice <b>idx_pedidos_cliente_data</b> sobre <b>duas colunas</b> de pedidos: <b>id_cliente</b> e <b>data_pedido</b>, nessa ordem.", r: "CREATE INDEX idx_pedidos_cliente_data ON pedidos (id_cliente, data_pedido);", v: ["SELECT sql FROM sqlite_master WHERE name='idx_pedidos_cliente_data';"], dica: "As colunas vão dentro dos parênteses, separadas por vírgula." },
+          { p: "Crie um índice <b>único</b> chamado <b>idx_clientes_email</b> sobre <b>email</b> em <b>clientes</b>.", r: "CREATE UNIQUE INDEX idx_clientes_email ON clientes (email);", v: ["SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%' ORDER BY name;", "SELECT \"unique\" FROM pragma_index_list('clientes') WHERE name='idx_clientes_email';", "SELECT name FROM pragma_index_info('idx_clientes_email');"], dica: "CREATE UNIQUE INDEX impede dois valores iguais na coluna." },
+          { p: "Crie o índice <b>idx_pedidos_cliente_data</b> sobre <b>duas colunas</b> de pedidos: <b>id_cliente</b> e <b>data_pedido</b>, nessa ordem.", r: "CREATE INDEX idx_pedidos_cliente_data ON pedidos (id_cliente, data_pedido);", v: ["SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%' ORDER BY name;", "SELECT name FROM pragma_index_info('idx_pedidos_cliente_data');"], dica: "As colunas vão dentro dos parênteses, separadas por vírgula." },
           { p: "Crie os índices <b>idx_temp</b> (sobre <b>status</b> em pedidos) e <b>idx_fica</b> (sobre <b>data_pedido</b> em pedidos), e depois <b>apague só o idx_temp</b>.", r: "CREATE INDEX idx_temp ON pedidos (status);\nCREATE INDEX idx_fica ON pedidos (data_pedido);\nDROP INDEX idx_temp;", v: ["SELECT name FROM sqlite_master WHERE type='index' AND name NOT LIKE 'sqlite_%' ORDER BY name;"], dica: "DROP INDEX nome; — no MySQL seria DROP INDEX nome ON tabela." }
         ]
       }
@@ -563,7 +567,7 @@ const MODULOS = [
         desafios: [
           { p: "Monte o cadastro de <b>setores</b>: crie a tabela com <b>id_setor</b> (chave primária) e <b>nome</b> (texto, obrigatório e único); insira <b>Vendas</b> e <b>Estoque</b> com ids 1 e 2; e crie o índice <b>idx_setores_nome</b> sobre o nome.", r: "CREATE TABLE setores (id_setor INTEGER PRIMARY KEY, nome TEXT NOT NULL UNIQUE);\nINSERT INTO setores (id_setor, nome) VALUES (1, 'Vendas'), (2, 'Estoque');\nCREATE INDEX idx_setores_nome ON setores (nome);", v: ["SELECT * FROM setores ORDER BY id_setor;", "SELECT name FROM sqlite_master WHERE type='index' AND name='idx_setores_nome';"], dica: "Três comandos: criar, povoar e indexar." },
           { p: "Faça a limpeza de fim de semestre, tudo numa transação que termina em COMMIT: apague os itens dos pedidos cancelados, depois apague os pedidos cancelados.", r: "BEGIN;\nDELETE FROM itens_pedido WHERE id_pedido IN (SELECT id_pedido FROM pedidos WHERE status = 'cancelado');\nDELETE FROM pedidos WHERE status = 'cancelado';\nCOMMIT;", v: ["SELECT COUNT(*) FROM pedidos WHERE status = 'cancelado';", "SELECT id_pedido, id_produto FROM itens_pedido ORDER BY id_pedido, id_produto;"], dica: "Apague primeiro o filho (itens) e depois o pai (pedido), senão sobra item órfão." },
-          { p: "Crie a tabela <b>relatorio_cidades</b> com <b>cidade</b> e <b>clientes</b>, grave nela quantos clientes há em cada cidade, e acrescente depois a coluna <b>gerado_em</b> (texto) com padrão <b>'2026-09-09'</b>.", r: "CREATE TABLE relatorio_cidades (cidade TEXT, clientes INTEGER);\nINSERT INTO relatorio_cidades (cidade, clientes) SELECT cidade, COUNT(*) FROM clientes GROUP BY cidade;\nALTER TABLE relatorio_cidades ADD COLUMN gerado_em TEXT DEFAULT '2026-09-09';", v: ["SELECT * FROM relatorio_cidades ORDER BY cidade;", "SELECT name, dflt_value FROM pragma_table_info('relatorio_cidades');"], dica: "Criar, povoar com INSERT ... SELECT e alterar. Três comandos." },
+          { p: "Crie a tabela <b>relatorio_cidades</b> com <b>cidade</b> e <b>clientes</b>, grave nela quantos clientes há em cada cidade, e acrescente depois a coluna <b>gerado_em</b> (texto) com padrão <b>'2026-09-09'</b>.", r: "CREATE TABLE relatorio_cidades (cidade TEXT, clientes INTEGER);\nINSERT INTO relatorio_cidades (cidade, clientes) SELECT cidade, COUNT(*) FROM clientes GROUP BY cidade;\nALTER TABLE relatorio_cidades ADD COLUMN gerado_em TEXT DEFAULT '2026-09-09';", v: ["SELECT * FROM relatorio_cidades ORDER BY cidade;", "SELECT name FROM pragma_table_info('relatorio_cidades');", "INSERT INTO relatorio_cidades (cidade, clientes) VALUES ('Zzz', 0);", "SELECT cidade, clientes, gerado_em FROM relatorio_cidades ORDER BY cidade;"], dica: "Criar, povoar com INSERT ... SELECT e alterar. Três comandos." },
           { p: "<b>Caso final.</b> Crie <b>produtos_arquivados</b> com as mesmas colunas de produtos (id_produto chave primária, nome, categoria, preco, estoque); mova para lá os produtos <b>com estoque zero</b> (copie e depois apague da tabela original); e faça tudo dentro de uma transação confirmada.", r: "BEGIN;\nCREATE TABLE produtos_arquivados (id_produto INTEGER PRIMARY KEY, nome TEXT, categoria TEXT, preco REAL, estoque INTEGER);\nINSERT INTO produtos_arquivados SELECT id_produto, nome, categoria, preco, estoque FROM produtos WHERE estoque = 0;\nDELETE FROM produtos WHERE estoque = 0;\nCOMMIT;", v: ["SELECT * FROM produtos_arquivados ORDER BY id_produto;", "SELECT id_produto FROM produtos ORDER BY id_produto;"], dica: "Copiar, apagar e confirmar — o arquivo morto de um sistema de verdade." }
         ]
       }
@@ -581,18 +585,58 @@ function pintarSQL(sql) {
   return esc(sql).replace(/(--[^\n]*)/g, '<span class="cm">$1</span>');
 }
 
+
+/* ==========================================================================
+   A MATÉRIA — um resumo de tudo no começo da página, que foi pedido pelos
+   alunos. Sai das próprias lições, então não há uma segunda versão do
+   conteúdo para manter atualizada. Cada item leva à lição inteira.
+   ========================================================================== */
+function montarMateria() {
+  const alvo = document.getElementById('materia');
+  if (!alvo) return;
+
+  const html = MODULOS.map(mod => {
+    const itens = mod.licoes.map((li, k) => {
+      const id = `licao-${mod.num}-${k}`;
+      /* resumo: as primeiras frases da explicação, até dar uma linha cheia.
+         Uma frase só às vezes é curta demais ("O INSERT grava linhas."). */
+      const semTag = textoDe(li.html);
+      const frases = semTag.split(/(?<=[.:])\s+/);
+      let resumo = '';
+      for (const f of frases) {
+        if (resumo && (resumo + ' ' + f).length > 190) break;
+        resumo = resumo ? resumo + ' ' + f : f;
+        if (resumo.length >= 110) break;
+      }
+      if (resumo.endsWith(':')) resumo = resumo.slice(0, -1) + '.';
+      const comandos = [...new Set(li.desafios.flatMap(d => etiquetasDe(d.r, 3)))].slice(0, 5);
+      return `<a class="materia-item" href="#${id}">
+        <b>${esc(li.titulo)}</b>
+        <span>${esc(resumo)}</span>
+        ${comandos.length ? `<span class="usa">${comandos.map(c => `<code>${esc(c)}</code>`).join('')}</span>` : ''}
+      </a>`;
+    }).join('');
+    return `<div class="materia-bloco">
+      <h3><span>${esc(mod.num)}</span> ${esc(mod.nome)} <small>${esc(mod.dur)}</small></h3>
+      <div class="materia-lista">${itens}</div>
+    </div>`;
+  }).join('');
+
+  alvo.innerHTML = html;
+}
+
 function montarConteudo() {
   const alvo = $('#conteudo');
   let n = 0;
   alvo.innerHTML = MODULOS.map(mod => {
     const nCasos = mod.licoes.reduce((t, li) => t + li.desafios.length, 0);
-    const licoes = mod.licoes.map(li => {
+    const licoes = mod.licoes.map((li, ki) => {
       const casos = li.desafios.map(d => {
         const id = 'b' + (n++);
         gabaritos[id] = d;
         return `
           <div class="desafio" id="${id}">
-            <div class="desafio-cab"><span>Caso</span><span>+10 XP</span></div>
+            <div class="desafio-cab"><span>Caso</span>${htmlEtiquetas(d.r)}<span>+10 XP</span></div>
             <div class="desafio-corpo">
               <p>${d.p}</p>
               <textarea spellcheck="false" placeholder="Escreva o seu comando aqui…"></textarea>
@@ -608,7 +652,7 @@ function montarConteudo() {
           </div>`;
       }).join('');
       return `
-        <div class="licao">
+        <div class="licao" id="licao-${mod.num}-${ki}">
           <h3>${esc(li.titulo)}</h3>
           <p>${li.html}</p>
           <div class="exemplo">${pintarSQL(li.exemplo)}</div>
@@ -638,6 +682,7 @@ function montarConteudo() {
     if (v) { v.className = 'veredicto bom'; v.textContent = 'Resolvido numa sessão anterior.'; }
   }
 
+  montarMateria();
   ligarInteracoes();
   atualizarProgresso();
 }

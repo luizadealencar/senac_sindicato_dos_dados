@@ -4,6 +4,7 @@
    ========================================================================== */
 
 import { sb, configurado, sessao, esc } from './sindicato.js';
+import { htmlEtiquetas, etiquetasDe, textoDe } from './etiquetas.js';
 
 let db = null;
 let eu = null;                    // ficha do aluno que entrou
@@ -689,16 +690,56 @@ async function gravarNoBanco() {
 /* ---------- render ---------- */
 let totalDesafios = 0;
 
+
+/* ==========================================================================
+   A MATÉRIA — um resumo de tudo no começo da página, que foi pedido pelos
+   alunos. Sai das próprias lições, então não há uma segunda versão do
+   conteúdo para manter atualizada. Cada item leva à lição inteira.
+   ========================================================================== */
+function montarMateria() {
+  const alvo = document.getElementById('materia');
+  if (!alvo) return;
+
+  const html = MODULOS.map(mod => {
+    const itens = mod.licoes.map((li, k) => {
+      const id = `licao-${mod.num}-${k}`;
+      /* resumo: as primeiras frases da explicação, até dar uma linha cheia.
+         Uma frase só às vezes é curta demais ("O INSERT grava linhas."). */
+      const semTag = textoDe(li.html);
+      const frases = semTag.split(/(?<=[.:])\s+/);
+      let resumo = '';
+      for (const f of frases) {
+        if (resumo && (resumo + ' ' + f).length > 190) break;
+        resumo = resumo ? resumo + ' ' + f : f;
+        if (resumo.length >= 110) break;
+      }
+      if (resumo.endsWith(':')) resumo = resumo.slice(0, -1) + '.';
+      const comandos = [...new Set(li.desafios.flatMap(d => etiquetasDe(d.r, 3)))].slice(0, 5);
+      return `<a class="materia-item" href="#${id}">
+        <b>${esc(li.titulo)}</b>
+        <span>${esc(resumo)}</span>
+        ${comandos.length ? `<span class="usa">${comandos.map(c => `<code>${esc(c)}</code>`).join('')}</span>` : ''}
+      </a>`;
+    }).join('');
+    return `<div class="materia-bloco">
+      <h3><span>${esc(mod.num)}</span> ${esc(mod.nome)} <small>${esc(mod.dur)}</small></h3>
+      <div class="materia-lista">${itens}</div>
+    </div>`;
+  }).join('');
+
+  alvo.innerHTML = html;
+}
+
 function montarConteudo() {
   const alvo = $('#conteudo');
   let n = 0;
   const html = MODULOS.map(mod => {
-    const licoes = mod.licoes.map(li => {
+    const licoes = mod.licoes.map((li, ki) => {
       const desafios = li.desafios.map(d => {
         const id = 'd' + (n++);
         return `
           <div class="desafio" id="${id}">
-            <div class="desafio-cab"><span>Caso</span><span>+10 XP</span></div>
+            <div class="desafio-cab"><span>Caso</span>${htmlEtiquetas(d.r)}<span>+10 XP</span></div>
             <div class="desafio-corpo">
               <p>${d.p}</p>
               <textarea spellcheck="false" placeholder="Escreva a sua consulta aqui…"></textarea>
@@ -714,7 +755,7 @@ function montarConteudo() {
           </div>`;
       }).join('');
       return `
-        <div class="licao">
+        <div class="licao" id="licao-${mod.num}-${ki}">
           <h3>${esc(li.titulo)}</h3>
           <p>${li.html}</p>
           <div class="exemplo">${pintarSQL(li.exemplo)}</div>
@@ -750,6 +791,7 @@ function montarConteudo() {
   n = 0;
   MODULOS.forEach(mod => mod.licoes.forEach(li => li.desafios.forEach(d => { gabaritos['d' + (n++)] = d; })));
 
+  montarMateria();
   ligarInteracoes();
   atualizarProgresso();   // sem isto o contador volta zerado depois de um F5
 }

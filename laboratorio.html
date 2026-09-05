@@ -30,6 +30,55 @@
   font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.2em;
   font-size:13px;font-weight:600;color:var(--carimbo);margin:22px 0 -6px
 }
+
+/* ---------- a matéria no começo da página ---------- */
+.materia-cx{border:2px solid var(--tinta);background:var(--papel);margin:22px 0 4px}
+.materia-cx>summary{
+  background:var(--tinta);color:var(--papel);padding:11px 16px;cursor:pointer;list-style:none;
+  font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;
+  font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:48px
+}
+.materia-cx>summary::-webkit-details-marker{display:none}
+.materia-cx>summary::after{content:'+';font-family:'JetBrains Mono',monospace;font-size:20px}
+.materia-cx[open]>summary::after{content:'−'}
+.materia-cx>.dentro{padding:6px 16px 18px}
+.materia-bloco{margin-top:16px}
+.materia-bloco h3{
+  font-family:'Saira Condensed',sans-serif;text-transform:uppercase;font-size:17px;font-weight:800;
+  border-bottom:2px solid var(--tinta);padding-bottom:5px;margin-bottom:10px;display:flex;align-items:baseline;gap:9px
+}
+.materia-bloco h3 span{color:var(--carimbo);font-family:'JetBrains Mono',monospace;font-size:13px}
+.materia-bloco h3 small{margin-left:auto;font-weight:400;font-size:12.5px;color:var(--tinta-fraca);font-family:'Spectral',Georgia,serif;text-transform:none;letter-spacing:0}
+.materia-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:10px}
+.materia-item{
+  display:block;border:1.5px solid var(--borda);padding:10px 12px;text-decoration:none;color:inherit;background:var(--papel)
+}
+.materia-item:hover{background:var(--papel-barra);border-color:var(--tinta)}
+.materia-item b{
+  display:block;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;
+  font-size:15px;letter-spacing:.02em;margin-bottom:3px
+}
+.materia-item>span{display:block;font-size:14px;color:var(--tinta-fraca);line-height:1.45}
+
+/* ---------- etiquetas de comando ---------- */
+.usa{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}
+.usa code{
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.02em;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);
+  padding:1px 5px;white-space:nowrap;text-transform:none
+}
+.materia-item .usa{margin-top:7px}
+.materia-item .usa code{
+  background:var(--papel-barra);border-color:var(--papel-linha);color:var(--tinta-fraca)
+}
+.desafio-cab{gap:10px;flex-wrap:wrap}
+.desafio-cab .usa{margin-right:auto}
+.desafio.resolvido .desafio-cab .usa code{border-color:rgba(255,255,255,.35)}
+@media(max-width:860px){
+  .usa code{font-size:10px}
+  .materia-lista{grid-template-columns:1fr}
+}
+
 .porta-lab{
   border:2px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);background:var(--papel);
   padding:28px 26px 30px;max-width:680px;margin:26px 0
@@ -156,6 +205,14 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
     <button type="button" id="btnRecomecar" class="btn-mini vazado" title="Apaga o progresso guardado neste navegador">Recomeçar</button>
   </div>
   <p class="salvo-aviso">O seu progresso e as consultas que você escreve ficam guardados <b>na sua ficha</b>. Pode fechar o navegador, trocar de computador e continuar de onde parou — é só entrar com a mesma conta.</p>
+
+  <details class="materia-cx" id="materiaCx">
+    <summary>A matéria — tudo o que este laboratório cobra</summary>
+    <div class="dentro">
+      <p class="fraco" style="font-size:15px;margin-bottom:2px">Toque num tema para ir direto à lição. Ao lado de cada caso, mais abaixo, aparecem os comandos que ele cobra.</p>
+      <div id="materia"></div>
+    </div>
+  </details>
 
   <!-- o banco: montado por JS a partir do próprio banco, para nunca faltar coluna -->
   <div class="banco">
