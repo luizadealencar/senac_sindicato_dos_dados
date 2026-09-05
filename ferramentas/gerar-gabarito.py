@@ -234,7 +234,7 @@ th{{background:var(--barra)}}
 
 <div class="aviso">
   <b>Só para a docente.</b> Traz a resposta de cada caso e o resultado que ela
-  devolve no banco. Para virar PDF: <b>Ctrl+P</b> (ou Cmd+P) e salvar como PDF.
+  devolve no banco. Cada dia começa em página nova.
   <br><br>
   O motor do laboratório é <b>SQLite</b>. Quase tudo é igual ao MySQL; onde muda,
   está avisado na lição — como a junção de texto, que no SQLite é
