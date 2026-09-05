@@ -64,20 +64,27 @@
 
 /* ---------- etiquetas de comando ---------- */
 .usa{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}
-.usa code{
+/* especificidade de dois níveis de propósito: a regra .licao code, mais
+   abaixo nesta folha, ganharia de um .usa code solto e devolveria o fundo
+   claro — que sobre o cabeçalho colorido fica ilegível. */
+.desafio-cab .usa code,
+.materia-item .usa code{
   font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.02em;
-  color:#fff;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.45);
   padding:1px 5px;white-space:nowrap;text-transform:none
+}
+.desafio-cab .usa code{
+  color:#fff;background:rgba(0,0,0,.30);border:1px solid rgba(255,255,255,.45)
 }
 .materia-item .usa{margin-top:7px}
 .materia-item .usa code{
-  background:var(--papel-barra);border-color:var(--papel-linha);color:var(--tinta-fraca)
+  background:var(--papel-barra);border:1px solid var(--papel-linha);color:var(--tinta-fraca)
 }
 .desafio-cab{gap:10px;flex-wrap:wrap}
 .desafio-cab .usa{margin-right:auto}
 .desafio.resolvido .desafio-cab .usa code{border-color:rgba(255,255,255,.35)}
 @media(max-width:860px){
-  .usa code{font-size:10px}
+  .desafio-cab .usa code,
+  .materia-item .usa code{font-size:10px}
   .materia-lista{grid-template-columns:1fr}
 }
 
