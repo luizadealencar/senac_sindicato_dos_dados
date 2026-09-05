@@ -623,6 +623,26 @@ function montarMateria() {
   }).join('');
 
   alvo.innerHTML = html;
+
+  /* Rolagem própria: a barra de progresso é fixa no topo e taparia o título
+     da lição, e numa página desta altura o salto do navegador nem sempre
+     acontece. Também fecha o painel, para a lição ficar à vista. */
+  alvo.addEventListener('click', e => {
+    const a = e.target.closest('.materia-item');
+    if (!a) return;
+    const destino = document.getElementById(a.getAttribute('href').slice(1));
+    if (!destino) return;
+    e.preventDefault();
+    const cx = document.getElementById('materiaCx');
+    if (cx) cx.open = false;
+    const barra = document.getElementById('progresso');
+    const folga = (barra && !barra.hidden ? barra.offsetHeight : 0) + 16;
+    requestAnimationFrame(() => {
+      const y = destino.getBoundingClientRect().top + window.pageYOffset - folga;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+      history.replaceState(null, '', a.getAttribute('href'));
+    });
+  });
 }
 
 function montarConteudo() {
