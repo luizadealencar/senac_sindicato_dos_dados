@@ -642,7 +642,7 @@ function montarMateria() {
        Dois quadros, para o painel já ter fechado quando a conta é feita. */
     requestAnimationFrame(() => requestAnimationFrame(() => {
       const y = destino.getBoundingClientRect().top + window.pageYOffset - folga;
-      window.scrollTo({ top: y, behavior: 'auto' });
+      window.scrollTo({ top: y, behavior: 'instant' });
       history.replaceState(null, '', a.getAttribute('href'));
     }));
   });
