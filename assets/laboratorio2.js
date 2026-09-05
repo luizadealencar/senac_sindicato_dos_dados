@@ -637,11 +637,14 @@ function montarMateria() {
     if (cx) cx.open = false;
     const barra = document.getElementById('progresso');
     const folga = (barra && !barra.hidden ? barra.offsetHeight : 0) + 16;
-    requestAnimationFrame(() => {
+    /* Salto seco, e não suave: numa página de vinte mil pixels o Chrome
+       interrompe a animação no meio do caminho e o aluno fica perdido.
+       Dois quadros, para o painel já ter fechado quando a conta é feita. */
+    requestAnimationFrame(() => requestAnimationFrame(() => {
       const y = destino.getBoundingClientRect().top + window.pageYOffset - folga;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      window.scrollTo({ top: y, behavior: 'auto' });
       history.replaceState(null, '', a.getAttribute('href'));
-    });
+    }));
   });
 }
 
