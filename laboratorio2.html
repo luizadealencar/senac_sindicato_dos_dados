@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#191E1B">
-<title>Laboratório I · As Consultas — O Sindicato dos Dados</title>
+<title>Laboratório II · A Construção — O Sindicato dos Dados</title>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -30,6 +30,8 @@
   font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.2em;
   font-size:13px;font-weight:600;color:var(--carimbo);margin:22px 0 -6px
 }
+.tabela.e-view{border-style:dashed}
+.tabela.e-view h4 small{color:var(--latao)}
 .porta-lab{
   border:2px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);background:var(--papel);
   padding:28px 26px 30px;max-width:680px;margin:26px 0
@@ -119,22 +121,22 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
 </head>
 <body>
 
-<nav class="nav" id="nav" data-pagina="laboratorio.html"></nav>
+<nav class="nav" id="nav" data-pagina="laboratorio2.html"></nav>
 
 <main class="palco env">
 
   <div class="classif rot">
-    <span>Dossiê A-279 · Laboratório de campo</span>
+    <span>Dossiê A-279 · Oficina</span>
     <span>Loja Aurora</span>
     <span>SQL ao vivo</span>
   </div>
 
-  <p class="mini-titulo">Laboratório I</p>
-  <h1 class="titulo">O <em>Laboratório</em></h1>
+  <p class="mini-titulo">Laboratório II</p>
+  <h1 class="titulo">A <em>Construção</em></h1>
   <!-- quem não entrou para aqui -->
   <div class="lab-intro">
-    <p>O banco da <strong>Loja Aurora</strong> — uma papelaria online — está aqui, vivo, dentro desta página. Você escreve a consulta, aperta <strong>Rodar</strong> e vê o resultado na hora. Nada para instalar.</p>
-    <p>Trabalhe de cima para baixo: cada lição explica um comando, mostra um exemplo que você pode rodar, e traz desafios para você resolver escrevendo a sua própria consulta. Some pontos resolvendo os casos.</p>
+    <p>No Laboratório I você <strong>perguntava</strong> ao banco. Aqui você <strong>mexe</strong> nele: cria tabela, grava, corrige, apaga e desfaz. O banco da Loja Aurora continua vivo dentro desta página, e agora é seu para construir e derrubar.</p>
+    <p>Cada caso é conferido num <strong>banco limpo</strong>, só seu — o que você fizer no console livre não atrapalha a correção, e a bagunça de um caso não vaza para o outro. Se quiser começar do zero, use <strong>Restaurar banco</strong>.</p>
   </div>
 
   <!-- A porta e o aviso de carregamento ficam FORA da área escondida.
@@ -172,6 +174,7 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
     <div class="console-pe">
       <button class="btn-mini" id="btnRodar">Rodar ▶</button>
       <button class="btn-mini vazado" id="btnLimpar">Limpar</button>
+      <button class="btn-mini vazado" id="btnRestaurar">Restaurar banco</button>
       <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tinta-fraca)">Dica: termine com <b>;</b></span>
     </div>
     <div class="saida" id="saidaLivre"></div>
@@ -190,6 +193,6 @@ textarea.sql:focus{outline:2px solid var(--carimbo);outline-offset:-2px}
 <script type="module" src="assets/nav.js"></script>
 <script src="assets/sqljs/sql-wasm.js"></script>
 <script src="assets/aurora-db.sql.js"></script>
-<script type="module" src="assets/laboratorio.js"></script>
+<script type="module" src="assets/laboratorio2.js"></script>
 </body>
 </html>

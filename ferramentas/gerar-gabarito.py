@@ -12,9 +12,20 @@ Rode de novo sempre que mexer nos casos: o documento se refaz sozinho.
 import json, re, sqlite3, html, io, os, sys
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LAB   = os.path.join(RAIZ, 'assets', 'laboratorio.js')
 BANCO = os.path.join(RAIZ, 'assets', 'aurora-db.sql.js')
-SAIDA = os.path.join(RAIZ, 'gabarito-docente.html')
+
+# qual laboratório gerar: 1 (consultas) ou 2 (construção)
+QUAL = sys.argv[1] if len(sys.argv) > 1 else '1'
+if QUAL == '2':
+    LAB   = os.path.join(RAIZ, 'assets', 'laboratorio2.js')
+    SAIDA = os.path.join(RAIZ, 'gabarito-docente-lab2.html')
+    TITULO = 'Gabarito da docente — Laboratório II · A Construção'
+    SUB = 'UC5 · Desenvolver Banco de Dados · CREATE, INSERT, UPDATE, DELETE, ALTER, DROP'
+else:
+    LAB   = os.path.join(RAIZ, 'assets', 'laboratorio.js')
+    SAIDA = os.path.join(RAIZ, 'gabarito-docente.html')
+    TITULO = 'Gabarito da docente — Laboratório I · As Consultas'
+    SUB = 'UC5 · Desenvolver Banco de Dados · banco da Loja Aurora' 
 
 
 def carregar_banco():
@@ -62,7 +73,11 @@ def ler_modulos():
     corpo = s[ini:_fim_array(s, s.find('[', ini)) + 1]
 
     modulos = []
-    cabs = list(re.finditer(r"num: '([IVX]+)', nome: '([^']+)', dur: '([^']+)'", corpo))
+    # aceita aspas simples ou duplas: os dois laboratorios foram escritos de jeitos diferentes
+    padrao = (r"num:\s*['\"]([IVX]+)['\"],\s*"
+              r"nome:\s*['\"]([^'\"]+)['\"],\s*"
+              r"dur:\s*['\"]([^'\"]+)['\"]")
+    cabs = list(re.finditer(padrao, corpo))
     for idx, cab in enumerate(cabs):
         fim_mod = cabs[idx + 1].start() if idx + 1 < len(cabs) else len(corpo)
         trecho = corpo[cab.start():fim_mod]
@@ -76,8 +91,14 @@ def ler_modulos():
             for d in re.finditer(r"\{ p: ", bloco):
                 fim_caso = bloco.find('}', d.start())
                 b = bloco[d.start():fim_caso + 1]
+                mv = re.search(r"\bv:\s*(\[.*?\])\s*,\s*dica:", b, re.S)
+                verifs = []
+                if mv:
+                    try: verifs = json.loads(mv.group(1))
+                    except Exception: verifs = []
                 casos.append({
-                    'p': _campo(b, 'p'), 'r': _campo(b, 'r'), 'dica': _campo(b, 'dica')
+                    'p': _campo(b, 'p'), 'r': _campo(b, 'r'),
+                    'dica': _campo(b, 'dica'), 'v': verifs
                 })
             licoes.append({
                 'titulo': _campo(bloco, 'titulo'),
@@ -96,6 +117,24 @@ def amostra(con, sql, limite=4):
     cols = [c[0] for c in cur.description] if cur.description else []
     linhas = cur.fetchall()
     return cols, linhas[:limite], len(linhas)
+
+
+def estado_apos(sql_texto, verificacoes, limite=4):
+    """Laboratório II: roda o comando num banco limpo e mostra como o banco ficou."""
+    con = carregar_banco()
+    con.executescript(sql_texto)
+    partes = []
+    for q in verificacoes:
+        try:
+            cur = con.execute(q)
+            cols = [c[0] for c in cur.description] if cur.description else []
+            linhas = cur.fetchall()
+            partes.append(f'<p class="conferencia">{html.escape(q)}</p>' +
+                          tabela_html(cols, linhas[:limite], len(linhas), limite))
+        except Exception as e:
+            partes.append(f'<p class="alerta">A conferência deu erro: {html.escape(str(e))}</p>')
+    con.close()
+    return ''.join(partes)
 
 
 def tabela_html(cols, linhas, total, limite=4):
@@ -130,9 +169,13 @@ def gerar():
             for c in li['casos']:
                 n += 1
                 try:
-                    cols, linhas, tot = amostra(con, c['r'])
-                    saida = tabela_html(cols, linhas, tot)
-                    aviso = '' if tot else '<p class="alerta">Atenção: esta resposta não devolve nenhuma linha.</p>'
+                    if c.get('v'):
+                        saida = estado_apos(c['r'], c['v'])
+                        aviso = ''
+                    else:
+                        cols, linhas, tot = amostra(con, c['r'])
+                        saida = tabela_html(cols, linhas, tot)
+                        aviso = '' if tot else '<p class="alerta">Atenção: esta resposta não devolve nenhuma linha.</p>'
                 except Exception as e:
                     saida = f'<p class="alerta">A resposta deu erro: {html.escape(str(e))}</p>'; aviso = ''
                 partes.append(f'''<div class="caso">
@@ -185,8 +228,8 @@ th{{background:var(--barra)}}
 @media print{{body{{padding:0;font-size:11pt}} .caso{{border-left-width:3px}}}}
 </style></head><body>
 
-<h1>Gabarito da docente — O Laboratório</h1>
-<p class="sub">UC5 · Desenvolver Banco de Dados · banco da Loja Aurora</p>
+<h1>{TITULO}</h1>
+<p class="sub">{SUB}</p>
 <p class="sub"><b>{total_casos} casos</b> em {len(modulos)} dias.</p>
 
 <div class="aviso">

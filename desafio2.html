@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#191E1B">
-<title>Desafio I · O Interrogatório — O Sindicato dos Dados</title>
+<title>Desafio II · A Vistoria — O Sindicato dos Dados</title>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -88,19 +88,19 @@
 </head>
 <body>
 
-<nav class="nav" id="nav" data-pagina="desafio.html"></nav>
+<nav class="nav" id="nav" data-pagina="desafio2.html"></nav>
 
 <main class="palco env">
 
   <div class="classif rot">
-    <span>Dossiê A-279 · Boss do Ato IV</span>
+    <span>Dossiê A-279 · Vistoria da obra</span>
     <span id="seloTopo">O interrogatório</span>
     <span>Só com SQL</span>
   </div>
 
-  <p class="mini-titulo">Desafio I</p>
-  <h1 class="titulo">O <em>Desafio</em></h1>
-  <p class="subtitulo">O cofre está trancado com <span id="quantas2">30</span> perguntas. Cada uma testa um golpe de SQL que vocês aprenderam no Ato IV. Errar não elimina — mas o placar conta. Respondam em célula.</p>
+  <p class="mini-titulo">Desafio II</p>
+  <h1 class="titulo">A <em>Vistoria</em></h1>
+  <p class="subtitulo">A obra está pronta e o fiscal chegou: <span id="quantas2">30</span> perguntas sobre construir, gravar, corrigir e apagar. </p>
 
   <!-- trava: só para filiados -->
   <section id="trava" class="abertura" hidden>
@@ -118,7 +118,7 @@
   <!-- abertura -->
   <section id="abertura" class="abertura" hidden>
     <h2>Antes de começar</h2>
-    <p>São <strong><span id="quantas">30</span> perguntas</strong> sobre o banco da <strong>Loja Aurora</strong> (uma loja online de papelaria). Cada pergunta mostra as alternativas; ao escolher, você vê na hora se acertou e por quê.</p>
+    <p>São <strong><span id="quantas">30</span> perguntas</strong> sobre o <strong>Laboratório II</strong>: CREATE, INSERT, UPDATE, DELETE, ALTER, DROP, transações, views e índices. Cada pergunta mostra as alternativas; ao escolher, você vê na hora se acertou e por quê.</p>
     <p>Tabelas em jogo: <span class="mono">clientes</span>, <span class="mono">produtos</span>, <span class="mono">pedidos</span> e <span class="mono">itens_pedido</span>.</p>
     <div class="acoes"><button class="btn" type="button" id="btnComecar">Encarar o Boss</button></div>
   </section>
@@ -150,366 +150,364 @@ import { sessao, sb, configurado } from './assets/sindicato.js';
 /* ==== O DESAFIO — quiz de SQL, 10 perguntas, tudo em português ==== */
 const PERGUNTAS = [
   {
-    p: "Você quer ver <b>todas as colunas de todos os clientes</b>. Qual consulta faz isso?",
+    p: "Qual comando <b>cria</b> uma tabela nova?",
     codigo: null, mono: true,
     alts: [
-      "SELECT * FROM clientes;",
-      "SELECT todos FROM clientes;",
-      "GET * FROM clientes;",
-      "SELECT clientes;"
-    ],
-    certa: 0,
-    porque: "O asterisco (*) traz todas as colunas, e o FROM diz de qual tabela. GET não existe em SQL."
-  },
-  {
-    p: "Quer só os produtos com <b>preço maior que 20</b>. Qual filtro está certo?",
-    codigo: null, mono: true,
-    alts: [
-      "SELECT nome FROM produtos HAVING preco > 20;",
-      "SELECT nome FROM produtos WHERE preco > 20;",
-      "SELECT nome FROM produtos IF preco > 20;",
-      "SELECT nome FROM produtos FILTER preco > 20;"
+      "NEW TABLE equipes (id INTEGER);",
+      "CREATE TABLE equipes (id INTEGER PRIMARY KEY);",
+      "MAKE TABLE equipes (id INTEGER);",
+      "INSERT TABLE equipes (id INTEGER);"
     ],
     certa: 1,
-    porque: "Para filtrar linhas usamos WHERE. O HAVING só serve depois de um GROUP BY, para filtrar grupos."
+    porque: "CREATE TABLE desenha a tabela: nome dela, nome e tipo de cada coluna."
   },
   {
-    p: "Você quer os clientes cujo <b>nome começa com “Ana”</b>. Qual consulta usa o padrão certo?",
-    codigo: null, mono: true,
-    alts: [
-      "WHERE nome = 'Ana%'",
-      "WHERE nome LIKE 'Ana%'",
-      "WHERE nome LIKE '%Ana'",
-      "WHERE nome IN 'Ana'"
-    ],
-    certa: 1,
-    porque: "LIKE com o coringa % no fim ('Ana%') pega tudo que começa com Ana. Se o % viesse antes ('%Ana'), pegaria o que termina em Ana."
-  },
-  {
-    p: "Quer os pedidos feitos <b>entre 01/09 e 30/09</b>. Qual opção é a mais direta?",
-    codigo: null, mono: true,
-    alts: [
-      "WHERE data_pedido BETWEEN '2026-09-01' AND '2026-09-30'",
-      "WHERE data_pedido = '2026-09-01' AND '2026-09-30'",
-      "WHERE data_pedido IN ('setembro')",
-      "WHERE data_pedido > '2026-09'"
-    ],
-    certa: 0,
-    porque: "BETWEEN … AND … pega um intervalo, incluindo as duas pontas. É o jeito mais limpo de filtrar faixas de data ou número."
-  },
-  {
-    p: "Quer a lista de produtos <b>do mais caro para o mais barato</b>. O que completa a consulta?<br><span class='mono'>SELECT nome, preco FROM produtos ____ ;</span>",
-    codigo: null, mono: true,
-    alts: [
-      "ORDER BY preco ASC",
-      "ORDER BY preco DESC",
-      "GROUP BY preco",
-      "SORT preco DOWN"
-    ],
-    certa: 1,
-    porque: "ORDER BY ordena; DESC é decrescente (do maior para o menor). ASC seria do menor para o maior."
-  },
-  {
-    p: "Você quer saber <b>quantos clientes existem em cada cidade</b>. Qual consulta responde?",
-    codigo: null, mono: true,
-    alts: [
-      "SELECT cidade, COUNT(*) FROM clientes GROUP BY cidade;",
-      "SELECT cidade, COUNT(*) FROM clientes;",
-      "SELECT COUNT(cidade) FROM clientes ORDER BY cidade;",
-      "SELECT cidade FROM clientes WHERE COUNT(*);"
-    ],
-    certa: 0,
-    porque: "Para contar por grupo, junte a função de agregação COUNT(*) com GROUP BY na coluna que define o grupo (cidade)."
-  },
-  {
-    p: "Você quer só as <b>cidades com mais de 10 clientes</b>. Onde entra esse filtro?",
-    codigo: null, mono: true,
-    alts: [
-      "… WHERE COUNT(*) > 10",
-      "… GROUP BY cidade WHERE total > 10",
-      "… GROUP BY cidade HAVING COUNT(*) > 10",
-      "… ORDER BY COUNT(*) > 10"
-    ],
-    certa: 2,
-    porque: "Filtro sobre um resultado agregado (COUNT, SUM…) usa HAVING, depois do GROUP BY. O WHERE não enxerga o COUNT porque roda antes de agrupar."
-  },
-  {
-    p: "Você quer o <b>nome do cliente ao lado do valor de cada pedido</b>. Como juntar as duas tabelas?",
-    codigo: null, mono: true,
-    alts: [
-      "SELECT c.nome, p.valor FROM clientes c, pedidos p;",
-      "SELECT c.nome, p.valor FROM clientes c JOIN pedidos p ON p.id_cliente = c.id_cliente;",
-      "SELECT c.nome, p.valor FROM clientes JOIN pedidos;",
-      "SELECT c.nome, p.valor MERGE clientes, pedidos;"
-    ],
-    certa: 1,
-    porque: "O JOIN precisa do ON dizendo quais colunas ligam as tabelas (a FK id_cliente). Sem o ON, o banco cruza todas as linhas com todas — o temido produto cartesiano."
-  },
-  {
-    p: "Qual a diferença do <b>LEFT JOIN</b> para o INNER JOIN?",
+    p: "O que faz a restrição <code>NOT NULL</code>?",
     codigo: null, mono: false,
     alts: [
-      "LEFT JOIN traz só os clientes que têm pedido.",
-      "LEFT JOIN traz TODOS os clientes, mesmo os sem pedido (com NULL onde não houver).",
-      "LEFT JOIN é mais rápido, mas dá o mesmo resultado.",
-      "Não há diferença, são sinônimos."
-    ],
-    certa: 1,
-    porque: "O LEFT JOIN mantém tudo da tabela da esquerda; quem não tem correspondência aparece com NULL. O INNER JOIN traz só quem casa nos dois lados."
-  },
-  {
-    p: "Um colega vai rodar <span class='mono'>DELETE FROM clientes;</span> <b>sem WHERE</b>. O que acontece?",
-    codigo: null, mono: false,
-    alts: [
-      "Nada, o banco pede confirmação antes.",
-      "Apaga só o último cliente.",
-      "Apaga TODOS os clientes da tabela.",
-      "Dá erro de sintaxe."
-    ],
-    certa: 2,
-    porque: "DELETE sem WHERE apaga a tabela inteira, linha por linha, sem perguntar. Regra de ouro: escreva o WHERE antes do DELETE."
-  },
-
-  /* ---- casos vindos do Laboratório ---- */
-  {
-    p: "Qual consulta conta <b>quantos clientes há em cada cidade</b>?",
-    codigo: null, mono: true,
-    alts: [
-      "SELECT cidade, COUNT(*) FROM clientes;",
-      "SELECT COUNT(cidade) FROM clientes ORDER BY cidade;",
-      "SELECT cidade, COUNT(*) FROM clientes GROUP BY cidade;",
-      "SELECT cidade, COUNT(*) FROM clientes WHERE cidade;"
-    ],
-    certa: 2,
-    porque: "Para virar “um número por grupo”, a agregação precisa do GROUP BY. Sem ele, o COUNT(*) devolveria um número só para a tabela inteira."
-  },
-  {
-    p: "Você quer as <b>cidades com mais de 3 clientes</b>. Qual está certa?",
-    codigo: null, mono: true,
-    alts: [
-      "SELECT cidade, COUNT(*) FROM clientes GROUP BY cidade HAVING COUNT(*) > 3;",
-      "SELECT cidade, COUNT(*) FROM clientes WHERE COUNT(*) > 3 GROUP BY cidade;",
-      "SELECT cidade, COUNT(*) FROM clientes GROUP BY cidade WHERE COUNT(*) > 3;",
-      "SELECT cidade FROM clientes WHERE cidade > 3;"
-    ],
-    certa: 0,
-    porque: "O WHERE filtra linhas antes de agrupar e não enxerga COUNT. Quem filtra o resultado do grupo é o HAVING, e ele vem depois do GROUP BY."
-  },
-  {
-    p: "Qual a diferença entre <b>WHERE</b> e <b>HAVING</b>?",
-    codigo: null, mono: false,
-    alts: [
-      "São sinônimos: dá para usar qualquer um dos dois.",
-      "WHERE só funciona com texto e HAVING só com número.",
-      "HAVING vem antes do GROUP BY e o WHERE depois.",
-      "WHERE filtra linhas antes de agrupar; HAVING filtra grupos depois de agrupar."
+      "Impede valores repetidos na coluna.",
+      "Preenche a coluna com zero quando ninguém informa.",
+      "Faz a coluna se numerar sozinha.",
+      "Obriga a coluna a ter valor: não aceita ficar vazia."
     ],
     certa: 3,
-    porque: "Essa é a regra que resolve quase todo erro de agrupamento: o WHERE age na linha crua, o HAVING age no grupo já formado."
+    porque: "Quem impede repetição é o UNIQUE; quem preenche sozinho é o DEFAULT."
   },
   {
-    p: "Os clientes sem telefone têm <code>NULL</code> nessa coluna. Como listá-los?",
-    codigo: null, mono: true,
-    alts: [
-      "SELECT nome FROM clientes WHERE telefone = NULL;",
-      "SELECT nome FROM clientes WHERE telefone IS NULL;",
-      "SELECT nome FROM clientes WHERE telefone = '';",
-      "SELECT nome FROM clientes WHERE telefone = 'NULL';"
-    ],
-    certa: 1,
-    porque: "NULL é ausência de informação e não se compara com =. Só IS NULL e IS NOT NULL funcionam. O = NULL não dá erro: devolve nada, que é pior."
-  },
-  {
-    p: "Qual consulta acha os <b>clientes que nunca fizeram pedido</b>?",
-    codigo: null, mono: true,
-    alts: [
-      "SELECT c.nome FROM clientes c JOIN pedidos p ON p.id_cliente = c.id_cliente WHERE p.id_pedido IS NULL;",
-      "SELECT c.nome FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente;",
-      "SELECT c.nome FROM clientes c LEFT JOIN pedidos p ON p.id_cliente = c.id_cliente WHERE p.id_pedido IS NULL;",
-      "SELECT nome FROM clientes WHERE pedidos = 0;"
-    ],
-    certa: 2,
-    porque: "O LEFT JOIN mantém todo cliente, mesmo sem par em pedidos, e preenche com NULL. Quem ficou com NULL é justamente quem nunca comprou. Com JOIN comum esses clientes sumiriam."
-  },
-  {
-    p: "O que o <code>DISTINCT</code> faz?",
+    p: "Qual das restrições <b>impede valor repetido</b> numa coluna?",
     codigo: null, mono: false,
     alts: [
-      "Ordena o resultado sem repetir.",
-      "Conta quantos valores diferentes existem.",
-      "Apaga as linhas repetidas da tabela.",
-      "Remove as linhas repetidas do resultado."
-    ],
-    certa: 3,
-    porque: "Ele só muda o que aparece na tela — a tabela continua intacta. Para contar os diferentes, aí sim seria COUNT(DISTINCT coluna)."
-  },
-  {
-    p: "Qual consulta traz a <b>segunda página</b> de uma lista de 5 em 5, em ordem alfabética?",
-    codigo: null, mono: true,
-    alts: [
-      "SELECT nome FROM clientes ORDER BY nome ASC LIMIT 5 OFFSET 5;",
-      "SELECT nome FROM clientes ORDER BY nome ASC LIMIT 5;",
-      "SELECT nome FROM clientes ORDER BY nome ASC OFFSET 5;",
-      "SELECT nome FROM clientes LIMIT 2 OFFSET 5;"
+      "UNIQUE",
+      "NOT NULL",
+      "DEFAULT",
+      "CHECK"
     ],
     certa: 0,
-    porque: "O LIMIT diz quantas linhas trazer e o OFFSET quantas pular. Página 2 de 5 em 5 pula as 5 primeiras. Sem ORDER BY a divisão em páginas não teria sentido."
+    porque: "O UNIQUE recusa o segundo valor igual. A PRIMARY KEY também, porque é única por definição."
   },
   {
-    p: "Quais produtos custam <b>mais que a média</b> do catálogo?",
+    p: "Você quer que a coluna <b>ativa</b> valha 1 quando ninguém informar. Qual usar?",
     codigo: null, mono: true,
     alts: [
-      "SELECT nome, preco FROM produtos WHERE preco > AVG(preco);",
-      "SELECT nome, preco FROM produtos WHERE preco > (SELECT AVG(preco) FROM produtos);",
-      "SELECT nome, preco FROM produtos HAVING preco > AVG(preco);",
-      "SELECT nome, AVG(preco) FROM produtos WHERE preco > AVG(preco);"
-    ],
-    certa: 1,
-    porque: "A média precisa ser calculada antes, por uma consulta à parte entre parênteses. Um WHERE não aceita função de agregação direto."
-  },
-  {
-    p: "Qual a diferença entre <code>UNION</code> e <code>UNION ALL</code>?",
-    codigo: null, mono: false,
-    alts: [
-      "UNION junta colunas; UNION ALL junta linhas.",
-      "UNION ALL é mais lento porque ordena o resultado.",
-      "Não há diferença, só o nome muda.",
-      "UNION remove as linhas repetidas; UNION ALL mantém todas."
-    ],
-    certa: 3,
-    porque: "Os dois empilham um resultado embaixo do outro e exigem o mesmo número de colunas. O UNION ainda dá o trabalho extra de tirar as repetidas."
-  },
-  {
-    p: "Você quer marcar cada produto como 'barato' ou 'caro' numa coluna nova. Qual comando usa?",
-    codigo: null, mono: false,
-    alts: [
-      "IF preco < 10 THEN 'barato' ELSE 'caro'",
-      "SWITCH preco WHEN < 10 THEN 'barato'",
-      "CASE WHEN preco < 10 THEN 'barato' ELSE 'caro' END",
-      "WHERE preco < 10 THEN 'barato'"
+      "ativa INTEGER CHECK (ativa = 1)",
+      "ativa INTEGER NOT NULL",
+      "ativa INTEGER DEFAULT 1",
+      "ativa INTEGER UNIQUE"
     ],
     certa: 2,
-    porque: "O CASE é o se/senão do SQL, e sempre termina com END. Ele cria uma coluna calculada na hora, sem mexer na tabela."
+    porque: "DEFAULT é o valor que entra quando o INSERT não menciona a coluna."
   },
   {
-    p: "No SQLite, como se juntam dois textos numa coluna só?",
+    p: "Para que serve a <b>chave estrangeira</b>?",
     codigo: null, mono: false,
     alts: [
-      "Com o sinal de +, assim: nome + ' - ' + cidade",
-      "Com <code>||</code>, assim: nome || ' - ' || cidade",
-      "Com a função JOIN(nome, cidade)",
-      "Com vírgula: SELECT nome, cidade"
-    ],
-    certa: 1,
-    porque: "No SQLite é o ||. Vale guardar que o MySQL faz o mesmo com CONCAT(nome, ' - ', cidade) — é uma das poucas diferenças que você vai encontrar entre os dois."
-  },
-  {
-    p: "Qual filtro pega os produtos cujo nome <b>contém</b> a palavra Neon?",
-    codigo: null, mono: true,
-    alts: [
-      "WHERE nome LIKE '%Neon%'",
-      "WHERE nome LIKE 'Neon'",
-      "WHERE nome = '%Neon%'",
-      "WHERE nome CONTAINS 'Neon'"
-    ],
-    certa: 0,
-    porque: "O % vale por “qualquer coisa”. Nas duas pontas, encontra a palavra em qualquer posição. Sozinho no fim, 'Neon%' acharia só o que começa com Neon."
-  },
-  {
-    p: "<code>WHERE preco BETWEEN 10 AND 20</code> inclui o 10 e o 20?",
-    codigo: null, mono: false,
-    alts: [
-      "Não, ele exclui os dois extremos.",
-      "Inclui o 10 mas não o 20.",
-      "Sim, o BETWEEN inclui os dois extremos.",
-      "Depende do banco de dados."
-    ],
-    certa: 2,
-    porque: "O BETWEEN é inclusivo: equivale a preco >= 10 AND preco <= 20."
-  },
-  {
-    p: "Qual consulta conta <b>quantas cidades diferentes</b> existem no cadastro?",
-    codigo: null, mono: true,
-    alts: [
-      "SELECT DISTINCT COUNT(cidade) FROM clientes;",
-      "SELECT COUNT(cidade) FROM clientes;",
-      "SELECT DISTINCT cidade FROM clientes;",
-      "SELECT COUNT(DISTINCT cidade) FROM clientes;"
+      "Deixar a busca mais rápida na coluna.",
+      "Impedir que a coluna fique vazia.",
+      "Numerar as linhas automaticamente.",
+      "Amarrar uma coluna à chave primária de outra tabela, impedindo referência a algo que não existe."
     ],
     certa: 3,
-    porque: "O DISTINCT vai dentro do COUNT. A última opção até lista as cidades diferentes, mas não conta quantas são."
+    porque: "É ela que impede pedido de cliente inexistente. Quem acelera a busca é o índice."
   },
   {
-    p: "Numa consulta com <code>GROUP BY categoria</code>, o que pode aparecer no SELECT?",
-    codigo: null, mono: false,
-    alts: [
-      "Qualquer coluna da tabela, sem restrição.",
-      "A própria categoria e funções de agregação como COUNT, SUM e AVG.",
-      "Só as funções de agregação, nunca a categoria.",
-      "Só as colunas de texto."
-    ],
-    certa: 1,
-    porque: "A regra: o que não está dentro de uma função de agregação precisa estar no GROUP BY. Pedir o nome do produto aqui não faria sentido — são vários nomes por categoria."
-  },
-  {
-    p: "Você quer o <b>total faturado por categoria</b>, juntando itens vendidos e produtos. Qual está certa?",
+    p: "Qual comando insere <b>duas linhas de uma vez</b>?",
     codigo: null, mono: true,
     alts: [
-      "SELECT pr.categoria, SUM(i.quantidade * i.preco_unit) FROM itens_pedido i JOIN produtos pr ON pr.id_produto = i.id_produto GROUP BY pr.categoria;",
-      "SELECT pr.categoria, SUM(i.quantidade) FROM itens_pedido i, produtos pr GROUP BY pr.categoria;",
-      "SELECT categoria, SUM(quantidade * preco_unit) FROM produtos GROUP BY categoria;",
-      "SELECT pr.categoria, SUM(i.quantidade * i.preco_unit) FROM itens_pedido i JOIN produtos pr GROUP BY pr.categoria;"
+      "INSERT INTO setores (id, nome) VALUES (1,'A') AND (2,'B');",
+      "INSERT INTO setores (id, nome) VALUES (1,'A'), (2,'B');",
+      "INSERT INTO setores (id, nome) VALUES (1,'A') + (2,'B');",
+      "INSERT 2 INTO setores VALUES (1,'A'),(2,'B');"
     ],
-    certa: 0,
-    porque: "O JOIN precisa do ON dizendo qual coluna liga as duas tabelas. Sem ele, o banco cruza tudo com tudo — ou nem aceita a consulta."
+    certa: 1,
+    porque: "Depois do VALUES vão vários grupos de parênteses, separados por vírgula."
   },
   {
-    p: "O que esta consulta responde?",
-    codigo: "SELECT SUM(CASE WHEN status = 'pago' THEN 1 ELSE 0 END) AS pagos\nFROM pedidos;", mono: false,
+    p: "O que este comando faz?",
+    codigo: "UPDATE produtos SET preco = 10;", mono: false,
     alts: [
-      "A soma dos valores dos pedidos pagos.",
-      "Todos os pedidos, marcando os pagos com 1.",
-      "Nada: CASE não funciona dentro de SUM.",
-      "Quantos pedidos estão com status 'pago'."
-    ],
-    certa: 3,
-    porque: "O CASE devolve 1 para o que interessa e 0 para o resto; somando, você conta só o que bate. É o jeito de contar duas coisas diferentes na mesma linha de resultado."
-  },
-  {
-    p: "Para que serve o <code>COALESCE(telefone, 'sem telefone')</code>?",
-    codigo: null, mono: false,
-    alts: [
-      "Apagar os telefones vazios da tabela.",
-      "Conferir se o telefone é válido.",
-      "Mostrar 'sem telefone' quando a coluna estiver vazia (NULL).",
-      "Preencher a coluna telefone no banco."
+      "Muda o preço só do primeiro produto.",
+      "Dá erro por faltar o WHERE.",
+      "Muda o preço de <b>todos</b> os produtos para 10.",
+      "Não faz nada até um COMMIT."
     ],
     certa: 2,
-    porque: "Ele troca o NULL por um valor de reserva só na exibição — a tabela não muda. No MySQL o IFNULL faz a mesma coisa."
+    porque: "É o erro mais caro do SQL: UPDATE sem WHERE atinge a tabela inteira. Confira com um SELECT antes."
   },
   {
-    p: "Numa consulta com WHERE, GROUP BY e HAVING, qual é a ordem de execução?",
-    codigo: null, mono: false,
-    alts: [
-      "WHERE filtra as linhas, depois GROUP BY agrupa, depois HAVING filtra os grupos.",
-      "GROUP BY agrupa, depois WHERE filtra, depois HAVING ordena.",
-      "HAVING filtra primeiro, depois WHERE, depois GROUP BY.",
-      "Os três acontecem ao mesmo tempo."
-    ],
-    certa: 0,
-    porque: "Entender essa ordem explica por que o WHERE não enxerga COUNT: quando ele roda, os grupos ainda nem existem."
-  },
-  {
-    p: "Qual consulta mostra os produtos <b>ordenados por categoria (A-Z) e, dentro de cada uma, do mais caro para o mais barato</b>?",
+    p: "Como dar <b>10% de aumento</b> em todos os produtos de Papelaria?",
     codigo: null, mono: true,
     alts: [
-      "SELECT nome, categoria, preco FROM produtos ORDER BY categoria, preco;",
-      "SELECT nome, categoria, preco FROM produtos ORDER BY categoria ASC, preco DESC;",
-      "SELECT nome, categoria, preco FROM produtos ORDER BY categoria ASC AND preco DESC;",
-      "SELECT nome, categoria, preco FROM produtos ORDER BY preco DESC, categoria ASC;"
+      "UPDATE produtos SET preco = preco * 1.1 WHERE categoria = 'Papelaria';",
+      "UPDATE produtos SET preco = 10% WHERE categoria = 'Papelaria';",
+      "UPDATE produtos SET preco + 10 WHERE categoria = 'Papelaria';",
+      "ALTER produtos SET preco = preco * 1.1;"
+    ],
+    certa: 0,
+    porque: "A coluna pode aparecer dos dois lados do igual: ela lê o valor atual e grava o novo."
+  },
+  {
+    p: "Qual a diferença entre <code>DELETE FROM t;</code> e <code>DROP TABLE t;</code>?",
+    codigo: null, mono: false,
+    alts: [
+      "São a mesma coisa.",
+      "DELETE apaga as linhas e mantém a tabela; DROP apaga a tabela inteira.",
+      "DELETE apaga a tabela; DROP apaga só as linhas.",
+      "DELETE precisa de WHERE; DROP não."
     ],
     certa: 1,
-    porque: "Dá para ordenar por várias colunas separadas por vírgula, cada uma com a sua direção. A ordem em que aparecem é o que decide: primeiro a categoria, e o preço só desempata dentro dela."
+    porque: "Depois do DELETE a tabela continua lá, vazia. Depois do DROP ela não existe mais."
+  },
+  {
+    p: "Você quer apagar a tabela <b>temp</b> <b>sem dar erro</b> caso ela não exista. Qual usar?",
+    codigo: null, mono: true,
+    alts: [
+      "DROP TABLE temp IF EXISTS;",
+      "DELETE TABLE temp IF EXISTS;",
+      "DROP TABLE temp OR IGNORE;",
+      "DROP TABLE IF EXISTS temp;"
+    ],
+    certa: 3,
+    porque: "IF EXISTS vem logo depois do DROP TABLE."
+  },
+  {
+    p: "Qual comando acrescenta uma coluna numa tabela que já existe?",
+    codigo: null, mono: true,
+    alts: [
+      "ALTER TABLE clientes ADD COLUMN observacao TEXT;",
+      "UPDATE TABLE clientes ADD observacao TEXT;",
+      "CREATE COLUMN observacao TEXT ON clientes;",
+      "INSERT COLUMN observacao INTO clientes;"
+    ],
+    certa: 0,
+    porque: "ALTER TABLE é o comando de mudar a estrutura depois de pronta."
+  },
+  {
+    p: "Como renomear a tabela <b>antiga</b> para <b>nova</b> no SQLite?",
+    codigo: null, mono: true,
+    alts: [
+      "RENAME TABLE antiga TO nova;",
+      "ALTER TABLE antiga SET NAME nova;",
+      "ALTER TABLE antiga RENAME TO nova;",
+      "UPDATE TABLE antiga RENAME nova;"
+    ],
+    certa: 2,
+    porque: "A segunda opção é a forma do MySQL — vale lá, não aqui. Guarde as duas."
+  },
+  {
+    p: "O que o <code>ROLLBACK</code> faz?",
+    codigo: null, mono: false,
+    alts: [
+      "Confirma as mudanças de vez.",
+      "Apaga a tabela e recria vazia.",
+      "Desfaz tudo o que foi feito desde o BEGIN.",
+      "Volta o último comando, só ele."
+    ],
+    certa: 2,
+    porque: "Quem confirma é o COMMIT. O ROLLBACK devolve o banco ao ponto de partida da transação."
+  },
+  {
+    p: "Numa transação, o que acontece se você fechar o programa <b>antes</b> do COMMIT?",
+    codigo: null, mono: false,
+    alts: [
+      "As mudanças se perdem, como se nada tivesse acontecido.",
+      "As mudanças ficam gravadas do mesmo jeito.",
+      "O banco fica travado até alguém confirmar.",
+      "O banco confirma sozinho depois de um tempo."
+    ],
+    certa: 0,
+    porque: "Só o COMMIT torna a mudança definitiva. É por isso que a transação é a rede de segurança."
+  },
+  {
+    p: "Para que serve o <code>SAVEPOINT</code>?",
+    codigo: null, mono: false,
+    alts: [
+      "Salvar o banco em arquivo.",
+      "Confirmar parte da transação e continuar.",
+      "Criar uma cópia da tabela antes de mexer.",
+      "Marcar um ponto no meio da transação para onde se pode voltar."
+    ],
+    certa: 3,
+    porque: "ROLLBACK TO nome_do_ponto volta só até ali, sem desfazer a transação inteira."
+  },
+  {
+    p: "O que é uma <b>VIEW</b>?",
+    codigo: null, mono: false,
+    alts: [
+      "Uma cópia dos dados feita para consulta rápida.",
+      "Uma consulta guardada com nome, usada como se fosse tabela.",
+      "Um índice sobre várias colunas.",
+      "Uma tabela temporária que some ao fechar."
+    ],
+    certa: 1,
+    porque: "A view não guarda dados: ela roda a consulta na hora, então mostra sempre o dado atual."
+  },
+  {
+    p: "Qual comando cria uma view?",
+    codigo: null, mono: true,
+    alts: [
+      "CREATE VIEW vw_ativos (SELECT id_cliente FROM clientes);",
+      "CREATE TABLE VIEW vw_ativos AS SELECT * FROM clientes;",
+      "NEW VIEW vw_ativos = SELECT * FROM clientes;",
+      "CREATE VIEW vw_ativos AS SELECT id_cliente, nome FROM clientes WHERE status_cliente = 'ativo';"
+    ],
+    certa: 3,
+    porque: "CREATE VIEW nome AS + a consulta."
+  },
+  {
+    p: "Para que serve um <b>índice</b>?",
+    codigo: null, mono: false,
+    alts: [
+      "Impedir valores repetidos numa coluna.",
+      "Guardar uma consulta com nome.",
+      "Achar linhas mais rápido, como o dedo no dicionário.",
+      "Ordenar a tabela no disco para sempre."
+    ],
+    certa: 2,
+    porque: "O UNIQUE INDEX também impede repetição, mas o objetivo do índice comum é velocidade. O preço é a gravação ficar um pouco mais lenta."
+  },
+  {
+    p: "Qual comando cria um índice na coluna <b>cidade</b> de <b>clientes</b>?",
+    codigo: null, mono: true,
+    alts: [
+      "CREATE INDEX idx_clientes_cidade ON clientes (cidade);",
+      "CREATE INDEX ON clientes (cidade) AS idx_clientes_cidade;",
+      "ALTER TABLE clientes ADD INDEX cidade;",
+      "INDEX clientes (cidade);"
+    ],
+    certa: 0,
+    porque: "CREATE INDEX nome ON tabela (coluna);"
+  },
+  {
+    p: "O que faz o <code>INSERT OR IGNORE</code>?",
+    codigo: null, mono: false,
+    alts: [
+      "Substitui a linha existente pela nova.",
+      "Tenta inserir e, se a chave já existir, não faz nada e não dá erro.",
+      "Insere sempre, criando linha repetida.",
+      "Ignora as colunas que você não informou."
+    ],
+    certa: 1,
+    porque: "Quem substitui é o INSERT OR REPLACE. O OR IGNORE simplesmente deixa passar."
+  },
+  {
+    p: "Você quer inserir e, <b>se já existir</b>, atualizar só o preço. Qual forma serve?",
+    codigo: null, mono: true,
+    alts: [
+      "INSERT INTO produtos (...) VALUES (...) IF EXISTS UPDATE preco;",
+      "UPDATE OR INSERT produtos SET preco = 8.00;",
+      "INSERT INTO produtos (...) VALUES (...) ON CONFLICT(id_produto) DO UPDATE SET preco = excluded.preco;",
+      "INSERT INTO produtos (...) VALUES (...) OR UPDATE preco;"
+    ],
+    certa: 2,
+    porque: "O excluded guarda o valor que você tentou inserir. No MySQL isso se escreve ON DUPLICATE KEY UPDATE."
+  },
+  {
+    p: "O <b>TRUNCATE TABLE</b> existe no MySQL. E no SQLite?",
+    codigo: null, mono: false,
+    alts: [
+      "Existe e faz a mesma coisa.",
+      "Existe, mas apaga a tabela inteira.",
+      "Existe só dentro de uma transação.",
+      "Não existe: usa-se DELETE FROM tabela; para o mesmo efeito."
+    ],
+    certa: 3,
+    porque: "No MySQL o TRUNCATE é mais rápido e ainda zera o AUTO_INCREMENT. No SQLite o caminho é o DELETE sem WHERE."
+  },
+  {
+    p: "No MySQL a coluna que se numera sozinha é <code>AUTO_INCREMENT</code>. Qual o equivalente aqui?",
+    codigo: null, mono: false,
+    alts: [
+      "Usar AUTOINCREMENT sozinho, sem PRIMARY KEY.",
+      "Declarar a coluna como INTEGER PRIMARY KEY.",
+      "Usar DEFAULT NEXT.",
+      "Não existe: o id tem que ser sempre informado."
+    ],
+    certa: 1,
+    porque: "Uma INTEGER PRIMARY KEY no SQLite já se numera sozinha quando você deixa o id de fora do INSERT."
+  },
+  {
+    p: "Você precisa <b>mudar o tipo</b> de uma coluna no SQLite. Qual é o caminho?",
+    codigo: null, mono: false,
+    alts: [
+      "Criar a tabela nova com o tipo certo, copiar os dados e derrubar a antiga.",
+      "Usar ALTER TABLE ... MODIFY COLUMN.",
+      "Usar UPDATE para trocar o tipo linha a linha.",
+      "Não é possível de jeito nenhum."
+    ],
+    certa: 0,
+    porque: "O MODIFY COLUMN é do MySQL. Aqui o contorno é criar, copiar e derrubar."
+  },
+  {
+    p: "Para que servem <code>GRANT</code> e <code>REVOKE</code> no MySQL?",
+    codigo: null, mono: false,
+    alts: [
+      "Criar e apagar tabelas.",
+      "Confirmar e desfazer transações.",
+      "Criar e remover índices.",
+      "Dar e tirar permissões de usuários sobre o banco."
+    ],
+    certa: 3,
+    porque: "São o DCL, o controle de quem pode o quê. O SQLite não os tem porque não tem usuários: quem abre o arquivo pode tudo."
+  },
+  {
+    p: "O que este comando faz?",
+    codigo: "INSERT INTO backup (id, nome)\nSELECT id_cliente, nome FROM clientes WHERE cidade = 'Serra';", mono: false,
+    alts: [
+      "Cria a tabela backup com os clientes de Serra.",
+      "Copia para a tabela backup os clientes de Serra.",
+      "Apaga os clientes de Serra depois de copiar.",
+      "Dá erro: INSERT não aceita SELECT."
+    ],
+    certa: 1,
+    porque: "No lugar do VALUES entra um SELECT. A tabela backup já precisa existir — o INSERT não a cria."
+  },
+  {
+    p: "Qual comando apaga <b>só os pedidos cancelados</b>?",
+    codigo: null, mono: true,
+    alts: [
+      "DELETE FROM pedidos WHERE status = 'cancelado';",
+      "DELETE pedidos WHERE status = 'cancelado';",
+      "DROP FROM pedidos WHERE status = 'cancelado';",
+      "DELETE FROM pedidos IF status = 'cancelado';"
+    ],
+    certa: 0,
+    porque: "DELETE FROM tabela WHERE condição; — o FROM é obrigatório."
+  },
+  {
+    p: "Qual restrição garante que a nota fique <b>entre 0 e 10</b>?",
+    codigo: null, mono: true,
+    alts: [
+      "nota INTEGER DEFAULT 0 AND 10",
+      "nota INTEGER UNIQUE (0,10)",
+      "nota INTEGER CHECK (nota BETWEEN 0 AND 10)",
+      "nota INTEGER NOT NULL (0-10)"
+    ],
+    certa: 2,
+    porque: "O CHECK impõe uma condição que toda linha tem de cumprir, na gravação e na atualização."
+  },
+  {
+    p: "Antes de apagar 5.000 linhas em produção, o que é mais prudente?",
+    codigo: null, mono: false,
+    alts: [
+      "Apagar direto: dá para restaurar do backup depois.",
+      "Rodar o SELECT com o mesmo WHERE, conferir o que vem, e abrir uma transação.",
+      "Apagar sem WHERE e reinserir só o que importa.",
+      "Derrubar a tabela e recriar."
+    ],
+    certa: 1,
+    porque: "O SELECT mostra exatamente quais linhas o WHERE alcança, e a transação permite voltar atrás se algo vier errado."
+  },
+  {
+    p: "O que acontece ao apagar um pedido que ainda tem itens ligados a ele?",
+    codigo: null, mono: false,
+    alts: [
+      "O banco apaga os itens junto, sempre.",
+      "O comando é recusado em qualquer banco.",
+      "Os itens viram NULL automaticamente.",
+      "Os itens ficam órfãos, apontando para um pedido que não existe mais."
+    ],
+    certa: 3,
+    porque: "Sem uma regra de exclusão em cascata, os filhos ficam órfãos. Por isso se apaga o filho antes do pai."
   }
 ];
 
@@ -677,7 +675,7 @@ async function registrar(acertos, total){
   try {
     const { error } = await sb.from('topicos').insert({
       autor_id: eu.id,
-      titulo: 'Desafio (Boss do Ato IV)' + (eu.celula ? ' · ' + eu.celula : ''),
+      titulo: 'Desafio (Vistoria da obra)' + (eu.celula ? ' · ' + eu.celula : ''),
       corpo: 'Resultado do Desafio: ' + acertos + '/' + total + ' acertos = ' + (acertos * 10) + ' XP.',
       categoria: 'entrega',
       missao: 6

@@ -4,7 +4,7 @@
    cai no que ficou guardado. Assim o app abre mesmo sem internet, mas não
    trava numa versão velha quando há conexão. */
 
-const CACHE = 'sindicato-v3';
+const CACHE = 'sindicato-v4';
 
 // o essencial para a casca do app abrir offline
 const BASICO = [
@@ -14,6 +14,7 @@ const BASICO = [
   'assets/nav.js', 'assets/quadro.js', 'assets/placar.js',
   'assets/entrar.js', 'assets/forum.js',
   'laboratorio.html', 'assets/laboratorio.js', 'assets/aurora-db.sql.js',
+  'laboratorio2.html', 'assets/laboratorio2.js', 'desafio2.html',
   'favicon.svg', 'icon-192.png', 'icon-512.png', 'manifest.json'
 ];
 
