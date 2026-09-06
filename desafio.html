@@ -21,9 +21,12 @@
 .palco{padding:30px 0 60px}
 [hidden]{display:none!important}
 
-.abertura{border:2px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);background:var(--papel);padding:26px 26px 30px;max-width:680px;margin-top:26px}
+/* O texto usa a linha toda: os limites em ch quebravam a frase cedo e
+   deixavam meia página em branco à direita. */
+.subtitulo{max-width:none}
+.abertura{border:2px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);background:var(--papel);padding:26px 26px 30px;max-width:none;margin-top:26px}
 .abertura h2{font-family:'Saira Condensed',sans-serif;font-weight:800;text-transform:uppercase;font-size:26px;margin-bottom:10px;line-height:1.05}
-.abertura p{color:var(--tinta-fraca);font-size:17px;max-width:60ch;margin-bottom:10px}
+.abertura p{color:var(--tinta-fraca);font-size:17px;max-width:none;margin-bottom:10px}
 .abertura .acoes{margin-top:20px}
 
 /* barra de progresso */
@@ -65,15 +68,15 @@
 .pergunta-pe{margin-top:18px;display:flex;justify-content:flex-end}
 
 /* tela final */
-.final{border:2px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);background:var(--papel);padding:26px 26px 24px;text-align:center;max-width:520px}
+.final{border:2px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);background:var(--papel);padding:26px 26px 24px;text-align:center;max-width:none}
 .final .nota{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:58px;line-height:1;color:var(--carimbo);margin:4px 0 10px}
 .final-linha{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:14px}
 .final .patente-sel{display:inline-block;font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:14px;font-weight:600;border:2px solid var(--tinta);padding:5px 14px}
 .final-pct{font-family:'Saira Condensed',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-weight:800;font-size:16px;color:var(--tinta)}
 .final-xp{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--tinta-fraca);background:var(--papel-barra);border:2px solid var(--tinta);padding:9px 16px;display:inline-block;margin-bottom:14px}
 .final-xp b{color:var(--carimbo);font-size:22px;vertical-align:-1px}
-.final-recado{color:var(--tinta-fraca);font-size:15.5px;line-height:1.45;max-width:42ch;margin:0 auto 12px}
-.final-reg{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.45;color:var(--tinta-fraca);max-width:42ch;margin:0 auto}
+.final-recado{color:var(--tinta-fraca);font-size:15.5px;line-height:1.45;max-width:none;margin:0 auto 12px}
+.final-reg{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.45;color:var(--tinta-fraca);max-width:none;margin:0 auto}
 .final .acoes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
 
 @media(max-width:860px){
@@ -539,7 +542,9 @@ let eu = null;             // perfil do filiado logado
       const { data } = await sb.from('topicos')
         .select('corpo, criado_em')
         .eq('autor_id', eu.id)
-        .ilike('titulo', 'Desafio%')
+        /* só a entrega DESTE desafio: 'Desafio%' casava com a do outro,
+           e quem tinha feito o I chegava no II já travado. */
+        .ilike('titulo', 'Desafio (Boss do Ato IV)%')
         .limit(1);
       if (data && data.length) { travarFeito(data[0]); return; }
     } catch (e) { /* se a checagem falhar, deixa passar para não travar por engano */ }
@@ -554,7 +559,9 @@ let eu = null;             // perfil do filiado logado
 function travarFeito(reg){
   $('#carregando').hidden = true;
   $('#abertura').hidden = true;
-  const seu = (reg && reg.corpo) ? String(reg.corpo).replace('Resultado do Desafio:', '').trim() : '';
+  const seu = (reg && reg.corpo)
+    ? String(reg.corpo).replace('Resultado do Desafio:', '').trim().replace(/\.$/, '')
+    : '';
   const t = $('#trava');
   t.innerHTML = `
     <h2>Você já enfrentou o Boss</h2>
