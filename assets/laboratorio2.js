@@ -635,8 +635,13 @@ function montarMateria() {
     e.preventDefault();
     const cx = document.getElementById('materiaCx');
     if (cx) cx.open = false;
-    const barra = document.getElementById('progresso');
-    const folga = (barra && !barra.hidden ? barra.offsetHeight : 0) + 16;
+    /* O que fica grudado no topo: a barra do site mais, logo abaixo, a barra
+       de progresso. A lição precisa parar abaixo das duas. */
+    const barraSite = document.querySelector('.nav');
+    const barraProg = document.getElementById('progresso');
+    const folga = (barraSite ? barraSite.offsetHeight : 0)
+                + (barraProg && !barraProg.hidden ? barraProg.offsetHeight + 6 : 0)
+                + 12;
     /* Fechar o painel encurta a página acima do destino, então é preciso
        forçar o recálculo do layout ANTES de medir — daí a leitura de
        offsetHeight, cujo valor não interessa.

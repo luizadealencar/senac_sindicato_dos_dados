@@ -95,7 +95,25 @@ function montar() {
   /* a mesma medida do CSS: ao voltar para tela larga a gaveta some sozinha */
   matchMedia('(min-width: 981px)').addEventListener('change', e => { if (e.matches) fechar(); });
 
+  medirAltura();
   pintarSessao();
+}
+
+/* A altura da barra vira --nav-h, para quem gruda logo abaixo dela (a barra
+   de progresso do laboratório) saber onde parar. Sem isso ela colava em
+   top:0, atrás da barra, e sobrava uma faixa cortada aparecendo por baixo.
+   Mede só a .nav-in: com a gaveta aberta no celular a .nav inteira cresce,
+   e não é isso que empurra o conteúdo. */
+function medirAltura() {
+  const dentro = nav.querySelector('.nav-in');
+  if (!dentro) return;
+  const anotar = () => {
+    const h = Math.ceil(dentro.getBoundingClientRect().height) + 3;  /* + a borda */
+    document.documentElement.style.setProperty('--nav-h', h + 'px');
+  };
+  anotar();
+  if (window.ResizeObserver) new ResizeObserver(anotar).observe(dentro);
+  else addEventListener('resize', anotar);
 }
 
 async function pintarSessao() {
