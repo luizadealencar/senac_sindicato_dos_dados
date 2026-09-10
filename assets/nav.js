@@ -105,14 +105,17 @@ function montar() {
    Mede só a .nav-in: com a gaveta aberta no celular a .nav inteira cresce,
    e não é isso que empurra o conteúdo. */
 function medirAltura() {
-  const dentro = nav.querySelector('.nav-in');
-  if (!dentro) return;
   const anotar = () => {
-    const h = Math.ceil(dentro.getBoundingClientRect().height) + 3;  /* + a borda */
+    /* Com a gaveta aberta no celular a barra cresce, mas não é isso que
+       cobre o topo da página — nessa hora a medida de antes continua boa. */
+    if (nav.classList.contains('aberto')) return;
+    const h = Math.ceil(nav.getBoundingClientRect().height);
     document.documentElement.style.setProperty('--nav-h', h + 'px');
   };
   anotar();
-  if (window.ResizeObserver) new ResizeObserver(anotar).observe(dentro);
+  /* remede quando as fontes chegam: até lá a barra pode estar mais alta */
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(anotar);
+  if (window.ResizeObserver) new ResizeObserver(anotar).observe(nav);
   else addEventListener('resize', anotar);
 }
 

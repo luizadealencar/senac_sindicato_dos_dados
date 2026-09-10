@@ -640,7 +640,7 @@ function montarMateria() {
     const barraSite = document.querySelector('.nav');
     const barraProg = document.getElementById('progresso');
     const folga = (barraSite ? barraSite.offsetHeight : 0)
-                + (barraProg && !barraProg.hidden ? barraProg.offsetHeight + 6 : 0)
+                + (barraProg && !barraProg.hidden ? barraProg.offsetHeight : 0)
                 + 12;
     /* Fechar o painel encurta a página acima do destino, então é preciso
        forçar o recálculo do layout ANTES de medir — daí a leitura de
