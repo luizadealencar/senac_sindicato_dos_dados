@@ -117,7 +117,10 @@ function medirAltura() {
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(anotar);
   /* border-box: é a altura total que cobre o topo, com bordas e recheio */
   if (window.ResizeObserver) new ResizeObserver(anotar).observe(nav, { box: 'border-box' });
-  else addEventListener('resize', anotar);
+  /* e o resize da janela também, sempre: os dois juntos, porque a conta
+     errada aqui deixa a barra de progresso presa no lugar errado */
+  addEventListener('resize', anotar);
+  addEventListener('orientationchange', anotar);
 }
 
 async function pintarSessao() {
