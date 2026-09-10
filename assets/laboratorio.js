@@ -844,6 +844,18 @@ function ligarInteracoes() {
     espera = setTimeout(salvarEstado, 600);
   });
 
+  /* Ctrl+Enter (ou Cmd+Enter) confere sem tirar a mão do teclado — o mesmo
+     atalho que já existe no console livre. Pedido em aula. */
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || !(e.ctrlKey || e.metaKey)) return;
+    const ta = e.target;
+    if (ta.tagName !== 'TEXTAREA') return;
+    const caso = ta.closest('.desafio');
+    if (!caso) return;
+    e.preventDefault();
+    caso.querySelector('[data-conferir]')?.click();
+  });
+
   document.addEventListener('click', e => {
     const alvo = e.target.closest('button');
     if (!alvo) return;
