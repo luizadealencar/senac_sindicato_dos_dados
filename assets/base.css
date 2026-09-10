@@ -204,7 +204,7 @@ img{max-width:100%;height:auto}
   font-size:clamp(44px,11vw,110px);line-height:.88;letter-spacing:-.01em;margin:24px 0 13px
 }
 .titulo em{font-style:normal;color:var(--carimbo)}
-.subtitulo{max-width:52ch;font-size:clamp(17px,4.4vw,20px)}
+.subtitulo{font-size:clamp(17px,4.4vw,20px)}
 
 /* ==========================================================================
    FORMULÁRIOS E BOTÕES
