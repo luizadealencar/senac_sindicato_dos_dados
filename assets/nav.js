@@ -115,7 +115,8 @@ function medirAltura() {
   anotar();
   /* remede quando as fontes chegam: até lá a barra pode estar mais alta */
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(anotar);
-  if (window.ResizeObserver) new ResizeObserver(anotar).observe(nav);
+  /* border-box: é a altura total que cobre o topo, com bordas e recheio */
+  if (window.ResizeObserver) new ResizeObserver(anotar).observe(nav, { box: 'border-box' });
   else addEventListener('resize', anotar);
 }
 
